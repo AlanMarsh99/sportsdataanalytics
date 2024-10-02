@@ -34,10 +34,9 @@ This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing
 
 1. Clone the repository:
 
-    git clone https://github.com/yourusername/f1-data-analytics-tool.git
+    git clone https://github.com/stifnes/sports-data-analytics.git
 
 2. Navigate to the project directory:
 
     cd sports-data-analytics
 
-...
