@@ -47,5 +47,5 @@
 
 ## Next Meeting:
 
-- Date: 1/9/2024
+- Date: 1/10/2024
 - Tasks to be reviewed: Tech stack and system diagram, project plan document and presentation.
