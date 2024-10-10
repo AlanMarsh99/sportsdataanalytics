@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/screens/drivers_screen.dart';
+import 'package:frontend/ui/screens/login_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 void main() {
@@ -13,8 +14,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: theme,
-      home: DriversScreen(),
+      home: LoginScreen()
+      //DriversScreen(),
     );
   }
 }
