@@ -25,20 +25,7 @@ class _DriversScreenState extends State<DriversScreen> {
           ),
         ),
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: primary,
-            leading: const Icon(
-              Icons.menu,
-              color: Colors.white,
-            ), // Menu icon
-            actions: [
-              const CircleAvatar(
-                backgroundImage:
-                    NetworkImage('https://example.com/profile.jpg'),
-              ),
-              const SizedBox(width: 10),
-            ],
-          ),
+         
           body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
