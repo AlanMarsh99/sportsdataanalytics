@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/screens/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
 
 class DriversScreen extends StatefulWidget {
   const DriversScreen({
@@ -93,22 +94,27 @@ class _DriversScreenState extends State<DriversScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 //const Spacer(),
-               Align(
-  alignment: Alignment.centerRight,
-  child: TextButton(
-    onPressed: () {
-      // Navigate to the "All Races" screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => DriverAllRacesScreen()),
-      );
-    },
-    child: const Text(
-      'All races >',
-      style: TextStyle(color: Colors.white),
-    ),
-  ),
-),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: TextButton(
+                    onPressed: () {
+                      // Navigate to the "All Races" screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DriverAllRacesScreen()),
+                      );
+                    },
+                    child: const Text(
+                      'All races >',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Center(child: DriverSeasonsTable(),
+                ),),
               ],
             ),
           ),
