@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/screens/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 class DriversScreen extends StatefulWidget {
@@ -63,7 +64,7 @@ class _DriversScreenState extends State<DriversScreen> {
                 Container(
                   alignment: Alignment.centerLeft,
                   child: const TabBar(
-                    padding: EdgeInsets.only(left: 6),
+                    //padding: EdgeInsets.only(left: 6),
                     labelColor: redAccent,
                     unselectedLabelColor: Colors.white,
                     indicatorColor: redAccent,
@@ -92,16 +93,22 @@ class _DriversScreenState extends State<DriversScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 //const Spacer(),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // Navigate to the "All Races" screen
-                    },
-                    child: const Text('All races >',
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                ),
+               Align(
+  alignment: Alignment.centerRight,
+  child: TextButton(
+    onPressed: () {
+      // Navigate to the "All Races" screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DriverAllRacesScreen()),
+      );
+    },
+    child: const Text(
+      'All races >',
+      style: TextStyle(color: Colors.white),
+    ),
+  ),
+),
               ],
             ),
           ),
@@ -191,7 +198,8 @@ class _DriversScreenState extends State<DriversScreen> {
               ),
               Visibility(
                 visible: hasPercentage,
-                child: const SizedBox(width: 10),),
+                child: const SizedBox(width: 10),
+              ),
               Visibility(
                 visible: hasPercentage,
                 child: Text(
@@ -207,7 +215,8 @@ class _DriversScreenState extends State<DriversScreen> {
           const SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ],
       ),
