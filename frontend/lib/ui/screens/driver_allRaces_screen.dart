@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/tables/driver_allRaces_table.dart';
 
 class DriverAllRacesScreen extends StatefulWidget {
   const DriverAllRacesScreen({
@@ -38,8 +39,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
+          child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
@@ -67,9 +67,12 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                 ),
                 const SizedBox(height: 20),
                 _buildRacesOverviewContainers(),
-                const SizedBox(height: 10),
+                const SizedBox(height: 30),
+                Expanded(
+                  child: RaceTableScreen(),
+                ),
               ],
-            ),
+            
           ),
         ),
       ),
