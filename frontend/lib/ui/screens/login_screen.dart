@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/drivers_screen.dart';
+import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/screens/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
@@ -263,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
     //if (auth.status == Status.Authenticated) {
     await Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const DriversScreen()
+      MaterialPageRoute(builder: (context) => const NavigationScreen()
           //NavigationScreen(),
           ),
     );

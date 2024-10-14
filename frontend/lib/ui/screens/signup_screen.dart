@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/drivers_screen.dart';
+import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -304,7 +305,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     await Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const DriversScreen()
+      MaterialPageRoute(builder: (context) => const NavigationScreen()
           //NavigationScreen(),
           ),
     );
