@@ -23,7 +23,6 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
       ),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-       
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(

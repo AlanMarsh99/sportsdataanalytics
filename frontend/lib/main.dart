@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
-import 'package:frontend/ui/screens/login_screen.dart';
+import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
