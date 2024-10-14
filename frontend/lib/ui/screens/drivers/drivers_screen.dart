@@ -27,7 +27,8 @@ class _DriversScreenState extends State<DriversScreen> {
         child: Scaffold(
           body: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
+            child: SingleChildScrollView(child:
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
@@ -98,13 +99,14 @@ class _DriversScreenState extends State<DriversScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Expanded(
+                Container(
+                  height: 400,
                   child: Center(
                     child: DriverSeasonsTable(),
                   ),
                 ),
               ],
-            ),
+            ),),
           ),
         ),
       ),

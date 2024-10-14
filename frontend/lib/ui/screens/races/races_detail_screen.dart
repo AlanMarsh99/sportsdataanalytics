@@ -29,116 +29,123 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
         child: Scaffold(
           body: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.race.name,
-                  style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Flexible(
-                      flex: 2,
-                      fit: FlexFit.tight,
-                      child: _buildSquareCard(
-                        'Round',
-                        widget.race.round,
-                      ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 25),
+                    child: Text(
+                      widget.race.name,
+                      style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
-                    const SizedBox(width: 16),
-                    Flexible(
-                      flex: 2,
-                      fit: FlexFit.tight,
-                      child: _buildSquareCard(
-                        'Date',
-                        Globals.toDateFormat(widget.race.date),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Flexible(
-                      flex: 2,
-                      fit: FlexFit.tight,
-                      child: _buildSquareCard(
-                        'Location',
-                        widget.race.location,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Flexible(
-                      flex: 2,
-                      fit: FlexFit.tight,
-                      child: _buildSquareCard('Circuit', widget.race.circuit),
-                    ),
-                  ],
-                ),
+                  ),
 
-                const SizedBox(height: 12),
-                _buildInfoContainer('Winner', widget.race.winner),
-                const SizedBox(height: 12),
-                _buildInfoContainer('Winning time', widget.race.winningTime),
-                const SizedBox(height: 12),
-                _buildInfoContainer('Pole position', widget.race.polePosition),
-                const SizedBox(height: 12),
-                _buildInfoContainer('Fastest lap', widget.race.fastestLap),
-                const SizedBox(height: 12),
-                _buildInfoContainer(
-                    'Fastest lap time', widget.race.fastestLapTime),
-                const SizedBox(height: 12),
-                _buildInfoContainer(
-                    'Fastest pitstop', widget.race.fastestPitStop),
-                const SizedBox(height: 12),
-                _buildInfoContainer(
-                    'Fastest pitstop time', widget.race.fastestPitStopTime),
-                const SizedBox(height: 12),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: const TabBar(
-                    //padding: EdgeInsets.only(left: 6),
-                    labelColor: redAccent,
-                    unselectedLabelColor: Colors.white,
-                    indicatorColor: redAccent,
-                    dividerHeight: 0,
-                    isScrollable: true,
-                    tabs: [
-                      Tab(text: "Results"),
-                      Tab(text: "Lap graphs"),
-                      Tab(text: "Lap times"),
-                      Tab(text: "Pit stops"),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // TabBarView for the content of each tab
-                Expanded(
-                  child: TabBarView(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Center(
-                        child: DriverSeasonsTable(),
+                      Flexible(
+                        flex: 2,
+                        fit: FlexFit.tight,
+                        child: _buildSquareCard(
+                          'Round',
+                          widget.race.round,
+                        ),
                       ),
-                      Center(
-                        child: DriverSeasonsTable(),
-                      ),
-                      Center(
-                        child: DriverSeasonsTable(),
-                      ),
-                      Center(
-                        child: DriverSeasonsTable(),
+                      const SizedBox(width: 16),
+                      Flexible(
+                        flex: 2,
+                        fit: FlexFit.tight,
+                        child: _buildSquareCard(
+                          'Date',
+                          Globals.toDateFormat(widget.race.date),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Flexible(
+                        flex: 2,
+                        fit: FlexFit.tight,
+                        child: _buildSquareCard(
+                          'Location',
+                          widget.race.location,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Flexible(
+                        flex: 2,
+                        fit: FlexFit.tight,
+                        child: _buildSquareCard('Circuit', widget.race.circuit),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+                  _buildInfoContainer('Winner', widget.race.winner),
+                  const SizedBox(height: 12),
+                  _buildInfoContainer('Winning time', widget.race.winningTime),
+                  const SizedBox(height: 12),
+                  _buildInfoContainer(
+                      'Pole position', widget.race.polePosition),
+                  const SizedBox(height: 12),
+                  _buildInfoContainer('Fastest lap', widget.race.fastestLap),
+                  const SizedBox(height: 12),
+                  _buildInfoContainer(
+                      'Fastest lap time', widget.race.fastestLapTime),
+                  const SizedBox(height: 12),
+                  _buildInfoContainer(
+                      'Fastest pitstop', widget.race.fastestPitStop),
+                  const SizedBox(height: 12),
+                  _buildInfoContainer(
+                      'Fastest pitstop time', widget.race.fastestPitStopTime),
+                  const SizedBox(height: 12),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: const TabBar(
+                      //padding: EdgeInsets.only(left: 6),
+                      labelColor: redAccent,
+                      unselectedLabelColor: Colors.white,
+                      indicatorColor: redAccent,
+                      dividerHeight: 0,
+                      isScrollable: true,
+                      tabs: [
+                        Tab(text: "Results"),
+                        Tab(text: "Lap graphs"),
+                        Tab(text: "Lap times"),
+                        Tab(text: "Pit stops"),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // TabBarView for the content of each tab
+                  Container(
+                    height: 500,
+                    child: TabBarView(
+                      children: [
+                        Center(
+                          child: DriverSeasonsTable(),
+                        ),
+                        Center(
+                          child: DriverSeasonsTable(),
+                        ),
+                        Center(
+                          child: DriverSeasonsTable(),
+                        ),
+                        Center(
+                          child: DriverSeasonsTable(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

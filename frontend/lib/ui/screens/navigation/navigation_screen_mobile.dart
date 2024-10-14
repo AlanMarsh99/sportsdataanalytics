@@ -81,7 +81,7 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
 
   Widget _buildDrawerItem(BuildContext context, String title, int value) {
     bool isSelected =
-        title == widget.nav.screenTitle; // Verifica si es la pantalla actual
+        value == widget.nav.selectedIndex; // Verifica si es la pantalla actual
     return TextButton(
       child: Text(
         title,
