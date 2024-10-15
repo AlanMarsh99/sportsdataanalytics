@@ -198,8 +198,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         const SizedBox(height: 10.0),
-        GestureDetector(
-          onTap: () {
+        TextButton(
+          onPressed: () {
             // Navigator.push(
             //   context,
             //   MaterialPageRoute(
