@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/screens/driver_allRaces_screen.dart';
+import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
 
@@ -25,10 +25,10 @@ class _DriversScreenState extends State<DriversScreen> {
           ),
         ),
         child: Scaffold(
-         
           body: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
+            child: SingleChildScrollView(child:
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
@@ -99,11 +99,14 @@ class _DriversScreenState extends State<DriversScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Expanded(
-                  child: Center(child: DriverSeasonsTable(),
-                ),),
+                Container(
+                  height: 400,
+                  child: Center(
+                    child: DriverSeasonsTable(),
+                  ),
+                ),
               ],
-            ),
+            ),),
           ),
         ),
       ),
@@ -142,16 +145,34 @@ class _DriversScreenState extends State<DriversScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildStatCard(61, 203, 'WINS', true),
-            _buildStatCard(109, 203, 'PODIUMS', true),
+            Flexible(
+              flex: 2,
+              fit: FlexFit.tight,
+              child: _buildStatCard(61, 203, 'WINS', true),
+            ),
+            SizedBox(width: 16),
+            Flexible(
+              flex: 2,
+              fit: FlexFit.tight,
+              child: _buildStatCard(109, 203, 'PODIUMS', true),
+            ),
           ],
         ),
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildStatCard(3, 10, 'CHAMPIONSHIPS', false),
-            _buildStatCard(40, 203, 'POLE POSITIONS', false),
+            Flexible(
+              flex: 2,
+              fit: FlexFit.tight,
+              child: _buildStatCard(3, 10, 'CHAMPIONSHIPS', false),
+            ),
+            SizedBox(width: 16),
+            Flexible(
+              flex: 2,
+              fit: FlexFit.tight,
+              child: _buildStatCard(40, 203, 'POLE POSITIONS', false),
+            )
           ],
         ),
       ],

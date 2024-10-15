@@ -23,44 +23,48 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
       ),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-       
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'DRIVERS',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              const SizedBox(height: 16),
-              _buildDriverDropdown(),
-              const SizedBox(height: 40),
-              Row(
-                children: [
-                  const Text(
-                    'RACES OVERVIEW',
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 25, bottom: 10),
+                  child: Text(
+                    'DRIVERS',
                     style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
-                  const SizedBox(width: 29),
-                  _buildYearDropdown(),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _buildRacesOverviewContainers(),
-              const SizedBox(height: 30),
-              Expanded(
-                child: Center(
-                  child: DriverAllRacesTableScreen(),
                 ),
-              ),
-            ],
+                _buildDriverDropdown(),
+                const SizedBox(height: 40),
+                Row(
+                  children: [
+                    const Text(
+                      'RACES OVERVIEW',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                    const SizedBox(width: 29),
+                    _buildYearDropdown(),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _buildRacesOverviewContainers(),
+                const SizedBox(height: 30),
+                Container(
+                  height: 500,
+                  child: Center(
+                    child: DriverAllRacesTableScreen(),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

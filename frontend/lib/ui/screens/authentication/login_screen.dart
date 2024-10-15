@@ -1,29 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/shared/globals.dart';
-import 'package:frontend/ui/screens/drivers_screen.dart';
+import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
+import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
-class SignUpScreen extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _repeatPasswordController = TextEditingController();
   bool _passwordVisible = false;
-  bool _repeatPasswordVisible = false;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _usernameController.dispose();
     _passwordController.dispose();
-    _repeatPasswordController.dispose();
     super.dispose();
   }
 
@@ -52,7 +48,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       fit: BoxFit.cover,
                                       scale: 14)),*/
                 const Text(
-                  'Create an account',
+                  'Welcome back',
                   style: TextStyle(
                     color: Colors.white,
                     fontFamily: 'OpenSans',
@@ -60,20 +56,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 30.0),
+                const SizedBox(height: 28.0),
+                const Text(
+                  'Log in to play the F1 Predictions Challenge with your friends and win prizes!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'OpenSans',
+                    fontSize: 16.0,
+                  ),
+                ),
+                const SizedBox(height: 25.0),
                 _buildEmailTF(),
                 const SizedBox(
                   height: 30.0,
                 ),
-                _buildUsernameTF(),
-                const SizedBox(
-                  height: 30.0,
-                ),
                 _buildPasswordTF(),
-                const SizedBox(
-                  height: 30.0,
-                ),
-                _buildRepeatPasswordTF(),
                 const SizedBox(
                   height: 15,
                 ),
@@ -82,7 +79,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         color: secondary,
                       )
                     : */
-                _buildSignUpButton(/*auth*/),
+                _buildLogInButton(/*auth*/),
+                const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don't have an account?  ",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: secondary,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'OpenSans',
+                        ),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -119,41 +144,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 color: Colors.white,
               ),
               hintText: 'Enter your email',
-              hintStyle: Globals.kHintTextStyle,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUsernameTF() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Username',
-          style: Globals.kLabelStyle,
-        ),
-        const SizedBox(height: 10.0),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: Globals.kBoxDecorationStyle,
-          height: 60.0,
-          child: TextField(
-            controller: _usernameController,
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: 'OpenSans',
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.only(top: 14.0),
-              prefixIcon: const Icon(
-                Icons.person,
-                color: Colors.white,
-              ),
-              hintText: 'Enter your username',
               hintStyle: Globals.kHintTextStyle,
             ),
           ),
@@ -202,59 +192,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Icons.lock,
                 color: Colors.white,
               ),
-              hintText: 'Enter a password',
+              hintText: 'Enter your password',
               hintStyle: Globals.kHintTextStyle,
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRepeatPasswordTF() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Repeat password',
-          style: Globals.kLabelStyle,
         ),
         const SizedBox(height: 10.0),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: Globals.kBoxDecorationStyle,
-          height: 60.0,
-          child: TextField(
-            controller: _repeatPasswordController,
-            obscureText: !_repeatPasswordVisible,
-            style: const TextStyle(
-              color: Colors.white,
-              fontFamily: 'OpenSans',
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.only(top: 14.0),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  // Based on passwordVisible state choose the icon
-                  _repeatPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  // Update the state i.e. toogle the state of passwordVisible variable
-                  setState(() {
-                    _repeatPasswordVisible = !_repeatPasswordVisible;
-                  });
-                },
-              ),
-              prefixIcon: const Icon(
-                Icons.lock,
+        GestureDetector(
+          onTap: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => ForgotPasswordScreen(),
+            //   ),
+            // );
+          },
+          child: Container(
+            alignment: Alignment.centerRight,
+            child: const Text(
+              'Forgot password?',
+              style: TextStyle(
                 color: Colors.white,
+                fontWeight: FontWeight.normal,
+                fontFamily: 'OpenSans',
               ),
-              hintText: 'Enter the password',
-              hintStyle: Globals.kHintTextStyle,
             ),
           ),
         ),
@@ -262,7 +223,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildSignUpButton(/*AuthService auth*/) {
+  Widget _buildLogInButton(/*AuthService auth*/) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
@@ -277,7 +238,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: const EdgeInsets.all(2),
           child: const Center(
             child: Text(
-              'SIGN UP',
+              'LOG IN',
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 20,
@@ -288,26 +249,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
         onPressed: () async {
-          // Check if the passwords match
-
-          signUp(/*auth*/);
+          signIn(/*auth*/);
         },
       ),
     );
   }
 
-  void signUp(/*AuthService auth*/) async {
-    /*await auth.signUp(
+  void signIn(/*AuthService auth*/) async {
+    /*await auth.signIn(
       _emailController.text.trim(),
-      _usernameController.text.trim(),
       _passwordController.text,
     );*/
 
+    //if (auth.status == Status.Authenticated) {
     await Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const NavigationScreen()
           //NavigationScreen(),
           ),
     );
+    //}
+
+    /*if (auth.status == Status.Unauthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Wrong email or password.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }*/
   }
 }
