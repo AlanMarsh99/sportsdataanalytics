@@ -6,6 +6,9 @@ class Team {
   int podiums;
   String drivers;
   int seasonYear;
+  int polePositions;
+  int points;
+  int position;
   // List<Results> results;
   // List<Lap> laps;
   // List<Pitstop> pitstops;
@@ -18,6 +21,9 @@ class Team {
       required this.podiums,
       required this.drivers,
       required this.seasonYear,
+      required this.polePositions,
+      required this.points,
+      required this.position,
       // required this.results,
       // required this.laps,
       // required this.pitstops,

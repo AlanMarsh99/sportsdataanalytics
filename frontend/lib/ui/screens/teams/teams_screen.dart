@@ -20,6 +20,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -27,6 +30,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -34,6 +40,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -41,6 +50,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -48,6 +60,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -55,6 +70,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -62,6 +80,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -69,6 +90,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -76,6 +100,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
       Team(
@@ -83,6 +110,9 @@ class _TeamsScreenState extends State<TeamsScreen> {
           name: 'McLaren Racing',
           wins: 5,
           podiums: 18,
+          polePositions: 6,
+          points: 331,
+          position: 1,
           drivers: 'Lando Norris & Oscar Piastri',
           seasonYear: 2024),
     ];

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/team.dart';
+import 'package:frontend/ui/screens/teams/teams_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 class TeamsSeasonTable extends StatelessWidget {
@@ -61,22 +62,22 @@ class TeamsSeasonTable extends StatelessWidget {
                   ),
               
                 ],
-                rows: teams.map((teams) {
+                rows: teams.map((team) {
                   return DataRow(cells: [
                    
                     DataCell(
                       GestureDetector(
                         onTap: () {
-                          /*Navigator.push(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  RacesDetailScreen(race: teams),
+                                  TeamsDetailScreen(team: team),
                             ),
-                          );*/
+                          );
                         },
                         child: Text(
-                          teams.name,
+                          team.name,
                           style: const TextStyle(
                               color: lightGradient,
                               fontWeight: FontWeight.bold),
@@ -85,19 +86,19 @@ class TeamsSeasonTable extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        teams.wins.toString(),
+                        team.wins.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        teams.podiums.toString(),
+                        team.podiums.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        teams.drivers,
+                        team.drivers,
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
