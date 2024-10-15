@@ -87,6 +87,13 @@ Below are the results for each model:
 - **Recall**: 0.6857
 - **F1-Score**: 0.6658
 
+#### Stacked Logistic Regression/Random Forest Classifier
+- **Test AUC-ROC**: 0.9125
+- **Accuracy**: 0.8797
+- **Precision**: 0.6604
+- **Recall**: 0.6416
+- **F1-Score**: 0.6509
+
 ---
 
 ### Visualization
