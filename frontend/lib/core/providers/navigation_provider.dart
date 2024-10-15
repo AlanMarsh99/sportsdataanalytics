@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/races/races_screen.dart';
+import 'package:frontend/ui/screens/teams/teams_screen.dart';
 
 class NavigationProvider extends ChangeNotifier {
   NavigationProvider() {}
@@ -12,7 +13,7 @@ class NavigationProvider extends ChangeNotifier {
     const DriversScreen(),
     const RacesScreen(),
     const DriversScreen(),
-    const DriversScreen(),
+    const TeamsScreen(),
     const DriversScreen(),
     const DriversScreen(),
   ];
