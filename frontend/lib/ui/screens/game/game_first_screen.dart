@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/screens/game/game_predict_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 class GameFirstScreen extends StatefulWidget {
@@ -83,6 +84,7 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25.0),
       width: 200,
+      height: 100,
       child: ElevatedButton(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(secondary),
@@ -106,7 +108,14 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
             ),
           ),
         ),
-        onPressed: () async {},
+        onPressed: () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GamePredictScreen(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -114,12 +123,12 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
   Widget _buildSkipTextButton() {
     return TextButton(
       onPressed: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => ForgotPasswordScreen(),
-        //   ),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GamePredictScreen(),
+          ),
+        );
       },
       child: const Text(
         'Skip',
