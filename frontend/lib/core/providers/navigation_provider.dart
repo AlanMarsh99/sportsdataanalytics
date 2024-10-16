@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
+import 'package:frontend/ui/screens/game/game_first_screen.dart';
 import 'package:frontend/ui/screens/races/races_screen.dart';
+import 'package:frontend/ui/screens/teams/teams_screen.dart';
+import 'package:frontend/ui/theme.dart';
 
 class NavigationProvider extends ChangeNotifier {
   NavigationProvider() {}
@@ -12,34 +15,34 @@ class NavigationProvider extends ChangeNotifier {
     const DriversScreen(),
     const RacesScreen(),
     const DriversScreen(),
-    const DriversScreen(),
-    const DriversScreen(),
+    const TeamsScreen(),
+    const GameFirstScreen(),
     const DriversScreen(),
   ];
 
   final List<NavigationRailDestination> _destinations = [
     const NavigationRailDestination(
-      icon: Icon(Icons.calendar_month_outlined),
+      icon: Icon(Icons.home),
       label: Text('HOME'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.calendar_month_outlined),
+      icon: Icon(Icons.flag),
       label: Text('RACES'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.calendar_month_outlined),
+      icon: Icon(Icons.drive_eta_outlined),
       label: Text('DRIVERS'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.calendar_month_outlined),
+      icon: Icon(Icons.group),
       label: Text('TEAMS'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.calendar_month_outlined),
+      icon: Icon(Icons.play_arrow),
       label: Text('GAME'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.calendar_month_outlined),
+      icon: Icon(Icons.help),
       label: Text('USER MANUAL'),
     ),
     /*NavigationRailDestination(

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/race.dart';
-import 'package:frontend/core/shared/globals.dart';
-import 'package:frontend/ui/screens/races/races_detail_screen.dart';
+import 'package:frontend/core/models/team.dart';
+import 'package:frontend/ui/screens/teams/teams_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
-class RacesSeasonTable extends StatelessWidget {
-  const RacesSeasonTable({Key? key, required this.races}) : super(key: key);
+class TeamsSeasonTable extends StatelessWidget {
+  const TeamsSeasonTable({Key? key, required this.teams}) : super(key: key);
 
-  final List<Race> races;
+  final List<Team> teams;
 
   @override
   Widget build(BuildContext context) {
@@ -35,49 +34,37 @@ class RacesSeasonTable extends StatelessWidget {
                 columns: const [
                   DataColumn(
                     label: Text(
-                      'Date',
+                      'Team',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
                   DataColumn(
                     label: Text(
-                      'Race',
+                      'Wins',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
                   DataColumn(
                     label: Text(
-                      'Circuit',
+                      'Podiums',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
                   DataColumn(
                     label: Text(
-                      'Winner',
+                      'Drivers',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
-                  DataColumn(
-                    label: Text(
-                      'Pole position',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
+              
                 ],
-                rows: races.map((race) {
+                rows: teams.map((team) {
                   return DataRow(cells: [
-                    DataCell(
-                      Text(
-                        Globals.toDateFormat(race.date),
-                        style: const TextStyle(
-                            color: lightGradient, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                   
                     DataCell(
                       GestureDetector(
                         onTap: () {
@@ -85,12 +72,12 @@ class RacesSeasonTable extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  RacesDetailScreen(race: race),
+                                  TeamsDetailScreen(team: team),
                             ),
                           );
                         },
                         child: Text(
-                          race.name,
+                          team.name,
                           style: const TextStyle(
                               color: lightGradient,
                               fontWeight: FontWeight.bold),
@@ -99,19 +86,19 @@ class RacesSeasonTable extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        race.circuit,
+                        team.wins.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        race.winner,
+                        team.podiums.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        race.polePosition,
+                        team.drivers,
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
