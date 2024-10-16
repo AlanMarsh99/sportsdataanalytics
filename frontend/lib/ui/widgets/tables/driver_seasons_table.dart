@@ -88,146 +88,148 @@ class DriverSeasonsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
-    thumbVisibility: true, 
-    child: SingleChildScrollView(
-      scrollDirection: Axis.vertical, 
-      child: Scrollbar(
-    thumbVisibility: true, 
-    child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal, 
-        child: Container(
-          //padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: DataTable(
-            /*dataRowColor: MaterialStateProperty.resolveWith<Color?>(
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Scrollbar(
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              //padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: DataTable(
+                /*dataRowColor: MaterialStateProperty.resolveWith<Color?>(
             (Set<MaterialState> states) {
         
             return Colors.white;
       
         }),*/
-            columns: const [
-              DataColumn(
-                label: Text(
-                  'Year',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Position',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Points',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Races',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Wins',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Podiums',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Pole positions',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Team(s)',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-            ],
-            rows: driverSeasons.map((race) {
-              return DataRow(cells: [
-                DataCell(
-                  GestureDetector(
-                    onTap: () {
-                      // Navigate to the race details screen
-                      /*Navigator.push(
+                columns: const [
+                  DataColumn(
+                    label: Text(
+                      'Year',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Position',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Points',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Races',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Wins',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Podiums',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Pole positions',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Team(s)',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                ],
+                rows: driverSeasons.map((race) {
+                  return DataRow(cells: [
+                    DataCell(
+                      TextButton(
+                        onPressed: () {
+                          // Navigate to the race details screen
+                          /*Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => RaceDetailsScreen(race['name'])),
                     );*/
-                    },
-                    child: Text(
-                      race['year'],
-                      style: const TextStyle(
-                          color: lightGradient, fontWeight: FontWeight.bold),
+                        },
+                        child: Text(
+                          race['year'],
+                          style: const TextStyle(
+                              color: secondary, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                DataCell(
-                  _buildPositionContainer(race['position']),
-                ),
-                DataCell(
-                  Text(
-                    race['points'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    race['races'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    race['wins'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    race['podiums'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    race['polePositions'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    race['team'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-              ]);
-            }).toList(),
+                    DataCell(
+                      _buildPositionContainer(race['position']),
+                    ),
+                    DataCell(
+                      Text(
+                        race['points'].toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        race['races'].toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        race['wins'].toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        race['podiums'].toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        race['polePositions'].toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        race['team'].toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ]);
+                }).toList(),
+              ),
+            ),
           ),
         ),
-      ),),),
+      ),
     );
   }
 

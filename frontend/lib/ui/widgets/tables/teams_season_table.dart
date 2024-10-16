@@ -60,14 +60,12 @@ class TeamsSeasonTable extends StatelessWidget {
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
-              
                 ],
                 rows: teams.map((team) {
                   return DataRow(cells: [
-                   
                     DataCell(
-                      GestureDetector(
-                        onTap: () {
+                      TextButton(
+                        onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -79,7 +77,7 @@ class TeamsSeasonTable extends StatelessWidget {
                         child: Text(
                           team.name,
                           style: const TextStyle(
-                              color: lightGradient,
+                              color: secondary,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
