@@ -73,7 +73,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
             ),
             const SizedBox(height: 16),
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Center(
                 child: _countdownContainer(),
               ),
@@ -98,10 +98,16 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             decoration: BoxDecoration(
-              color: secondary,
+              //color: secondary,
+              border: Border.all(
+                color: secondary,
+                width: 2,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Text(
+            child: const Padding(
+              padding: EdgeInsets.all(5),
+              child: Text(
               'FORMULA 1 PIRELLI UNITED STATES GRAND PRIX 2024',
               style: TextStyle(
                 color: Colors.white,
@@ -109,9 +115,9 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
-            ),
+            ),),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
           const Text(
             'WIN POINTS, BADGES\nAND BE THE TOP IN THE LEADERBOARD!',
             style: TextStyle(
@@ -136,7 +142,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 18),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

@@ -75,12 +75,12 @@ class RacesSeasonTable extends StatelessWidget {
                       Text(
                         Globals.toDateFormat(race.date),
                         style: const TextStyle(
-                            color: lightGradient, fontWeight: FontWeight.bold),
+                            color: Colors.black),
                       ),
                     ),
                     DataCell(
-                      GestureDetector(
-                        onTap: () {
+                      TextButton(
+                        onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -92,7 +92,7 @@ class RacesSeasonTable extends StatelessWidget {
                         child: Text(
                           race.name,
                           style: const TextStyle(
-                              color: lightGradient,
+                              color: secondary,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
