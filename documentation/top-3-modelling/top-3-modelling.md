@@ -54,7 +54,7 @@ Several machine learning models were selected for training and evaluation:
 ### Hyperparameter Tuning
 To further improve the performance of each model, hyperparameter tuning was performed using GridSearchCV. Hyperparameter tuning allows us to search for the best combination of parameters that optimizes the model's performance based on a specified metric, in this case, F1 Score.
 
-For each model, a grid of hyperparameters was defined. These grids included ranges of values for key parameters such as the regularization strength in Logistic Regression, the number of neighbours in K-Nearest Neighbours, and the maximum depth and number of estimators in Random Forest and Decision Trees. We used GridSearchCV to perform a search over the hyperparameter grids. For each combination of hyperparameters, the model was trained and evaluated using 3-fold cross-validation to prevent overfitting.
+For each model, a grid of hyperparameters was defined. These grids included ranges of values for key parameters such as the regularization strength in Logistic Regression, the number of neighbours in K-Nearest Neighbours, and the maximum depth and number of estimators in Random Forest and Decision Trees. We used GridSearchCV to perform a search over the hyperparameter grids. For each combination of hyperparameters, the model was trained and evaluated using 10-fold cross-validation to prevent overfitting.
 
 ### Model Evaluation
 
