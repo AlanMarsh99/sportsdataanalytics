@@ -54,7 +54,7 @@ Several machine learning models were selected for training and evaluation:
 ### Hyperparameter Tuning
 To further improve the performance of each model, hyperparameter tuning was performed using GridSearchCV. Hyperparameter tuning allows us to search for the best combination of parameters that optimizes the model's performance based on a specified metric, in this case, F1 Score.
 
-For each model, a grid of hyperparameters was defined. These grids included ranges of values for key parameters such as the regularization strength in Logistic Regression, the number of neighbours in K-Nearest Neighbours, and the maximum depth and number of estimators in Random Forest and Decision Trees. We used GridSearchCV to perform an exhaustive search over the specified hyperparameter grids. For each combination of hyperparameters, the model was trained and evaluated using 3-fold cross-validation to prevent overfitting and ensure that the hyperparameters generalize well to unseen data.
+For each model, a grid of hyperparameters was defined. These grids included ranges of values for key parameters such as the regularization strength in Logistic Regression, the number of neighbours in K-Nearest Neighbours, and the maximum depth and number of estimators in Random Forest and Decision Trees. We used GridSearchCV to perform a search over the hyperparameter grids. For each combination of hyperparameters, the model was trained and evaluated using 3-fold cross-validation to prevent overfitting.
 
 ### Model Evaluation
 
@@ -103,7 +103,7 @@ Below are the results for each model:
 
 ### Visualization
 
-To visually assess the performance of the models, ROC curves and Precision-Recall curves were generated. These curves show the trade-offs between true positive rates and false positive rates, as well as precision and recall across different thresholds. The visualizations help in comparing the performance of different models and identifying the best-performing model based on the area under the curve (AUC).
+To visually assess the performance of the models, ROC curves and Precision-Recall curves as well as confusion matrices were generated for each model. The curve plots show the trade-offs between true positive rates and false positive rates, as well as precision and recall across different thresholds, while the confusion matrix shows the number of true positives, true negatives, false positives and false negatives for each model.
 
 ---
 
