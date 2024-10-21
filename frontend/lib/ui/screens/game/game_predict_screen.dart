@@ -49,16 +49,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [darkGradient, lightGradient],
-        ),
-      ),
-      child: Scaffold(
-        body: Column(
+    return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
@@ -79,9 +70,9 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
               ),
             ),
           ],
-        ),
-      ),
     );
+    
+  
   }
 
   Widget _countdownContainer() {

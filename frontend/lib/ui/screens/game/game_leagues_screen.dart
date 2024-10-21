@@ -28,16 +28,7 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [darkGradient, lightGradient],
-        ),
-      ),
-      child: Scaffold(
-        body: Padding(
+    return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,8 +46,8 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
               ),
             ],
           ),
-        ),
-      ),
+      
+    
     );
   }
 

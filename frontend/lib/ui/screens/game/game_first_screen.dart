@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/ui/screens/game/game_leagues_screen.dart';
 import 'package:frontend/ui/screens/game/game_predict_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/carousel_game_options.dart';
 
 class GameFirstScreen extends StatefulWidget {
   const GameFirstScreen({
@@ -113,7 +114,7 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => GameLeaguesScreen()
+              builder: (context) => F1Carousel()
               //GamePredictScreen(),
             ),
           );
@@ -128,7 +129,7 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => GamePredictScreen(),
+            builder: (context) => F1Carousel()
           ),
         );
       },
