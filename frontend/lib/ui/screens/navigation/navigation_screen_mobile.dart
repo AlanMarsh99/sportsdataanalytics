@@ -22,7 +22,8 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
         leading: Builder(
           builder: (context) {
             return IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white), // Icono del menú
+              icon:
+                  const Icon(Icons.menu, color: Colors.white), // Icono del menú
               onPressed: () {
                 Scaffold.of(context)
                     .openDrawer(); // Abre el Drawer al hacer clic
@@ -30,11 +31,13 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
             );
           },
         ),
-        actions: const [
-          /*CircleAvatar(
-                backgroundImage:
-                    NetworkImage('https://example.com/profile.jpg'),
-              ),*/
+        actions: [
+          GestureDetector(
+            onTap: () {},
+            child: CircleAvatar(
+              backgroundImage: AssetImage('assets/images/placeholder.png'),
+            ),
+          ),
           SizedBox(width: 10),
         ],
       ),

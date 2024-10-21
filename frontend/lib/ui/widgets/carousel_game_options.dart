@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/screens/game/game_leaderboard_screen.dart';
 import 'package:frontend/ui/screens/game/game_leagues_screen.dart';
 import 'package:frontend/ui/screens/game/game_predict_screen.dart';
 import 'package:frontend/ui/theme.dart';
@@ -14,7 +15,8 @@ class _F1CarouselState extends State<F1Carousel> {
   int _currentIndex = 0;
   List<String> _tabs = ["Predict", "Leaderboard", "Leagues", "My Stats"];
 
-  final CarouselSliderController carouselController = CarouselSliderController();
+  final CarouselSliderController carouselController =
+      CarouselSliderController();
 
   @override
   void initState() {
@@ -56,30 +58,30 @@ class _F1CarouselState extends State<F1Carousel> {
             ),
             SizedBox(height: 20),
             Container(
-              alignment: Alignment.center,
-              color: primary,
-              width: double.infinity,
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Align(
                 alignment: Alignment.center,
-                child: CarouselSlider(
-                carouselController: carouselController,
-                options: CarouselOptions(
-                  viewportFraction: 0.4,
-                  height: 45.0,
-                  enableInfiniteScroll: true,
-                  initialPage: _currentIndex,
-                  scrollDirection: Axis.horizontal,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _currentIndex = index;
-                      _pageController.jumpToPage(index);
-                    });
-                  },
-                ),
-                items: _buildCarouselItems(),
-              ),)
-            ),
+                color: primary,
+                width: double.infinity,
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: CarouselSlider(
+                    carouselController: carouselController,
+                    options: CarouselOptions(
+                      viewportFraction: 0.4,
+                      height: 45.0,
+                      enableInfiniteScroll: true,
+                      initialPage: _currentIndex,
+                      scrollDirection: Axis.horizontal,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentIndex = index;
+                          _pageController.jumpToPage(index);
+                        });
+                      },
+                    ),
+                    items: _buildCarouselItems(),
+                  ),
+                )),
             SizedBox(height: 20),
             GestureDetector(
               onPanUpdate: (details) {
@@ -119,6 +121,8 @@ class _F1CarouselState extends State<F1Carousel> {
     switch (text) {
       case 'Predict':
         return GamePredictScreen();
+      case 'Leaderboard':
+        return GameLeaderboardScreen();
       case 'Leagues':
         return GameLeaguesScreen();
       default:
@@ -140,7 +144,6 @@ class _F1CarouselState extends State<F1Carousel> {
   void _goToNextPage() {
     setState(() {
       if (_currentIndex == _tabs.length - 1) {
-        
         _currentIndex = 0;
         carouselController.jumpToPage(0);
         _pageController.jumpToPage(0);
