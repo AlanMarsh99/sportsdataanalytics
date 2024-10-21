@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
+import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false, theme: theme, home: LoginScreen()
+        debugShowCheckedModeBanner: false, theme: theme, home: NavigationScreen()
         );
   }
 }
