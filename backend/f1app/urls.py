@@ -8,7 +8,6 @@ urlpatterns = [
     # Driver
     path('driver/', views.DriverList.as_view(), name='driver-list'),
     path('driver/<int:driverid>/', views.DriverDetail.as_view(), name='driver-detail'),
-    path('driver/<int:driverid>/results/', views.DriverResultsList.as_view(), name='driver-results'),
 
     # Constructor
     path('constructor/', views.ConstructorList.as_view(), name='constructor-list'),
@@ -21,5 +20,4 @@ urlpatterns = [
     # Race
     path('race/', views.RaceList.as_view(), name='race-list'),
     path('race/<int:raceid>/', views.RaceDetail.as_view(), name='race-detail'),
-    path('race/<int:raceid>/results/', views.RaceResultsList.as_view(), name='race-results'),
 ]

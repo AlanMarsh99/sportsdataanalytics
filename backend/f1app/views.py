@@ -3,8 +3,8 @@ utilizing Django REST Framework's generic views to handle HTTP requests and resp
 
 from django.shortcuts import render
 from rest_framework import generics
-from .models import Driver, Constructor, Circuit, Race, RaceData
-from .serializers import DriverSerializer, ConstructorSerializer, CircuitSerializer, RaceSerializer, ResultSerializer
+from .models import Driver, Constructor, Circuit, Race
+from .serializers import DriverSerializer, ConstructorSerializer, CircuitSerializer, RaceSerializer
 
 # Driver
 class DriverList(generics.ListAPIView):
