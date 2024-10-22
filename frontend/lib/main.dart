@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
@@ -10,6 +11,9 @@ void main() {
     MultiProvider(providers: [
       ChangeNotifierProvider(
         create: (_) => NavigationProvider(),
+      ),
+       ChangeNotifierProvider(
+        create: (_) => DataProvider(),
       ),
     ], child: const MyApp()),
   );

@@ -4,6 +4,7 @@ import 'dart:convert';
 
 class DataProvider extends ChangeNotifier {
   // Function to get all drivers with optional filters
+  // This one works
   Future<List<dynamic>> getAllDrivers(
       {String? search, String? nationality, int? limit, int? offset}) async {
     String baseUrl = 'http://127.0.0.1:8000/api/v1/driver/';
@@ -22,11 +23,18 @@ class DataProvider extends ChangeNotifier {
       });
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        // Parse the entire response
+        Map<String, dynamic> data = jsonDecode(response.body);
+
+        // Extract the list of drivers from 'results'
+        List<dynamic> drivers = data['results'];
+
+        return drivers;
       } else {
         throw Exception('Failed to load drivers');
       }
     } catch (e) {
+      print('Error fetching drivers: $e');
       throw Exception('Error fetching drivers: $e');
     }
   }
