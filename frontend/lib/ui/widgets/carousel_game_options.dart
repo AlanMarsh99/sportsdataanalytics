@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/screens/game/game_leaderboard_screen.dart';
 import 'package:frontend/ui/screens/game/game_leagues_screen.dart';
+import 'package:frontend/ui/screens/game/game_myStats_screen.dart';
 import 'package:frontend/ui/screens/game/game_predict_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -125,6 +126,8 @@ class _F1CarouselState extends State<F1Carousel> {
         return GameLeaderboardScreen();
       case 'Leagues':
         return GameLeaguesScreen();
+      case 'My Stats':
+        return GameMyStatsScreen();
       default:
         return Container(
           color: Colors.white,
