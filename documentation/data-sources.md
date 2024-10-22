@@ -1,7 +1,8 @@
 # Formula 1 Data Sources
 This document provides a list of public data sources currently being used for our Formula 1 project(subject to update/change).
 
-## Kaggle - Formula 1 World Championship 1950-2024
+## Predictions Data
+### Kaggle - Formula 1 World Championship 1950-2024
 
 **Datasets:**
 *Circuits.csv* - circuitId, circuitRef, name, location, country, lat, long, alt, url.
@@ -19,8 +20,15 @@ This document provides a list of public data sources currently being used for ou
 *Sprint_results.csv* - resultId, raceId, driverId, constructorId, number, grid, position, positionText, positionOrder, points.
 *Status.csv* - statusId, status.
 
-### Accessibility
+#### Accessibility
 The datasets are publicly accessible for download after registering on Kaggle. Kaggle provides the data in CSV formats.
 
-### Usage Terms
+#### Usage Terms
 The datasets aew subject to Kaggle's terms of service, and users must comply with the respective licensing and attributions where required.
+
+## App Data
+### F1db - https://github.com/f1db/f1db/releases/tag/v2024.18.0
+We used data from the f1db repo on github for our app as it is regularly maintained and updated providing us with up-to-date data.
+
+#### Accessibility
+The datasets are publicly accessible for download on github at the link above. The repository provides the data in many different formats.
