@@ -14,18 +14,20 @@ This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing
 
 ## Technology Stack
 
-- **Frontend**: React for UI
-- **Backend**: 
-- **Machine Learning**: 
+- **Frontend**: Flutter for mobile app development
+- **Backend**: Django for web application development
+- **Machine Learning**: Python for predictive analytics models
 - **Database**: PostgreSQL for data storage
-- **Visualization Tools**: 
+- **Visualization Tools**: To be decided.
 - **Version Control**: Git, GitHub for code repository
 
 ## Setup and Installation
 
 ### Prerequisites
 
-- Node.js
+- Django
+- Flutter
+- Python
 - Git
 - PostgreSQL
 

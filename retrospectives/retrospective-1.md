@@ -4,12 +4,11 @@
 **Attendees:**  
 - David Santamaria
 - Alan Marsh
-- Fidel Chittettukalam
 
 ---
 
 **Duration:**
-- 30 minutes
+- 20 minutes
 
 ---
 
@@ -23,13 +22,21 @@
 
 ## Key Discussions:
 
+- **Successes From Our First Sprint:**
+  - David made a lot of good progress on the frontend screens. He talked about designing the screens in Figma and walked us through some of his designs as well as some prototypes too. Alan made some progress on the modelling bit of the project and finished the EDA on the chosen dataset. Fidel is still working on the setting up of the databases as far as we are aware.
+
+- **What We're Working On:**
+  - For this next sprint, David is building out the screens for the game part of our design. Alan is finishing off the modelling process and will assist Fidel with the database setup too.
+
+- **Blockers:**
+  - Nothing of note on this today.
 
 ---
 
 ## Tasks Assigned:
 
-- **David:**
-- **Alan:** 
-- **Fidel:**
+- **David:** Game frontend designs and prototypes.
+- **Alan:** Build models to predict if a driver gets into top 3 and the actual position each driver ends up in.
+- **Fidel:** Setting up the databases for storing the data.
 
 ---
