@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
+import 'package:frontend/data/data_provider.dart';
+
 
 class DriversScreen extends StatefulWidget {
   const DriversScreen({
@@ -12,6 +15,18 @@ class DriversScreen extends StatefulWidget {
 }
 
 class _DriversScreenState extends State<DriversScreen> {
+
+  late Future<List<dynamic>> _driversFuture;
+  String? selectedDriver;
+  int currentOffset = 0;
+  final int limit = 50;
+
+  @override
+  void initState() {
+    super.initState();
+    _driversFuture = DataProvider().getAllDrivers(/*limit: limit, offset: currentOffset*/); // Fetch the drivers
+  }
+  
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -39,7 +54,23 @@ class _DriversScreenState extends State<DriversScreen> {
                       color: Colors.white),
                 ),
                 const SizedBox(height: 16),
-                _buildDriverDropdown(),
+                FutureBuilder<List<dynamic>>(
+                    future: _driversFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator(); // Show loading while fetching
+                      } else if (snapshot.hasError) {
+                        return const Text(
+                          'Failed to load drivers',
+                          style: TextStyle(color: Colors.red),
+                        ); // Error handling
+                      } else if (snapshot.hasData) {
+                        return _buildDriverDropdown(snapshot.data!);
+                      }
+                      return Container();
+                    },
+                  ),
+                
                 const SizedBox(height: 40),
                 const Text(
                   'CAREER STATS',
@@ -113,7 +144,7 @@ class _DriversScreenState extends State<DriversScreen> {
     );
   }
 
-  Widget _buildDriverDropdown() {
+  Widget _buildDriverDropdown(List<dynamic> drivers) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       decoration: BoxDecoration(
@@ -121,19 +152,21 @@ class _DriversScreenState extends State<DriversScreen> {
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: DropdownButton<String>(
-        value: 'Max Verstappen',
+        value: selectedDriver,
+        hint: const Text('Select a driver', style: TextStyle(color: Colors.black)),
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: <String>['Max Verstappen', 'Lewis Hamilton', 'Sebastian Vettel']
-            .map<DropdownMenuItem<String>>((String value) {
+        items: drivers.map<DropdownMenuItem<String>>((dynamic driver) {
           return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value, style: const TextStyle(color: Colors.black)),
+            value: driver['name'], // Assuming the driver object has a 'name' field
+            child: Text(driver['name'], style: const TextStyle(color: Colors.black)),
           );
         }).toList(),
         onChanged: (String? newValue) {
-          // Handle driver selection
+          setState(() {
+            selectedDriver = newValue;
+          });
         },
       ),
     );
