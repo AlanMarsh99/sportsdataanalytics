@@ -5,12 +5,32 @@ import 'package:frontend/ui/widgets/tables/driver_allRaces_table.dart';
 class DriverAllRacesScreen extends StatefulWidget {
   const DriverAllRacesScreen({
     Key? key,
+    required this.driver,
+
   }) : super(key: key);
+
+  final String driver;
 
   _DriverAllRacesScreenState createState() => _DriverAllRacesScreenState();
 }
 
 class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
+  List<String> seasons = [];
+  String selectedSeason = '2024';
+  String selectedDriver = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Generate a list with the years from 1950 to the current year
+    int currentYear = DateTime.now().year;
+    for (int i = currentYear; i >= 1950; i--) {
+      seasons.add(i.toString());
+    }
+    selectedSeason = currentYear.toString();
+    selectedDriver = widget.driver;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -126,11 +146,11 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: DropdownButton<String>(
-        value: 'Max Verstappen',
+        value: selectedDriver,
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: <String>['Max Verstappen', 'Lewis Hamilton', 'Sebastian Vettel']
+        items: <String>['Max Verstappen', 'Lewis Hamilton', 'Sebastian Vettel', widget.driver]
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
@@ -138,7 +158,9 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
           );
         }).toList(),
         onChanged: (String? newValue) {
-          // Handle driver selection
+          setState(() {
+            selectedDriver = newValue!;
+          });
         },
       ),
     );
@@ -211,11 +233,11 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: DropdownButton<String>(
-        value: '2024',
+        value: selectedSeason,
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: <String>['2024', '2023', '2022', '2021', '2020', '2019', '2018']
+        items: seasons
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
@@ -223,7 +245,9 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
           );
         }).toList(),
         onChanged: (String? newValue) {
-          // Handle driver selection
+          setState(() {
+            selectedSeason = newValue!;
+          });
         },
       ),
     );

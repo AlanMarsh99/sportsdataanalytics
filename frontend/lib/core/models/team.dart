@@ -9,6 +9,9 @@ class Team {
   int polePositions;
   int points;
   int position;
+  int championshipsWins;
+  int championshipsParticipated;
+  int totalRaces;
   // List<Results> results;
   // List<Lap> laps;
   // List<Pitstop> pitstops;
@@ -24,6 +27,9 @@ class Team {
       required this.polePositions,
       required this.points,
       required this.position,
+      required this.championshipsWins,
+      required this.championshipsParticipated,
+      required this.totalRaces,
       // required this.results,
       // required this.laps,
       // required this.pitstops,

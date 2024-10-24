@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
+
+import 'package:provider/provider.dart';
 
 class GameLeaguesScreen extends StatefulWidget {
   const GameLeaguesScreen({
@@ -12,14 +15,20 @@ class GameLeaguesScreen extends StatefulWidget {
 }
 
 class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
-  final List<Map<String, dynamic>> leagues = [
+  List<Map<String, dynamic>> leagues = [
     {"name": "TUD", "members": 8},
     {"name": "FAMILY", "members": 5},
     {"name": "FERRARI LEAGUE", "members": 40},
   ];
 
   @override
-  void initState() {}
+  void initState() {
+    super.initState();
+    final provider = Provider.of<NavigationProvider>(context, listen: false);
+    if (!provider.userAuthenticated) {
+      leagues = [];
+    }
+  }
 
   @override
   void dispose() {
@@ -29,25 +38,21 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'GAME',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: _leaguesContainer(),
-              ),
-            ],
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'GAME',
+            style: TextStyle(
+                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-      
-    
+          const SizedBox(height: 16),
+          Expanded(
+            child: _leaguesContainer(),
+          ),
+        ],
+      ),
     );
   }
 

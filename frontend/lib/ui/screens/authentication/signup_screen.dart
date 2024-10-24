@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -297,6 +299,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void signUp(/*AuthService auth*/) async {
+    final provider = Provider.of<NavigationProvider>(context, listen: false);
+    provider.authenticateUser();
     /*await auth.signUp(
       _emailController.text.trim(),
       _usernameController.text.trim(),
