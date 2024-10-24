@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing calles **RACEVISION**. The tool enables users to explore, visualize, and make predictions using F1 race data. It includes dashboards for data exploration, predictive analytics models and gamification elements. The goal is to make complex data accessible to both technical and non-technical users, offering insights and trends about F1 races, drivers, and teams. To enhace user engagement, motivation, and interaction, the platform will incorporate various gamification features.
+This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing called **RACEVISION**. The tool enables users to explore, visualize, and make predictions using F1 race data. It includes dashboards for data exploration, predictive analytics models and gamification elements. The goal is to make complex data accessible to both technical and non-technical users, offering insights and trends about F1 races, drivers, and teams. To enhace user engagement, motivation, and interaction, the platform will incorporate various gamification features.
 
 ## Features
 
