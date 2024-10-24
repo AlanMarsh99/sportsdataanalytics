@@ -4,17 +4,25 @@ import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/team_seasons_table.dart';
 
 class TeamsDetailScreen extends StatefulWidget {
-  const TeamsDetailScreen({
-    Key? key,
-    required this.team,
-  }) : super(key: key);
+  const TeamsDetailScreen(
+      {Key? key, required this.team, required this.teamsSeason})
+      : super(key: key);
 
   final Team team;
+  final List<Team> teamsSeason;
 
   _TeamsDetailScreenState createState() => _TeamsDetailScreenState();
 }
 
 class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
+  Team? selectedTeam;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTeam = widget.team;
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -83,7 +91,7 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                     'SEASONS',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-      
+
                   const SizedBox(height: 10),
                   Container(
                     height: 400,
@@ -107,20 +115,24 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
       ),
-      child: DropdownButton<String>(
-        value: 'Scuderia Ferrari',
+      child: DropdownButton<Team>(
+        value: selectedTeam,
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: <String>['Scuderia Ferrari', 'Red Bull Racing', 'Mercedes AMG Petronas F1 Team', 'McLaren F1 Team', 'Aston Martin Cognizant F1 Team', 'Alpine F1 Team', 'Scuderia AlphaTauri', 'Alfa Romeo Racing ORLEN', 'Williams Racing', 'Haas F1 Team']
-            .map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value, style: const TextStyle(color: Colors.black)),
+        items: widget.teamsSeason.map<DropdownMenuItem<Team>>((Team team) {
+          return DropdownMenuItem<Team>(
+            value: team,
+            child: Text(
+              team.name,
+              style: TextStyle(color: Colors.black),
+            ), // Display the team name
           );
         }).toList(),
-        onChanged: (String? newValue) {
-          // Handle driver selection
+        onChanged: (Team? newValue) {
+          setState(() {
+            selectedTeam = newValue;
+          });
         },
       ),
     );
@@ -135,13 +147,13 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(61, 203, 'WINS', true),
+              child: _buildStatCard(368, selectedTeam!.totalRaces, 'WINS', true),
             ),
             SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(109, 203, 'PODIUMS', true),
+              child: _buildStatCard(584, selectedTeam!.totalRaces, 'PODIUMS', true),
             ),
           ],
         ),
@@ -152,13 +164,13 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(3, 10, 'CHAMPIONSHIPS', false),
+              child: _buildStatCard(selectedTeam!.championshipsWins, selectedTeam!.championshipsParticipated, 'CHAMPIONSHIPS', false),
             ),
             SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(40, 203, 'POLE POSITIONS', false),
+              child: _buildStatCard(683, selectedTeam!.totalRaces, 'POLE POSITIONS', false),
             )
           ],
         ),
