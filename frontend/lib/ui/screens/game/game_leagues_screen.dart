@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/ui/screens/game/ranking_league_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
@@ -16,9 +17,9 @@ class GameLeaguesScreen extends StatefulWidget {
 
 class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
   List<Map<String, dynamic>> leagues = [
-    {"name": "TUD", "members": 8},
-    {"name": "FAMILY", "members": 5},
-    {"name": "FERRARI LEAGUE", "members": 40},
+    {"id": 1, "name": "TUD", "members": 8},
+    {"id": 2, "name": "FAMILY", "members": 5},
+    {"id": 3, "name": "FERRARI LEAGUE", "members": 40},
   ];
 
   @override
@@ -95,33 +96,46 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
             child: ListView.builder(
               itemCount: leagues.length,
               itemBuilder: (context, index) {
-                return Card(
-                  color: Colors.white,
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: ListTile(
-                    title: Text(
-                      leagues[index]["name"],
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          leagues[index]["members"].toString(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RankingLeagueScreen(
+                          leagueId: leagues[index]["leagueId"].toString(),
+                          leagueName: leagues[index]["name"],
                         ),
-                        SizedBox(width: 30),
-                        const Icon(Icons.arrow_forward_ios, color: secondary),
-                      ],
+                      ),
+                    );
+                  },
+                  child: Card(
+                    color: Colors.white,
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        leagues[index]["name"],
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            leagues[index]["members"].toString(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(width: 30),
+                          const Icon(Icons.chevron_right, color: secondary, size: 28,),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -179,59 +193,6 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTutorialButton() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 25.0),
-      width: 200,
-      child: ElevatedButton(
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all<Color>(secondary),
-          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(35.0),
-            ),
-          ),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(2),
-          child: const Center(
-            child: Text(
-              'TAKE THE TOUR',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-        onPressed: () async {},
-      ),
-    );
-  }
-
-  Widget _buildSkipTextButton() {
-    return TextButton(
-      onPressed: () {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => ForgotPasswordScreen(),
-        //   ),
-        // );
-      },
-      child: const Text(
-        'Skip',
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.normal,
-          fontFamily: 'OpenSans',
-        ),
       ),
     );
   }
