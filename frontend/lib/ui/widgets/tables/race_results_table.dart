@@ -1,82 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/result.dart';
+import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
-class DriverAllRacesTableScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> races = [
-    {
-      'name': '2024 Singapore Grand Prix',
-      'result': 2,
-      'qualifying': 1,
-      'grid': 2,
-    },
-    {
-      'name': '2024 Azerbaijan Grand Prix',
-      'result': 5,
-      'qualifying': 3,
-      'grid': 6,
-    },
-    {
-      'name': '2024 Italian Grand Prix',
-      'result': 1,
-      'qualifying': 2,
-      'grid': 1,
-    },
-    {
-      'name': '2024 Singapore Grand Prix',
-      'result': 2,
-      'qualifying': 1,
-      'grid': 2,
-    },
-    {
-      'name': '2024 Azerbaijan Grand Prix',
-      'result': 5,
-      'qualifying': 3,
-      'grid': 6,
-    },
-    {
-      'name': '2024 Italian Grand Prix',
-      'result': 1,
-      'qualifying': 2,
-      'grid': 1,
-    },
-    {
-      'name': '2024 Singapore Grand Prix',
-      'result': 2,
-      'qualifying': 1,
-      'grid': 2,
-    },
-    {
-      'name': '2024 Azerbaijan Grand Prix',
-      'result': 5,
-      'qualifying': 3,
-      'grid': 6,
-    },
-    {
-      'name': '2024 Italian Grand Prix',
-      'result': 1,
-      'qualifying': 2,
-      'grid': 1,
-    },
-    {
-      'name': '2024 Singapore Grand Prix',
-      'result': 2,
-      'qualifying': 1,
-      'grid': 2,
-    },
-    {
-      'name': '2024 Azerbaijan Grand Prix',
-      'result': 5,
-      'qualifying': 3,
-      'grid': 6,
-    },
-    {
-      'name': '2024 Italian Grand Prix',
-      'result': 1,
-      'qualifying': 2,
-      'grid': 1,
-    },
-    // Add more races as needed
-  ];
+class RaceResultsTable extends StatelessWidget {
+  const RaceResultsTable({Key? key, required this.results}) : super(key: key);
+
+  final List<Result> results;
 
   @override
   Widget build(BuildContext context) {
@@ -104,14 +34,28 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                 columns: const [
                   DataColumn(
                     label: Text(
-                      'Race',
+                      'Position',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
                   DataColumn(
                     label: Text(
-                      'Qualifying',
+                      'Driver',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Team',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Time',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
@@ -125,42 +69,72 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                   ),
                   DataColumn(
                     label: Text(
-                      'Result',
+                      'Laps',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Points',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
                 ],
-                rows: races.map((race) {
+                rows: results.map((result) {
                   return DataRow(cells: [
                     DataCell(
-                      GestureDetector(
-                        onTap: () {
+                      _buildPositionContainer(result.position),
+                    ),
+                    DataCell(
+                      TextButton(
+                        onPressed: () {
                           // Navigate to the race details screen
-                          /*Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RaceDetailsScreen(race['name'])),
-                    );*/
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DriversScreen(/*driver: result.driver*/),
+                            ),
+                          );
                         },
                         child: Text(
-                          race['name'],
+                          result.driver,
                           style: const TextStyle(
-                              color: secondary,
-                              fontWeight: FontWeight.bold),
+                              color: secondary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     DataCell(
-                      _buildPositionContainer(race['qualifying']),
-                    ),
-                    DataCell(
                       Text(
-                        race['grid'].toString(),
+                        result.team,
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
-                      _buildPositionContainer(race['result']),
+                      Text(
+                        result.time,
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        result.grid.toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        result.laps.toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        result.points.toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
                     ),
                   ]);
                 }).toList(),
