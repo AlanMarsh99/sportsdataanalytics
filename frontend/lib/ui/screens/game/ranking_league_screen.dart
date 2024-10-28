@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/screens/game/result_prediction_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
@@ -123,10 +124,14 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     return GestureDetector(
       onTap: () {
         // Navigate to another screen when the card is tapped
-        /*Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => UserDetailsScreen(user: user)),
-              );*/
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ResultPredictionScreen(
+                    userId: rankingLeague[index]["username"].toString(),
+                    raceId: "",
+                  )),
+        );
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -257,8 +262,9 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                   }).toList(),
                   options: CarouselOptions(
                     reverse: true,
-                    viewportFraction: 0.15,
-                    height: 30.0,
+                    viewportFraction: 0.20,
+                    height: 35.0,
+                    padEnds: false,
                     enableInfiniteScroll: false,
                     //initialPage: _currentIndex,
                     scrollDirection: Axis.horizontal,

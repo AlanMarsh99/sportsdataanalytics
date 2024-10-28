@@ -59,30 +59,32 @@ class _F1CarouselState extends State<F1Carousel> {
             ),
             SizedBox(height: 20),
             Container(
+              alignment: Alignment.center,
+              color: primary,
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Align(
                 alignment: Alignment.center,
-                color: primary,
-                width: double.infinity,
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: CarouselSlider(
-                    carouselController: carouselController,
-                    options: CarouselOptions(
-                      viewportFraction: 0.4,
-                      height: 45.0,
-                      enableInfiniteScroll: true,
-                      initialPage: _currentIndex,
-                      scrollDirection: Axis.horizontal,
-                      onPageChanged: (index, reason) {
-                        setState(() {
-                          _currentIndex = index;
-                          _pageController.jumpToPage(index);
-                        });
-                      },
-                    ),
-                    items: _buildCarouselItems(),
+                child: CarouselSlider(
+                  carouselController: carouselController,
+                  options: CarouselOptions(
+                    viewportFraction: 0.4,
+                    height: 45.0,
+                    enableInfiniteScroll: true,
+                    initialPage: _currentIndex,
+                    enlargeCenterPage: true,
+                    scrollDirection: Axis.horizontal,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _currentIndex = index;
+                        _pageController.jumpToPage(index);
+                      });
+                    },
                   ),
-                )),
+                  items: _buildCarouselItems(),
+                ),
+              ),
+            ),
             SizedBox(height: 20),
             GestureDetector(
               onPanUpdate: (details) {
