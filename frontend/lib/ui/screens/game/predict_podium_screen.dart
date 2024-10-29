@@ -11,22 +11,9 @@ class PredictPodiumScreen extends StatefulWidget {
 }
 
 class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  List<Driver?> selectedDrivers = [
-    null,
-    null,
-    null
-  ]; // To store drivers for 1st, 2nd, 3rd positions
+  List<Driver?> selectedDrivers = [null, null, null];
   List<int> disabledDriverIds = [];
+
   List<Driver> drivers = [
     Driver(
       id: 1,
@@ -211,7 +198,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
 
   Widget _predictPodiumContainer() {
     return Container(
-      width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
+      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primary,
@@ -249,7 +236,6 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        
                       ),
                       textAlign: TextAlign.start,
                     ),
@@ -262,12 +248,16 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
             children: List.generate(3, (index) => _buildPodiumContainer(index)),
           ),
           const SizedBox(height: 30),
-          const Align(alignment: Alignment.centerLeft, child:
-          Text(
-            "Select Drivers",
-            style: TextStyle(
-                color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-          ),),
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Select drivers",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
           const SizedBox(height: 15),
           Expanded(
             child: ListView.builder(
@@ -295,31 +285,88 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
       },
       builder: (context, candidateData, rejectedData) {
         Driver? driver = selectedDrivers[index];
-        return Container(
-          width: MediaQuery.of(context).size.width * 0.25,
-          height: 70,
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white),
-          ),
-          child: driver == null
-              ? Center(
-                  child: Text("${index + 1}st",
-                      style: const TextStyle(color: Colors.white, fontSize: 16)))
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(driver.name,
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
-                    Text(driver.teamId,
-                        style: const TextStyle(color: Colors.white70)),
-                  ],
+        return Stack(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width * 0.25,
+              height: 70,
+              decoration: BoxDecoration(
+                color: driver == null ? Colors.transparent : Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white),
+              ),
+              child: driver == null
+                  ? Center(
+                      child: Text(
+                        "${index + 1}${getOrdinalSuffix(index + 1)}",
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "${index + 1}${getOrdinalSuffix(index + 1)}",
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 14),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          driver.name,
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+                        /*Text(
+                          driver.teamId,
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),*/
+                      ],
+                    ),
+            ),
+            if (driver != null)
+              Positioned(
+                right: 4,
+                top: 4,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      // Remove the driver from the selected podium and enable them again
+                      selectedDrivers[index] = null;
+                      disabledDriverIds.remove(driver.id);
+                    });
+                  },
+                  child: const Icon(
+                    Icons.close,
+                    color: Colors.red,
+                    size: 18,
+                  ),
                 ),
+              ),
+          ],
         );
       },
     );
+  }
+
+  String getOrdinalSuffix(int number) {
+    if (number == 1) {
+      return "st";
+    } else if (number == 2) {
+      return "nd";
+    } else if (number == 3) {
+      return "rd";
+    } else {
+      return "th";
+    }
   }
 
   // Driver List Tile
@@ -332,7 +379,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
       ),
       onDragCompleted: () {},
       maxSimultaneousDrags: isDisabled ? 0 : 1,
-      child: _buildDriverCard(driver, isDisabled), // Disable if already selected
+      child: _buildDriverCard(driver, isDisabled),
     );
   }
 
@@ -341,15 +388,31 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
     return Opacity(
       opacity: isDisabled ? 0.5 : 1.0,
       child: Card(
-        color: isDisabled ? Colors.grey[400] : Colors.white,
+        color: Colors.white,
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
         child: ListTile(
+          onTap: () {
+            if (!isDisabled) {
+              setState(() {
+                if (selectedDrivers.indexWhere((element) => element == null) !=
+                    -1) {
+                  selectedDrivers[selectedDrivers
+                      .indexWhere((element) => element == null)] = driver;
+                  disabledDriverIds.add(driver.id);
+                }
+              });
+            }
+          },
           leading: const Icon(Icons.flag, color: secondary),
-          title: Text(driver.name,
-              style:
-                  const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          subtitle:
-              Text(driver.teamId, style: TextStyle(color: Colors.grey[600])),
+          title: Text(
+            driver.name,
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            driver.teamId,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
         ),
       ),
     );
