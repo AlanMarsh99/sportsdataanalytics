@@ -9,6 +9,7 @@ class Driver {
   int seasonPodiums;
   int seasonChampionships;
   int seasonPolePositions;
+  String teamId;
   // List<Season> results;
 
   Driver({
@@ -22,6 +23,7 @@ class Driver {
     required this.seasonPodiums,
     required this.seasonChampionships,
     required this.seasonPolePositions,
+    required this.teamId,
     // required this.results,
   });
 }
