@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
@@ -50,29 +51,25 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
   @override
   Widget build(BuildContext context) {
     return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'GAME',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: _countdownContainer(),
-              ),
-            ),
-          ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'GAME',
+            style: TextStyle(
+                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: _countdownContainer(),
+          ),
+        ),
+      ],
     );
-    
-  
   }
 
   Widget _countdownContainer() {
@@ -99,14 +96,15 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
             child: const Padding(
               padding: EdgeInsets.all(5),
               child: Text(
-              'FORMULA 1 PIRELLI UNITED STATES GRAND PRIX 2024',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+                'FORMULA 1 PIRELLI UNITED STATES GRAND PRIX 2024',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),),
+            ),
           ),
           const SizedBox(height: 25),
           const Text(
@@ -238,7 +236,14 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                   ),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PredictPodiumScreen(),
+                  ),
+                );
+              },
               child: const Text(
                 'PLAY',
                 style: TextStyle(
