@@ -263,7 +263,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                   options: CarouselOptions(
                     reverse: true,
                     viewportFraction: 0.20,
-                    height: 35.0,
+                    height: 30.0,
                     padEnds: false,
                     enableInfiniteScroll: false,
                     //initialPage: _currentIndex,

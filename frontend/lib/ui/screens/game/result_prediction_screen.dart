@@ -137,84 +137,91 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
           const SizedBox(height: 30),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width + 50,
-              child: ConstrainedBox(
-                constraints:
-                    BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-                child: IntrinsicWidth(
-                  child: Row(
-                    children: [
-                      // Race Results Table
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
+              children: [
+                // Race Results Table
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Race results',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width + 50,
+                      child: const Divider(color: Colors.white),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Race results',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const Divider(color: Colors.white),
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(left: 95),
-                                  child: Container(
-                                    width: 115,
-                                    child: Text(
-                                      'ACTUAL',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 115,
-                                  child: Text(
-                                    widget.userId.toUpperCase(),
-                                    style: const TextStyle(
-                                        color: Colors.redAccent,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Text(
-                                  'AI',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
+                            padding: const EdgeInsets.only(left: 95),
+                            child: Container(
+                              width: 115,
+                              child: const Text(
+                                'ACTUAL',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
-                          const Divider(color: Colors.grey, height: 20),
-                          _buildResultRow(
-                              'Podium',
-                              ['Norris, L', 'Verstappen, M', 'Piastri, O'],
-                              ['Norris, L', 'Verstappen, M', 'Piastri, O'],
-                              ['Norris, L', 'Verstappen, M', 'Piastri, O'],
-                              '+10'),
-                          const Divider(color: Colors.grey, height: 20),
-                          _buildResultRow('Winner', ['Norris, L'],
-                              ['Verstappen, M'], ['Verstappen, M'], '+0'),
-                          const Divider(color: Colors.grey, height: 20),
-                          _buildResultRow('Fastest lap', ['Ricciardo, D'],
-                              ['Verstappen, M'], ['Verstappen, M'], '+10'),
+                          Container(
+                            width: 115,
+                            child: Text(
+                              widget.userId.toUpperCase(),
+                              style: const TextStyle(
+                                  color: Colors.redAccent,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const Text(
+                            'AI',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width + 50,
+                      child: const Divider(color: Colors.grey, height: 20),
+                    ),
+                    _buildResultRow(
+                        'Podium',
+                        ['Norris, L', 'Verstappen, M', 'Piastri, O'],
+                        ['Norris, L', 'Verstappen, M', 'Piastri, O'],
+                        ['Norris, L', 'Verstappen, M', 'Piastri, O'],
+                        '+10'),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width + 50,
+                      child: const Divider(color: Colors.grey, height: 20),
+                    ),
+                    _buildResultRow('Winner', ['Norris, L'], ['Verstappen, M'],
+                        ['Verstappen, M'], '+0'),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width + 50,
+                      child: const Divider(color: Colors.grey, height: 20),
+                    ),
+                    _buildResultRow('Fastest lap', ['Ricciardo, D'],
+                        ['Verstappen, M'], ['Verstappen, M'], '+10'),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width + 50,
+                      child: const Divider(color: Colors.grey, height: 20),
+                    ),
+                  ],
                 ),
-              ),
+              ],
             ),
           ),
         ],
