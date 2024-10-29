@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -100,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Sign up',
                         style: TextStyle(
-                          color: secondary,
+                          color: redAccent,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'OpenSans',
                         ),
@@ -256,6 +258,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void signIn(/*AuthService auth*/) async {
+    final provider = Provider.of<NavigationProvider>(context, listen: false);
+    provider.authenticateUser();
     /*await auth.signIn(
       _emailController.text.trim(),
       _passwordController.text,

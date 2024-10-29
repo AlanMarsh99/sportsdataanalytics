@@ -10,6 +10,7 @@ class User {
   int leaguesWon;
   int globalPosition;
   
+  
 
 
   User(

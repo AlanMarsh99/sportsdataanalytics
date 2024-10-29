@@ -10,6 +10,7 @@ class NavigationProvider extends ChangeNotifier {
   int _selectedIndex = 0;
   bool _extended = false;
   String _screenTitle = "DRIVERS";
+  bool _userAuthenticated = false;
 
   final List<Widget> _screens = [
     const DriversScreen(),
@@ -61,6 +62,12 @@ class NavigationProvider extends ChangeNotifier {
       label: Text('Users'),
     ),*/
   ];
+
+  bool get userAuthenticated => _userAuthenticated;
+  void authenticateUser() {
+    _userAuthenticated = true;
+    notifyListeners();
+  }
 
   int get selectedIndex => _selectedIndex;
   void updateIndex(int value) {

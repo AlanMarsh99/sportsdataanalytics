@@ -70,7 +70,7 @@ class TeamsSeasonTable extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  TeamsDetailScreen(team: team),
+                                  TeamsDetailScreen(team: team, teamsSeason: teams),
                             ),
                           );
                         },

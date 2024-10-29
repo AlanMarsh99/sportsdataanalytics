@@ -5,7 +5,6 @@ import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
 import 'package:frontend/data/data_provider.dart';
 
-
 class DriversScreen extends StatefulWidget {
   const DriversScreen({
     Key? key,
@@ -15,18 +14,26 @@ class DriversScreen extends StatefulWidget {
 }
 
 class _DriversScreenState extends State<DriversScreen> {
-
   late Future<List<dynamic>> _driversFuture;
   String? selectedDriver;
   int currentOffset = 0;
   final int limit = 50;
+  List<String> seasons = [];
+  String selectedSeason = '2024';
 
   @override
   void initState() {
     super.initState();
-    _driversFuture = DataProvider().getAllDrivers(/*limit: limit, offset: currentOffset*/); // Fetch the drivers
+    // Generate a list with the years from 1950 to the current year
+    int currentYear = DateTime.now().year;
+    for (int i = currentYear; i >= 1950; i--) {
+      seasons.add(i.toString());
+    }
+    selectedSeason = currentYear.toString();
+    _driversFuture = DataProvider().getAllDrivers(
+        /*limit: limit, offset: currentOffset*/); // Fetch the drivers
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -42,110 +49,155 @@ class _DriversScreenState extends State<DriversScreen> {
         child: Scaffold(
           body: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(child:
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'DRIVERS',
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                const SizedBox(height: 16),
-                FutureBuilder<List<dynamic>>(
-                    future: _driversFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator(); // Show loading while fetching
-                      } else if (snapshot.hasError) {
-                        return const Text(
-                          'Failed to load drivers',
-                          style: TextStyle(color: Colors.red),
-                        ); // Error handling
-                      } else if (snapshot.hasData) {
-                        return _buildDriverDropdown(snapshot.data!);
-                      }
-                      return Container();
-                    },
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'DRIVERS',
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
-                
-                const SizedBox(height: 40),
-                const Text(
-                  'CAREER STATS',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: const TabBar(
-                    //padding: EdgeInsets.only(left: 6),
-                    labelColor: redAccent,
-                    unselectedLabelColor: Colors.white,
-                    indicatorColor: redAccent,
-                    dividerHeight: 0,
-                    isScrollable: true,
-                    tabs: [
-                      Tab(text: "All time"),
-                      Tab(text: "Current season"),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // TabBarView for the content of each tab
-                Container(
-                  height: 250,
-                  child: TabBarView(
+                  const SizedBox(height: 16),
+                  Row(
                     children: [
-                      _buildCareerStats(),
-                      _buildCareerStats(),
+                      FutureBuilder<List<dynamic>>(
+                        future: _driversFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ); // Show loading while fetching
+                          } else if (snapshot.hasError) {
+                            return const Text(
+                              'Error: Failed to load drivers',
+                              style: TextStyle(color: Colors.white),
+                            ); // Error handling
+                          } else if (snapshot.hasData) {
+                            selectedDriver ??= snapshot.data![0]['name'];
+                            return _buildDriverDropdown(snapshot.data!);
+                          }
+                          return Container();
+                        },
+                      ),
+                      SizedBox(width: 20),
+                      //_buildYearDropdown()
                     ],
                   ),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  'SEASONS',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                //const Spacer(),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // Navigate to the "All Races" screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DriverAllRacesScreen()),
-                      );
-                    },
-                    child: const Text(
-                      'All races >',
-                      style: TextStyle(color: Colors.white),
+
+                  const SizedBox(height: 40),
+                  const Text(
+                    'CAREER STATS',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: const TabBar(
+                      //padding: EdgeInsets.only(left: 6),
+                      labelColor: redAccent,
+                      unselectedLabelColor: Colors.white,
+                      indicatorColor: redAccent,
+                      dividerHeight: 0,
+                      isScrollable: true,
+                      tabs: [
+                        Tab(text: "All time"),
+                        Tab(text: "Current season"),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  height: 400,
-                  child: Center(
-                    child: DriverSeasonsTable(),
+                  const SizedBox(height: 16),
+                  // TabBarView for the content of each tab
+                  Container(
+                    height: 250,
+                    child: TabBarView(
+                      children: [
+                        _buildCareerStats(),
+                        _buildCareerStats(),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'SEASONS',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  //const Spacer(),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: TextButton(
+                      onPressed: () {
+                        // Navigate to the "All Races" screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DriverAllRacesScreen(driver: selectedDriver!),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'All races >',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 400,
+                    child: Center(
+                      child: DriverSeasonsTable(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
+  Widget _buildYearDropdown() {
+    return Container(
+      width: 100,
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: DropdownButton<String>(
+        value: selectedSeason,
+        dropdownColor: Colors.white,
+        isExpanded: true,
+        underline: const SizedBox(),
+        items: seasons.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value, style: const TextStyle(color: Colors.black)),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() {
+            selectedSeason = newValue!;
+          });
+        },
+      ),
+    );
+  }
+
   Widget _buildDriverDropdown(List<dynamic> drivers) {
     return Container(
+      width: 200,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -153,14 +205,19 @@ class _DriversScreenState extends State<DriversScreen> {
       ),
       child: DropdownButton<String>(
         value: selectedDriver,
-        hint: const Text('Select a driver', style: TextStyle(color: Colors.black)),
+        hint: const Text(
+          'Select a driver',
+          style: TextStyle(color: Colors.black),
+        ),
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
         items: drivers.map<DropdownMenuItem<String>>((dynamic driver) {
           return DropdownMenuItem<String>(
-            value: driver['name'], // Assuming the driver object has a 'name' field
-            child: Text(driver['name'], style: const TextStyle(color: Colors.black)),
+            value:
+                driver['name'], // Assuming the driver object has a 'name' field
+            child: Text(driver['name'],
+                style: const TextStyle(color: Colors.black)),
           );
         }).toList(),
         onChanged: (String? newValue) {

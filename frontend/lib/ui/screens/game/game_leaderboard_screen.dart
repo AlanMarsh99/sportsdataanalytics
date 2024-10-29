@@ -37,8 +37,8 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
     ),
     User(
       id: 1,
-      username: 'deivit',
-      totalPoints: 311,
+      username: 'davidst',
+      totalPoints: 260,
       avatarPicture: 'assets/images/placeholder.png',
       numPredictions: 20,
       globalPosition: 12,
@@ -137,8 +137,8 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
     ),
     User(
       id: 1,
-      username: 'formula1fan',
-      totalPoints: 211,
+      username: 'andrea',
+      totalPoints: 305,
       avatarPicture: 'assets/images/placeholder.png',
       numPredictions: 20,
       globalPosition: 12,
@@ -147,8 +147,8 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
     ),
     User(
       id: 1,
-      username: 'thewinner',
-      totalPoints: 90,
+      username: 'damian',
+      totalPoints: 285,
       avatarPicture: 'assets/images/placeholder.png',
       numPredictions: 20,
       globalPosition: 12,
@@ -168,7 +168,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
     User(
       id: 1,
       username: 'fidel',
-      totalPoints: 27,
+      totalPoints: 240,
       avatarPicture: 'assets/images/placeholder.png',
       numPredictions: 20,
       globalPosition: 12,
@@ -187,8 +187,8 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
     ),
     User(
       id: 1,
-      username: 'user1',
-      totalPoints: 65,
+      username: 'stifnes',
+      totalPoints: 220,
       avatarPicture: 'assets/images/placeholder.png',
       numPredictions: 20,
       globalPosition: 12,
@@ -200,6 +200,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
   @override
   void initState() {
     super.initState();
+    _users.sort((a, b) => b.totalPoints.compareTo(a.totalPoints));
   }
 
   @override

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides an overview of the F1 Backend API and explains how the frontend developer(Deivit) can interact with it to retrieve data for the frontend application.
+This document provides an overview of the F1 Backend API and explains how the frontend developer (David) can interact with it to retrieve data for the frontend application.
 
 ## Running the Server
 

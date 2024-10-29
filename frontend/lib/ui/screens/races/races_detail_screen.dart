@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/race.dart';
+import 'package:frontend/core/models/result.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
+import 'package:frontend/ui/widgets/tables/race_results_table.dart';
 
 class RacesDetailScreen extends StatefulWidget {
   const RacesDetailScreen({Key? key, required this.race}) : super(key: key);
@@ -14,6 +16,119 @@ class RacesDetailScreen extends StatefulWidget {
 }
 
 class _RacesDetailScreenState extends State<RacesDetailScreen> {
+  List<Result> raceResults = [
+    Result(
+      id: 1,
+      raceId: 'race1',
+      driver: 'Max Verstappen',
+      team: 'Red Bull Racing',
+      position: 1,
+      time: '1:30:45.300',
+      grid: 1,
+      laps: 70,
+      points: 25,
+    ),
+    Result(
+      id: 2,
+      raceId: 'race1',
+      driver: 'Lewis Hamilton',
+      team: 'Mercedes',
+      position: 2,
+      time: '1:30:50.400',
+      grid: 2,
+      laps: 70,
+      points: 18,
+    ),
+    Result(
+      id: 3,
+      raceId: 'race1',
+      driver: 'Charles Leclerc',
+      team: 'Ferrari',
+      position: 3,
+      time: '1:31:00.200',
+      grid: 3,
+      laps: 70,
+      points: 15,
+    ),
+    Result(
+      id: 4,
+      raceId: 'race1',
+      driver: 'Sergio Perez',
+      team: 'Red Bull Racing',
+      position: 4,
+      time: '1:31:05.500',
+      grid: 4,
+      laps: 70,
+      points: 12,
+    ),
+    Result(
+      id: 5,
+      raceId: 'race1',
+      driver: 'Carlos Sainz',
+      team: 'Ferrari',
+      position: 5,
+      time: '1:31:10.000',
+      grid: 5,
+      laps: 70,
+      points: 10,
+    ),
+    Result(
+      id: 6,
+      raceId: 'race1',
+      driver: 'Lando Norris',
+      team: 'McLaren',
+      position: 6,
+      time: '1:31:15.800',
+      grid: 6,
+      laps: 70,
+      points: 8,
+    ),
+    Result(
+      id: 7,
+      raceId: 'race1',
+      driver: 'George Russell',
+      team: 'Mercedes',
+      position: 7,
+      time: '1:31:20.900',
+      grid: 7,
+      laps: 70,
+      points: 6,
+    ),
+    Result(
+      id: 8,
+      raceId: 'race1',
+      driver: 'Fernando Alonso',
+      team: 'Aston Martin',
+      position: 8,
+      time: '1:31:25.300',
+      grid: 8,
+      laps: 70,
+      points: 4,
+    ),
+    Result(
+      id: 9,
+      raceId: 'race1',
+      driver: 'Esteban Ocon',
+      team: 'Alpine',
+      position: 9,
+      time: '1:31:30.100',
+      grid: 9,
+      laps: 70,
+      points: 2,
+    ),
+    Result(
+      id: 10,
+      raceId: 'race1',
+      driver: 'Pierre Gasly',
+      team: 'Alpine',
+      position: 10,
+      time: '1:31:35.400',
+      grid: 10,
+      laps: 70,
+      points: 1,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -130,7 +245,9 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                     child: TabBarView(
                       children: [
                         Center(
-                          child: DriverSeasonsTable(),
+                          child: RaceResultsTable(
+                            results: raceResults,
+                          ),
                         ),
                         Center(
                           child: DriverSeasonsTable(),
