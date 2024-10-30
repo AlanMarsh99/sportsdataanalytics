@@ -1,13 +1,15 @@
-import 'package:flutter/material.dart';
+/*import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class DataProvider extends ChangeNotifier {
+  final String baseUrl = 'http://127.0.0.1:8000/api/v1';
+
   // Function to get all drivers with optional filters
   // This one works
   Future<List<dynamic>> getAllDrivers(
       {String? search, String? nationality, int? limit, int? offset}) async {
-    String baseUrl = 'http://127.0.0.1:8000/api/v1/driver/';
+    String baseUrl = '$baseUrl/driver/';
     Map<String, String> queryParams = {
       if (search != null) 'search': search,
       if (nationality != null) 'nationality': nationality,
@@ -112,3 +114,27 @@ class DataProvider extends ChangeNotifier {
     }
   }
 }
+
+Future<List<dynamic>> getRaces({
+    required int year,
+    String? search,
+    int limit = 10,
+    int offset = 0,
+  }) async {
+    final uri = Uri.parse('$baseUrl/race/').replace(queryParameters: {
+      'year': year.toString(),
+      if (search != null) 'search': search,
+      'limit': limit.toString(),
+      'offset': offset.toString(),
+    });
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final List races = json.decode(response.body);
+      return races;
+    } else {
+      throw Exception('Failed to load races');
+    }
+  }
+*/

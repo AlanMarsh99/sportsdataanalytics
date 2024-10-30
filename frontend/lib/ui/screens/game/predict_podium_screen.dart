@@ -290,6 +290,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
             Container(
               width: MediaQuery.of(context).size.width * 0.25,
               height: 70,
+              padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: driver == null ? Colors.transparent : Colors.white,
                 borderRadius: BorderRadius.circular(10),
@@ -298,23 +299,16 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
               child: driver == null
                   ? Center(
                       child: Text(
-                        "${index + 1}${getOrdinalSuffix(index + 1)}",
+                        "Make your prediction",
                         style:
-                            const TextStyle(color: Colors.white, fontSize: 16),
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                        textAlign: TextAlign.center,
                       ),
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          "${index + 1}${getOrdinalSuffix(index + 1)}",
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 14),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
+                        SizedBox(height: 4),
                         Text(
                           driver.name,
                           style: const TextStyle(
@@ -323,50 +317,38 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                               fontSize: 12),
                           textAlign: TextAlign.center,
                         ),
-                        /*Text(
+                        Text(
                           driver.teamId,
-                          style: const TextStyle(
-                              color: Colors.white70, fontSize: 12),
+                          style:
+                              TextStyle(color: Colors.grey[700], fontSize: 12),
                           textAlign: TextAlign.center,
-                        ),*/
+                        ),
                       ],
                     ),
             ),
             if (driver != null)
               Positioned(
-                right: 4,
-                top: 4,
-                child: GestureDetector(
-                  onTap: () {
+                right: -4,
+                top: -4,
+                child: IconButton(
+                  onPressed: () {
                     setState(() {
-                      // Remove the driver from the selected podium and enable them again
                       selectedDrivers[index] = null;
                       disabledDriverIds.remove(driver.id);
                     });
                   },
-                  child: const Icon(
+                  icon: const Icon(
                     Icons.close,
                     color: Colors.red,
                     size: 18,
                   ),
                 ),
+              
               ),
           ],
         );
       },
     );
-  }
-
-  String getOrdinalSuffix(int number) {
-    if (number == 1) {
-      return "st";
-    } else if (number == 2) {
-      return "nd";
-    } else if (number == 3) {
-      return "rd";
-    } else {
-      return "th";
-    }
   }
 
   // Driver List Tile
