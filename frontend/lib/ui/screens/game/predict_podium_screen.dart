@@ -178,7 +178,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                     },
                   ),
                   const Text(
-                    'Predictions',
+                    'Podium Prediction',
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

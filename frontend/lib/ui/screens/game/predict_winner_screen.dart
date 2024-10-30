@@ -178,7 +178,7 @@ class _PredictWinnerScreenState extends State<PredictWinnerScreen> {
                     },
                   ),
                   const Text(
-                    'Predictions',
+                    'Winner Prediction',
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

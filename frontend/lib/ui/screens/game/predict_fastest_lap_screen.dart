@@ -178,7 +178,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                     },
                   ),
                   const Text(
-                    'Predictions',
+                    'Fastest Lap Prediction',
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
