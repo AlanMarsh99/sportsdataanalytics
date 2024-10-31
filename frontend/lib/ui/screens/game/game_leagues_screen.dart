@@ -25,10 +25,10 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
   @override
   void initState() {
     super.initState();
-    final provider = Provider.of<NavigationProvider>(context, listen: false);
+    /*final provider = Provider.of<NavigationProvider>(context, listen: false);
     if (!provider.userAuthenticated) {
       leagues = [];
-    }
+    }*/
   }
 
   @override

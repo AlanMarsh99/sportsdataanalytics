@@ -19,6 +19,16 @@ class _F1CarouselState extends State<F1Carousel> {
   final CarouselSliderController carouselController =
       CarouselSliderController();
 
+  double _rotationAngle = 0.0;
+  bool _hasChangedScreen = false;
+  final double _delta = 0.5;
+
+  void _rotateWheel(double delta) {
+    setState(() {
+      _rotationAngle += delta;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +38,40 @@ class _F1CarouselState extends State<F1Carousel> {
         _pageController.jumpToPage(_currentIndex);
       });
     });
+  }
+
+  void _handlePanUpdate(DragUpdateDetails details) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final touchPosition = details.localPosition.dx;
+
+    // Check if the swipe is on the left or right side of the image
+    if (touchPosition < screenWidth / 2) {
+      // Left side of the image
+      if (details.delta.dy < 0) {
+        // Swiping up on the left side (rotate to the right)
+        _rotateWheel(_delta);
+        _goToNextPage();
+        _hasChangedScreen = true;
+      } else if (details.delta.dy > 0) {
+        // Swiping down on the left side (rotate to the left)
+        _rotateWheel(-1 * _delta);
+        _goToPreviousPage();
+        _hasChangedScreen = true;
+      }
+    } else {
+      // Right side of the image
+      if (details.delta.dy < 0) {
+        // Swiping up on the right side (rotate to the left)
+        _rotateWheel(-1 * _delta);
+        _goToPreviousPage();
+        _hasChangedScreen = true;
+      } else if (details.delta.dy > 0) {
+        // Swiping down on the right side (rotate to the right)
+        _rotateWheel(_delta);
+        _goToNextPage();
+        _hasChangedScreen = true;
+      }
+    }
   }
 
   @override
@@ -88,14 +132,21 @@ class _F1CarouselState extends State<F1Carousel> {
             SizedBox(height: 20),
             GestureDetector(
               onPanUpdate: (details) {
-                if (details.delta.dx > 0) {
-                  _goToPreviousPage();
-                } else if (details.delta.dx < 0) {
-                  _goToNextPage();
+                if (!_hasChangedScreen) {
+                  _handlePanUpdate(details);
                 }
               },
-              child: Image.asset('assets/images/wheel.png', width: 200),
-            ),
+              onPanEnd: (_) {
+                setState(() {
+                  _rotationAngle = 0.0;
+                  _hasChangedScreen = false;
+                });
+              },
+              child: Transform.rotate(
+                angle: _rotationAngle,
+                child: Image.asset('assets/images/wheel.png', width: 200),
+              ),
+            )
           ],
         ),
       ),
