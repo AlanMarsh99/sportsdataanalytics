@@ -352,7 +352,8 @@ class RaceConstructorStanding(models.Model):
 
 
 class RaceData(models.Model):
-    race = models.OneToOneField(Race, models.DO_NOTHING, primary_key=True)  # The composite primary key (race_id, type, position_display_order) found, that is not supported. The first column is selected.
+    id = models.AutoField(primary_key=True)  # Add an AutoField as the primary key
+    race = models.ForeignKey(Race, models.DO_NOTHING)
     type = models.CharField(max_length=50)
     position_display_order = models.IntegerField()
     position_number = models.IntegerField(blank=True, null=True)
