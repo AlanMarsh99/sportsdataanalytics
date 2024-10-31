@@ -117,22 +117,25 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Scaffold(
         body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'RACEVISION',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              const SizedBox(height: 16),
-              _countdownContainer(),
-              const SizedBox(height: 16),
-              _lastRaceResultsContainer(),
-            ],
+          padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'RACEVISION',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                const SizedBox(height: 16),
+                _countdownContainer(),
+                const SizedBox(height: 16),
+                _lastRaceResultsContainer(),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
@@ -160,58 +163,62 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _lastRaceResultsContainer() {
     return Container(
-        width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: primary,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child:  Padding(padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16), child: 
-        SingleChildScrollView(
-            child:
-        Column(mainAxisSize: MainAxisSize.min, children: [
-          
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "LAST RACE RESULTS",
+      width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "LAST RACE RESULTS",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "See more",
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: redAccent),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Podium",
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
-              TextButton(onPressed:() {
-                
-              }, child:  Text(
-                "See more",
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: redAccent),
-              ),)
-             
-            ],
-          ),
-          const SizedBox(height: 20),
-          Align(
-            alignment: Alignment.centerLeft,
-            child:
-          Text(
-            "Podium",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),),
-          const Divider(color: Colors.white),
-          _buildDriverCard(podiumDrivers[0]),
-          _buildDriverCard(podiumDrivers[1]),
-          _buildDriverCard(podiumDrivers[2]),
-           Align(
-            alignment: Alignment.centerLeft,
-            child:
-          Text(
-            "Fastest lap",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),),
-          const Divider(color: Colors.white),
-          _buildDriverCard(fastestLapDriver),
-        ]))));
+            ),
+            const Divider(color: Colors.white),
+            _buildDriverCard(podiumDrivers[0]),
+            _buildDriverCard(podiumDrivers[1]),
+            _buildDriverCard(podiumDrivers[2]),
+            const SizedBox(height: 20),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Fastest lap",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const Divider(color: Colors.white),
+            _buildDriverCard(fastestLapDriver),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _countdownContainer() {
@@ -248,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 20),
           const Text(
             'Sunday October 2 at 14:00 CET',
             style: TextStyle(
@@ -258,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 35),
+          const SizedBox(height: 25),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             decoration: BoxDecoration(
@@ -364,11 +371,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 25),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 30.0),
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
             width: 200,
-            height: 100,
+            //height: 100,
             child: ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all<Color>(secondary),
@@ -382,7 +389,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PredictPodiumScreen(),
+                    builder: (context) => const PredictPodiumScreen(),
                   ),
                 );
               },
