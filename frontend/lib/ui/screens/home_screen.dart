@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     DateTime raceDate =
-        DateTime(2024, 11, 27, 18, 0); // Set the race date and time
+        DateTime(2024, 11, 2, 14, 0); // Set the race date and time
     remainingTime = raceDate.difference(DateTime.now());
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -257,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 20),
           const Text(
-            'Sunday October 2 at 14:00 CET',
+            'Sunday November 2 at 14:00 CET',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
