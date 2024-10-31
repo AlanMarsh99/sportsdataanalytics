@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/data_provider.dart';
+import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
@@ -30,7 +31,7 @@ class _DriversScreenState extends State<DriversScreen> {
       seasons.add(i.toString());
     }
     selectedSeason = currentYear.toString();
-    _driversFuture = DataProvider().getAllDrivers(
+    _driversFuture = APIService().getAllDrivers(
         /*limit: limit, offset: currentOffset*/); // Fetch the drivers
   }
 

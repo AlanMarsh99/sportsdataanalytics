@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/game_first_screen.dart';
+import 'package:frontend/ui/screens/home_screen.dart';
 import 'package:frontend/ui/screens/races/races_screen.dart';
 import 'package:frontend/ui/screens/teams/teams_screen.dart';
 import 'package:frontend/ui/theme.dart';
@@ -13,7 +14,7 @@ class NavigationProvider extends ChangeNotifier {
   bool _userAuthenticated = false;
 
   final List<Widget> _screens = [
-    const DriversScreen(),
+    const HomeScreen(),
     const RacesScreen(),
     const DriversScreen(),
     const TeamsScreen(),

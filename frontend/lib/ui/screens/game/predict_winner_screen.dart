@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/driver.dart';
-import 'package:frontend/ui/screens/game/predict_winner_screen.dart';
+import 'package:frontend/ui/screens/game/predict_fastest_lap_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
-class PredictPodiumScreen extends StatefulWidget {
-  const PredictPodiumScreen({
+class PredictWinnerScreen extends StatefulWidget {
+  const PredictWinnerScreen({
     Key? key,
   }) : super(key: key);
 
-  _PredictPodiumScreenState createState() => _PredictPodiumScreenState();
+  _PredictWinnerScreenState createState() => _PredictWinnerScreenState();
 }
 
-class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
-  List<Driver?> selectedDrivers = [null, null, null];
-  List<int> disabledDriverIds = [];
+class _PredictWinnerScreenState extends State<PredictWinnerScreen> {
+  Driver? selectedDriver;
+  int disabledDriverId = -1;
 
   List<Driver> drivers = [
     Driver(
@@ -178,7 +178,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                     },
                   ),
                   const Text(
-                    'Podium Prediction',
+                    'Winner Prediction',
                     style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -225,7 +225,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '1 of 3',
+                      '2 of 3',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -233,7 +233,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      'Predict your podium for the United States Grand Prix',
+                      'Predict your winner for the United States Grand Prix',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -245,15 +245,12 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                 )),
           ),
           const SizedBox(height: 25),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(3, (index) => _buildPodiumContainer(index)),
-          ),
+          _buildPodiumContainer(),
           const SizedBox(height: 30),
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "Select drivers",
+              "Select a driver",
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -266,14 +263,13 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
               itemCount: drivers.length,
               itemBuilder: (context, index) {
                 Driver driver = drivers[index];
-                bool isDisabled = disabledDriverIds.contains(driver.id);
+                bool isDisabled = disabledDriverId == driver.id;
                 return _buildDriverTile(driver, isDisabled);
               },
             ),
           ),
           Visibility(
-            visible:
-                selectedDrivers.indexWhere((element) => element == null) == -1,
+            visible: selectedDriver != null,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 30.0),
               width: 200,
@@ -291,7 +287,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PredictWinnerScreen(),
+                      builder: (context) => PredictFastestLapScreen(),
                     ),
                   );
                 },
@@ -311,17 +307,17 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
     );
   }
 
-  // Podium Container (1st, 2nd, 3rd positions)
-  Widget _buildPodiumContainer(int index) {
+  // Winner Container
+  Widget _buildPodiumContainer() {
     return DragTarget<Driver>(
       onAcceptWithDetails: (driver) {
         setState(() {
-          selectedDrivers[index] = driver.data;
-          disabledDriverIds.add(driver.data.id);
+          selectedDriver = driver.data;
+          disabledDriverId = driver.data.id;
         });
       },
       builder: (context, candidateData, rejectedData) {
-        Driver? driver = selectedDrivers[index];
+        Driver? driver = selectedDriver;
         return Stack(
           children: [
             Container(
@@ -370,8 +366,8 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                 child: IconButton(
                   onPressed: () {
                     setState(() {
-                      selectedDrivers[index] = null;
-                      disabledDriverIds.remove(driver.id);
+                      selectedDriver = null;
+                      disabledDriverId = -1;
                     });
                   },
                   icon: const Icon(
@@ -412,11 +408,9 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
           onTap: () {
             if (!isDisabled) {
               setState(() {
-                if (selectedDrivers.indexWhere((element) => element == null) !=
-                    -1) {
-                  selectedDrivers[selectedDrivers
-                      .indexWhere((element) => element == null)] = driver;
-                  disabledDriverIds.add(driver.id);
+                if (selectedDriver == null) {
+                  selectedDriver = driver;
+                  disabledDriverId = driver.id;
                 }
               });
             }

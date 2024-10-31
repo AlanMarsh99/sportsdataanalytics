@@ -12,9 +12,9 @@ void main() {
       ChangeNotifierProvider(
         create: (_) => NavigationProvider(),
       ),
-       ChangeNotifierProvider(
+       /*ChangeNotifierProvider(
         create: (_) => DataProvider(),
-      ),
+      ),*/
     ], child: const MyApp()),
   );
 }
