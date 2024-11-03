@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "325042115318",
+    "project_id": "racevision-tud",
+    "storage_bucket": "racevision-tud.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325042115318:android:2b9bd9147995c931f2d2d7",
+        "android_client_info": {
+          "package_name": "com.example.racevision"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAA9grj2Zl47zDqkrXyBq9SG2Gq-04qkCA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
