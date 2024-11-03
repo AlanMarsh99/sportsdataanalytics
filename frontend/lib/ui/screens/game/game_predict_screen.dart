@@ -20,7 +20,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
   void initState() {
     super.initState();
     DateTime raceDate =
-        DateTime(2024, 11, 27, 18, 0); // Set the race date and time
+        DateTime(2024, 11, 2, 14, 0); // Set the race date and time
     remainingTime = raceDate.difference(DateTime.now());
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
