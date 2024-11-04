@@ -29,6 +29,7 @@
     }
   },
   "hosting": {
+    "site": "racevision-tud",
     "public": "build/web",
     "ignore": [
       "firebase.json",
