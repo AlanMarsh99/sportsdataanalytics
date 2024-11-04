@@ -2,115 +2,99 @@
 
 ## Overview
 
-This document provides an overview of the F1 Backend API and explains how the frontend developer (David) can interact with it to retrieve data for the frontend application.
+This document provides an overview of the F1 Backend API and explains how to interact with it to retrieve data for the frontend application. The API aggregates data from the [Ergast Developer API](http://ergast.com/mrd/) to provide Formula 1 statistics and information.
 
 ## Running the Server
 
-When you run the Django development server using the command `python manage.py runserver`, you're starting a local web server that listens for HTTP requests on port 8000 by default. This server hosts the backend application, including all the API endpoints.
-
-### What the Server Does
-
-- **Handles HTTP Requests**: Listens for incoming HTTP requests.
-- **Processes Requests**: Routes each request to the appropriate view based on the URL patterns defined in `urls.py`.
-- **Interacts with the Database**: Uses Django ORM to retrieve or manipulate data in the PostgreSQL database hosted on Railway.app.
-- **Returns Responses**: Sends back HTTP responses, typically in JSON format, containing the requested data or status messages.
-
----
+When you run the Flask development server using the command `python run.py`, you're starting a local web server that listens for HTTP requests on port **5000** by default. This server hosts the backend application, including all the API endpoints.
 
 ## Using the API
 
 ### Base URL
 
-- **Local Development**: `http://127.0.0.1:8000/api/v1/`
-- **Production**: Replace with the deployed server's URL when available.
-
-### Authentication
-
-- **No Authentication Required**: The API is public and doesn't require authentication for access.
-
-### CORS Configuration
-
-- **CORS Allowance**: Cross-Origin Resource Sharing (CORS) is configured to allow requests from all origins during development.
-
----
+- **Local Development**: `http://127.0.0.1:5000/`
+- **Production**: Will replace with the deployed server's URL when available.
 
 ## Endpoints
 
-### Driver Endpoints
+### Home Screen Views
 
-#### 1. Get All Drivers
+#### 1. Get Upcoming Race Information
 
-- **URL**: `/driver/`
+- **URL**: `/home/upcoming_race/`
 - **Method**: `GET`
-- **Description**: Retrieves a list of all drivers.
-- **Query Parameters**:
-  - `search` (string): Search drivers by first name or last name.
-  - `nationality` (string): Filter drivers by nationality.
-  - `limit` (int): Number of records to return (default is 50).
-  - `offset` (int): Number of records to skip (for pagination).
+- **Description**: Retrieves information about the next upcoming race in the current season.
 - **Sample Request**:
 
   ```
-  GET /api/v1/driver/?search=Hamilton&nationality=British
-  ```
-
-- **Sample Response**:
-
-  ```json
-  [
-    {
-      "id": "hamilton",
-      "name": "Lewis Hamilton",
-      "first_name": "Lewis",
-      "last_name": "Hamilton",
-      "full_name": "Lewis Hamilton",
-      "abbreviation": "HAM",
-      "permanent_number": "44",
-      "gender": "Male",
-      "date_of_birth": "1985-01-07",
-      "nationality": "British",
-      "total_championship_wins": 7,
-      // ... other fields
-    },
-    // ... other drivers
-  ]
-  ```
-
-#### 2. Get Driver Details
-
-- **URL**: `/driver/<str:id>/`
-- **Method**: `GET`
-- **Description**: Retrieves detailed information about a specific driver.
-- **Path Parameters**:
-  - `id` (string): The unique ID of the driver.
-- **Sample Request**:
-
-  ```
-  GET /api/v1/driver/hamilton/
+  GET /home/upcoming_race/
   ```
 
 - **Sample Response**:
 
   ```json
   {
-    "id": "hamilton",
-    "name": "Lewis Hamilton",
-    "first_name": "Lewis",
-    "last_name": "Hamilton",
-    "full_name": "Lewis Hamilton",
-    // ... other fields
+    "race_name": "Dutch Grand Prix",
+    "race_id": "14",
+    "date": "2023-08-27",
+    "hour": "13:00"
   }
   ```
 
-#### 3. Get Driver Results
+#### 2. Get Last Race Results
 
-- **URL**: `/driver/<str:id>/results/`
+- **URL**: `/home/last_race_results/`
 - **Method**: `GET`
-- **Description**: Retrieves race results for a specific driver.
+- **Description**: Retrieves the results of the most recent past race in the current season.
 - **Sample Request**:
 
   ```
-  GET /api/v1/driver/hamilton/results/
+  GET /home/last_race_results/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  {
+    "race_id": "13",
+    "first_position": {
+      "driver_name": "Max Verstappen",
+      "team_name": "Red Bull",
+      "driver_id": "max_verstappen"
+    },
+    "second_position": {
+      "driver_name": "Lewis Hamilton",
+      "team_name": "Mercedes",
+      "driver_id": "lewis_hamilton"
+    },
+    "third_position": {
+      "driver_name": "Charles Leclerc",
+      "team_name": "Ferrari",
+      "driver_id": "charles_leclerc"
+    },
+    "fastest_lap": {
+      "driver_name": "Lando Norris",
+      "team_name": "McLaren",
+      "driver_id": "lando_norris"
+    }
+  }
+  ```
+
+---
+
+### Race Screen Views
+
+#### 1. Get List of All Races in Selected Year
+
+- **URL**: `/races/<int:year>/`
+- **Method**: `GET`
+- **Description**: Retrieves a list of all races in the specified year.
+- **Path Parameters**:
+  - `year` (int): The year for which to retrieve races.
+- **Sample Request**:
+
+  ```
+  GET /races/2023/
   ```
 
 - **Sample Response**:
@@ -118,27 +102,37 @@ When you run the Django development server using the command `python manage.py r
   ```json
   [
     {
-      "race_id": 101,
-      "year": 2023,
-      "grand_prix": "British Grand Prix",
-      "date": "2023-07-18",
-      // ... other fields
+      "date": "2023-03-05",
+      "race_name": "Bahrain Grand Prix",
+      "race_id": "1",
+      "circuit_name": "Bahrain International Circuit",
+      "round": "1/22",
+      "location": "Sakhir, Bahrain",
+      "winner": "Max Verstappen",
+      "winner_driver_id": "max_verstappen",
+      "winning_time": "1:33:56.736",
+      "fastest_lap": "Sergio Perez",
+      "fastest_lap_driver_id": "sergio_perez",
+      "fastest_lap_time": "1:32.627",
+      "pole_position": "Charles Leclerc",
+      "pole_position_driver_id": "charles_leclerc"
     },
     // ... other races
   ]
   ```
 
-### Constructor Endpoints
+#### 2. Get Detailed Results for a Specific Race
 
-#### 1. Get All Constructors
-
-- **URL**: `/constructor/`
+- **URL**: `/race/<int:year>/<int:round>/results/`
 - **Method**: `GET`
-- **Description**: Retrieves a list of all constructors.
+- **Description**: Retrieves detailed results for a specific race.
+- **Path Parameters**:
+  - `year` (int): The year of the race.
+  - `round` (int): The round number of the race.
 - **Sample Request**:
 
   ```
-  GET /api/v1/constructor/
+  GET /race/2023/13/results/
   ```
 
 - **Sample Response**:
@@ -146,78 +140,309 @@ When you run the Django development server using the command `python manage.py r
   ```json
   [
     {
-      "id": "mercedes",
-      "name": "Mercedes",
-      "country": "Germany",
-      // ... other fields
+      "position": "1",
+      "driver": "Max Verstappen",
+      "driver_id": "max_verstappen",
+      "team": "Red Bull",
+      "team_id": "red_bull",
+      "time": "1:25:38.426",
+      "grid": "1",
+      "laps": "70",
+      "points": "25"
     },
-    // ... other constructors
+    {
+      "position": "2",
+      "driver": "Lewis Hamilton",
+      "driver_id": "lewis_hamilton",
+      "team": "Mercedes",
+      "team_id": "mercedes",
+      "time": "+5.123",
+      "grid": "3",
+      "laps": "70",
+      "points": "18"
+    },
+    // ... other drivers
   ]
   ```
 
-#### 2. Get Constructor Details
+#### 3. Get Lap by Lap Details for Specific Driver in a Race
 
-- **URL**: `/constructor/<str:id>/`
+- **URL**: `/race/<int:year>/<int:round>/driver/<string:driver_id>/laps/`
 - **Method**: `GET`
-- **Description**: Retrieves detailed information about a specific constructor.
+- **Description**: Retrieves lap-by-lap timing data for a specific driver in a race.
+- **Path Parameters**:
+  - `year` (int): The year of the race.
+  - `round` (int): The round number of the race.
+  - `driver_id` (string): The unique ID of the driver.
 - **Sample Request**:
 
   ```
-  GET /api/v1/constructor/mercedes/
+  GET /race/2023/13/driver/lewis_hamilton/laps/
   ```
 
-### Circuit Endpoints
+- **Sample Response**:
 
-#### 1. Get All Circuits
+  ```json
+  [
+    {
+      "lap_number": 1,
+      "lap_time": "1:34.567"
+    },
+    {
+      "lap_number": 2,
+      "lap_time": "1:33.789"
+    },
+    // ... other laps
+  ]
+  ```
 
-- **URL**: `/circuit/`
+#### 4. Get Pit Stop Data
+
+- **URL**: `/race/<int:year>/<int:round>/pitstops/`
 - **Method**: `GET`
-- **Description**: Retrieves a list of all circuits.
-
-#### 2. Get Circuit Details
-
-- **URL**: `/circuit/<str:id>/`
-- **Method**: `GET`
-- **Description**: Retrieves detailed information about a specific circuit.
-
-### Race Endpoints
-
-#### 1. Get All Races
-
-- **URL**: `/race/`
-- **Method**: `GET`
-- **Description**: Retrieves a list of all races.
-- **Query Parameters**:
-  - `year` (int): Filter races by year.
-  - `search` (string): Search races by official name.
-  - `limit` (int): Number of records to return.
-  - `offset` (int): Number of records to skip.
+- **Description**: Retrieves pit stop data for a specific race.
+- **Path Parameters**:
+  - `year` (int): The year of the race.
+  - `round` (int): The round number of the race.
 - **Sample Request**:
 
   ```
-  GET /api/v1/race/?year=2023
+  GET /race/2023/13/pitstops/
   ```
 
-#### 2. Get Race Details
+- **Sample Response**:
 
-- **URL**: `/race/<int:id>/`
+  ```json
+  [
+    {
+      "driver": "lewis_hamilton",
+      "total_duration": 4.5,
+      "stops": [
+        {
+          "lap": "15",
+          "time_of_day": "14:30:15",
+          "duration": 2.2
+        },
+        {
+          "lap": "45",
+          "time_of_day": "15:15:45",
+          "duration": 2.3
+        }
+      ]
+    },
+    {
+      "driver": "max_verstappen",
+      "total_duration": 2.0,
+      "stops": [
+        {
+          "lap": "30",
+          "time_of_day": "14:50:30",
+          "duration": 2.0
+        }
+      ]
+    },
+    // ... other drivers
+  ]
+  ```
+
+---
+
+### Drivers Screen Views
+
+#### 1. Get All Drivers in a Given Year
+
+- **URL**: `/drivers/<int:year>/`
 - **Method**: `GET`
-- **Description**: Retrieves detailed information about a specific race.
+- **Description**: Retrieves a list of all drivers who participated in the specified year.
+- **Path Parameters**:
+  - `year` (int): The year for which to retrieve drivers.
 - **Sample Request**:
 
   ```
-  GET /api/v1/race/101/
+  GET /drivers/2023/
   ```
 
-#### 3. Get Race Results
+- **Sample Response**:
 
-- **URL**: `/race/<int:id>/results/`
+  ```json
+  [
+    {
+      "driver_name": "Lewis Hamilton",
+      "driver_id": "lewis_hamilton"
+    },
+    {
+      "driver_name": "Max Verstappen",
+      "driver_id": "max_verstappen"
+    },
+    // ... other drivers
+  ]
+  ```
+
+#### 2. Get Driver Career and Season Stats
+
+- **URL**: `/driver/<string:driver_id>/<int:year>/stats/`
 - **Method**: `GET`
-- **Description**: Retrieves the results of a specific race.
+- **Description**: Retrieves career and current season statistics for a specific driver.
+- **Path Parameters**:
+  - `driver_id` (string): The unique ID of the driver.
+  - `year` (int): The current season year.
 - **Sample Request**:
 
   ```
-  GET /api/v1/race/101/results/
+  GET /driver/max_verstappen/2023/stats/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  {
+    "all_time_stats": {
+      "total_races": 150,
+      "total_wins": 35,
+      "total_podiums": 60,
+      "total_championships": 2,
+      "total_pole_positions": 20
+    },
+    "current_season_stats": {
+      "num_races": 13,
+      "wins": 8,
+      "podiums": 11,
+      "pole_positions": 6
+    },
+    "season_results": [
+      {
+        "year": "2023",
+        "position": "1",
+        "points": "310",
+        "num_races": 13,
+        "wins": 8,
+        "team": "Red Bull"
+      },
+      // ... previous seasons
+    ]
+  }
+  ```
+
+#### 3. Get Driver Race Stats for a Given Year
+
+- **URL**: `/driver/<string:driver_id>/<int:year>/races/`
+- **Method**: `GET`
+- **Description**: Retrieves race-by-race statistics for a specific driver in a given year.
+- **Path Parameters**:
+  - `driver_id` (string): The unique ID of the driver.
+  - `year` (int): The year for which to retrieve race stats.
+- **Sample Request**:
+
+  ```
+  GET /driver/charles_leclerc/2023/races/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  [
+    {
+      "race_id": "1",
+      "race_name": "Bahrain Grand Prix",
+      "qualifying_position": "1",
+      "grid": "1",
+      "result": "2"
+    },
+    {
+      "race_id": "2",
+      "race_name": "Saudi Arabian Grand Prix",
+      "qualifying_position": "3",
+      "grid": "3",
+      "result": "1"
+    },
+    // ... other races
+  ]
+  ```
+
+---
+
+### Teams Screen Views
+
+#### 1. Get Teams in a Year
+
+- **URL**: `/teams/<int:year>/`
+- **Method**: `GET`
+- **Description**: Retrieves a list of all teams (constructors) that participated in a given year.
+- **Path Parameters**:
+  - `year` (int): The year for which to retrieve teams.
+- **Sample Request**:
+
+  ```
+  GET //teams/2023/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  [
+    {
+      "team_id": "mercedes",
+      "team_name": "Mercedes",
+      "year_wins": 2,
+      "year_podiums": 7,
+      "drivers": ["Lewis Hamilton", "George Russell"]
+    },
+    {
+      "team_id": "red_bull",
+      "team_name": "Red Bull",
+      "year_wins": 8,
+      "year_podiums": 12,
+      "drivers": ["Max Verstappen", "Sergio Perez"]
+    },
+    // ... other teams
+  ]
+  ```
+
+#### 2. Get Detailed Team Stats
+
+- **URL**: `/team/<string:team_id>/<int:year>/stats/`
+- **Method**: `GET`
+- **Description**: Retrieves detailed statistics for a specific team, including all-time stats and current season stats.
+- **Path Parameters**:
+  - `team_id` (string): The unique ID of the team.
+  - `year` (int): The current season year.
+- **Sample Request**:
+
+  ```
+  GET //team/ferrari/2023/stats/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  {
+    "all_time_stats": {
+      "total_races": 1010,
+      "total_wins": 240,
+      "total_podiums": 770,
+      "total_championships": 16,
+      "total_pole_positions": 230
+    },
+    "current_season_stats": {
+      "num_races": 13,
+      "wins": 1,
+      "podiums": 4,
+      "pole_positions": 2
+    },
+    "season_results": [
+      {
+        "year": "2023",
+        "num_races": 13,
+        "wins": 1,
+        "podiums": 4,
+        "pole_positions": 2,
+        "position": "3",
+        "points": "220",
+        "drivers": ["Charles Leclerc", "Carlos Sainz"]
+      },
+      // ... previous seasons
+    ]
+  }
   ```
 
 ---
@@ -240,64 +465,9 @@ When you run the Django development server using the command `python manage.py r
 ### Example Request
 
 ```http
-GET /api/v1/driver/?search=Verstappen HTTP/1.1
-Host: 127.0.0.1:8000
+GET /drivers/2023/ HTTP/1.1
+Host: 127.0.0.1:5000
 Accept: application/json
 ```
-
----
-
-## Pagination
-
-- **Parameters**:
-  - `limit`: Number of items per page (default is 50).
-  - `offset`: Number of items to skip.
-- **Usage**:
-  - **First Page**: `/api/v1/driver/?limit=50&offset=0`
-  - **Second Page**: `/api/v1/driver/?limit=50&offset=50`
-
----
-
-## Error Handling
-
-### Standard HTTP Status Codes
-
-- **200 OK**: The request has succeeded.
-- **400 Bad Request**: The server could not understand the request due to invalid syntax.
-- **404 Not Found**: The server can not find the requested resource.
-- **500 Internal Server Error**: The server has encountered a situation it doesn't know how to handle.
-
-### Example Error Response
-
-- **404 Not Found**:
-
-  ```json
-  {
-    "detail": "Not found."
-  }
-  ```
-
----
-
-## Integration Notes
-
-### Data Models
-
-- **Consistency**: Ensure the field names and data types provided by the API match what the frontend expects.
-
-### CORS Considerations
-
-- The backend allows all origins during development, but in production, it's recommended to specify allowed origins for security.
-
-### Testing the API
-
-- **Tools**: Use tools like Postman, Insomnia, or curl to test API endpoints independently.
-
----
-
-## Deployment and Environment
-
-- **Development Server**: Run locally using `python manage.py runserver`.
-- **Production Server**: The backend will be deployed to a production environment accessible to the frontend application.
 
 ---
