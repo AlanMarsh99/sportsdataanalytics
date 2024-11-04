@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/ui/screens/authentication/forget_password_screen.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
@@ -202,12 +203,12 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 10.0),
         TextButton(
           onPressed: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => ForgotPasswordScreen(),
-            //   ),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ForgotPasswordScreen(),
+              ),
+            );
           },
           child: Container(
             alignment: Alignment.centerRight,

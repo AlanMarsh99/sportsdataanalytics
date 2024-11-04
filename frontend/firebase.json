@@ -1,0 +1,46 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "racevision-tud",
+          "appId": "1:325042115318:android:2b9bd9147995c931f2d2d7",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "racevision-tud",
+          "appId": "1:325042115318:ios:66e53c15328b5ebbf2d2d7",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "racevision-tud",
+          "configurations": {
+            "android": "1:325042115318:android:2b9bd9147995c931f2d2d7",
+            "ios": "1:325042115318:ios:66e53c15328b5ebbf2d2d7",
+            "web": "1:325042115318:web:a7aea04e88472813f2d2d7"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "site": "racevision-tud",
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

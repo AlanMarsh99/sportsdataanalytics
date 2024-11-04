@@ -1,18 +1,25 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/firebase_options.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider(
         create: (_) => NavigationProvider(),
       ),
-       /*ChangeNotifierProvider(
+      /*ChangeNotifierProvider(
         create: (_) => DataProvider(),
       ),*/
     ], child: const MyApp()),
@@ -26,7 +33,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false, theme: theme, home: NavigationScreen()
-        );
+        debugShowCheckedModeBanner: false,
+        theme: theme,
+        home: NavigationScreen());
   }
 }
