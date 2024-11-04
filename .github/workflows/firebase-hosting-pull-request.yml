@@ -21,7 +21,9 @@ jobs:
           flutter-version: '3.22.3' 
 
       # Build the web app
-      - run: flutter build web
+      - name: Build Flutter Web
+        run: flutter build web
+        working-directory: ./frontend # Set the directory to your Flutter app
 
       # Deploy to Firebase Hosting preview
       - uses: FirebaseExtended/action-hosting-deploy@v0
