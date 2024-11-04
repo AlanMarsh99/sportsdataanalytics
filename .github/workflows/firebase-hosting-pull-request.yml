@@ -31,3 +31,4 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RACEVISION_TUD }}
           projectId: racevision-tud
+          entryPoint: frontend # Specifies where to find firebase.json
