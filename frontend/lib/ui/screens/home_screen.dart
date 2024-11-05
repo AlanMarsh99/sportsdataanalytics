@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDriverCard(Map<String, String> fastestLapData) {
+  Widget _buildDriverCard(Map<String, dynamic> fastestLapData) {
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildPodiumCard(int position, Map<String, String> driverData) {
+  Widget _buildPodiumCard(int position, Map<String, dynamic> driverData) {
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
@@ -212,6 +212,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _countdownContainer(Map<String, dynamic> upcomingRaceInfo) {
+    String date = upcomingRaceInfo['date']; // e.g., "2023-08-27"
+    String hour = upcomingRaceInfo['hour']; // e.g., "13:00"
+
+    // Convert date and time strings to DateTime object
+    DateTime raceDate = DateTime.parse("$date $hour:00");
+
+    String formattedDate = DateFormat('EEEE MMMM d \a\t HH:mm z')
+        .format(raceDate);
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.all(16),
@@ -232,10 +240,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(5),
               child: Text(
-                'FORMULA 1 PIRELLI UNITED STATES GRAND PRIX 2024',
+                'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -246,8 +254,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Sunday November 2 at 14:00 CET',
+          Text(
+            formattedDate,
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
