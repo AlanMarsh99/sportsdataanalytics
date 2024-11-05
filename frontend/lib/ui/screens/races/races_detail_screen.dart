@@ -151,7 +151,7 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 25),
                     child: Text(
-                      widget.race.name,
+                      widget.race.raceName,
                       style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -176,7 +176,8 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                         fit: FlexFit.tight,
                         child: _buildSquareCard(
                           'Date',
-                          Globals.toDateFormat(widget.race.date),
+                          widget.race.date,
+                          //Globals.toDateFormat(widget.race.date),
                         ),
                       ),
                     ],
@@ -197,7 +198,7 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                       Flexible(
                         flex: 2,
                         fit: FlexFit.tight,
-                        child: _buildSquareCard('Circuit', widget.race.circuit),
+                        child: _buildSquareCard('Circuit', widget.race.circuitName),
                       ),
                     ],
                   ),
@@ -214,12 +215,12 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                   const SizedBox(height: 12),
                   _buildInfoContainer(
                       'Fastest lap time', widget.race.fastestLapTime),
-                  const SizedBox(height: 12),
-                  _buildInfoContainer(
+                  //const SizedBox(height: 12),
+                 /* _buildInfoContainer(
                       'Fastest pitstop', widget.race.fastestPitStop),
                   const SizedBox(height: 12),
                   _buildInfoContainer(
-                      'Fastest pitstop time', widget.race.fastestPitStopTime),
+                      'Fastest pitstop time', widget.race.fastestPitStopTime),*/
                   const SizedBox(height: 12),
                   Container(
                     alignment: Alignment.centerLeft,
