@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/race.dart';
+import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/races_season_table.dart';
+import 'package:provider/provider.dart';
 
 class RacesScreen extends StatefulWidget {
   const RacesScreen({
@@ -15,7 +17,9 @@ class RacesScreen extends StatefulWidget {
 class _RacesScreenState extends State<RacesScreen> {
   List<String> seasons = [];
   String selectedSeason = '2024';
-  late Future<List<dynamic>> _racesFuture;
+  Future<List<dynamic>>? _racesSeasonFuture;
+  List<dynamic>? racesSeason;
+  bool seasonChanged = false;
 
   @override
   void initState() {
@@ -31,7 +35,7 @@ class _RacesScreenState extends State<RacesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Race> racesSeason = [
+    /*List<Race> racesSeason = [
       Race(
         id: 1,
         name: 'Bahrain Grand Prix',
@@ -332,7 +336,13 @@ class _RacesScreenState extends State<RacesScreen> {
         fastestPitStop: 'Ferrari',
         fastestPitStopTime: '22.333',
       ),
-    ];
+    ];*/
+
+    // Access the provider
+    final dataProvider = Provider.of<DataProvider>(context);
+
+    // Extract data from provider
+    racesSeason = dataProvider.racesSeason;
 
     return Container(
       decoration: const BoxDecoration(
@@ -373,34 +383,43 @@ class _RacesScreenState extends State<RacesScreen> {
               Expanded(
                 child: Align(
                   alignment: Alignment.topCenter,
-                  child: FutureBuilder<List<dynamic>>(
-                    future: _racesFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
-                        ); // Show loading while fetching
-                      } else if (snapshot.hasError) {
-                        return const Text(
-                          'Error: Failed to load races',
-                          style: TextStyle(color: Colors.white),
-                        ); // Error handling
-                      } else if (snapshot.hasData) {
-                        //selectedRace ??= snapshot.data![0]['name'];
-                        //racesSeason = [];
-                        for (var item in snapshot.data!) {
-                          //Race race = Race();
-                          print(item);
-
-                        }
-
-                        return RacesSeasonTable(races: racesSeason);
-                      }
-                      return Container();
-                    },
-                  ),
+                  child: seasonChanged
+                      ? FutureBuilder<void>(
+                          future: _racesSeasonFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ); // Show loading while fetching
+                            } else if (snapshot.hasError) {
+                              return const Text(
+                                'Error: Failed to load races',
+                                style: TextStyle(color: Colors.white),
+                              ); // Error handling
+                            } else if (snapshot.hasData) {
+                              //selectedRace ??= snapshot.data![0]['name'];
+                              //racesSeason = [];
+                              /*for (var item in snapshot.data!) {
+                                //Race race = Race();
+                                print(item);
+                              }*/
+                              List<dynamic> races =
+                                  snapshot.data as List<dynamic>;
+                              return RacesSeasonTable(races: races);
+                            }
+                            return Container();
+                          },
+                        )
+                      : racesSeason == null
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : RacesSeasonTable(races: racesSeason!),
                 ),
               ),
             ],
@@ -433,7 +452,9 @@ class _RacesScreenState extends State<RacesScreen> {
         onChanged: (String? newValue) {
           setState(() {
             selectedSeason = newValue!;
-           // _racesFuture = APIService().getRaces(year: selectedSeason);
+            seasonChanged = true;
+            _racesSeasonFuture =
+                APIService().getAllRacesInYear(int.parse(selectedSeason));
           });
         },
       ),

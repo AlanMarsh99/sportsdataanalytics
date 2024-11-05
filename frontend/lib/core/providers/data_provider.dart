@@ -10,10 +10,15 @@ class DataProvider extends ChangeNotifier {
   List<dynamic>? _teamsSeason;
   List<dynamic>? _racesSeason;
   APIService apiService = APIService();
+  bool firstTime = true;
 
   DataProvider() {
-    getHomeScreenInfo();
-    getDriversList();
+    if (firstTime) {
+      getHomeScreenInfo();
+      getRacesYear(DateTime.now().year);
+      getDriversList();
+      firstTime = false;
+    }
   }
 
   Map<String, dynamic>? get upcomingRaceInfo => _upcomingRaceInfo;
