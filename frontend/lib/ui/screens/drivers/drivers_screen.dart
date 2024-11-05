@@ -31,8 +31,8 @@ class _DriversScreenState extends State<DriversScreen> {
       seasons.add(i.toString());
     }
     selectedSeason = currentYear.toString();
-    _driversFuture = APIService().getAllDrivers(
-        /*limit: limit, offset: currentOffset*/); // Fetch the drivers
+    /*_driversFuture = APIService().getAllDrivers(
+        /*limit: limit, offset: currentOffset*/); // Fetch the drivers*/
   }
 
   @override

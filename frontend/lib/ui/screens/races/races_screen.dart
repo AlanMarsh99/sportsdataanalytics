@@ -26,7 +26,7 @@ class _RacesScreenState extends State<RacesScreen> {
       seasons.add(i.toString());
     }
     selectedSeason = currentYear.toString();
-    _racesFuture = APIService().getRaces(year: selectedSeason);
+    //_racesFuture = APIService().getRaces(year: selectedSeason);
   }
 
   @override
@@ -433,7 +433,7 @@ class _RacesScreenState extends State<RacesScreen> {
         onChanged: (String? newValue) {
           setState(() {
             selectedSeason = newValue!;
-            _racesFuture = APIService().getRaces(year: selectedSeason);
+           // _racesFuture = APIService().getRaces(year: selectedSeason);
           });
         },
       ),
