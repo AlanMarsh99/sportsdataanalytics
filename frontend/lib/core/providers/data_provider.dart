@@ -60,7 +60,6 @@ class DataProvider extends ChangeNotifier {
         }
       }
 
-      notifyListeners();
     } catch (error) {
       print("Error fetching _driversList: $error");
     }

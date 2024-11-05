@@ -5,6 +5,7 @@ import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
 import 'package:frontend/data/data_provider.dart';
+import 'package:provider/provider.dart';
 
 class DriversScreen extends StatefulWidget {
   const DriversScreen({
@@ -21,6 +22,11 @@ class _DriversScreenState extends State<DriversScreen> {
   final int limit = 50;
   List<String> seasons = [];
   String selectedSeason = '2024';
+  Map<String, dynamic> driversMap = {};
+  List<String> driversNames = [];
+  bool firstTime = true;
+
+  bool seasonChanged = false;
 
   @override
   void initState() {
@@ -37,6 +43,13 @@ class _DriversScreenState extends State<DriversScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Access the provider
+    final dataProvider = Provider.of<DataProvider>(context);
+
+    // Extract data from provider
+    List<dynamic>? driversList = dataProvider.driversList;
+    Map<String, dynamic>? driversStats = dataProvider.driverStats;
+
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Container(
@@ -62,32 +75,40 @@ class _DriversScreenState extends State<DriversScreen> {
                         color: Colors.white),
                   ),
                   const SizedBox(height: 16),
+
                   Row(
                     children: [
-                      FutureBuilder<List<dynamic>>(
-                        future: _driversFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ); // Show loading while fetching
-                          } else if (snapshot.hasError) {
-                            return const Text(
-                              'Error: Failed to load drivers',
-                              style: TextStyle(color: Colors.white),
-                            ); // Error handling
-                          } else if (snapshot.hasData) {
-                            selectedDriver ??= snapshot.data![0]['name'];
-                            return _buildDriverDropdown(snapshot.data!);
-                          }
-                          return Container();
-                        },
-                      ),
+                      seasonChanged
+                          ? FutureBuilder<List<dynamic>>(
+                              future: _driversFuture,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  ); // Show loading while fetching
+                                } else if (snapshot.hasError) {
+                                  return const Text(
+                                    'Error: Failed to load drivers',
+                                    style: TextStyle(color: Colors.white),
+                                  ); // Error handling
+                                } else if (snapshot.hasData) {
+                                  return _buildDriverDropdown(snapshot.data!);
+                                }
+                                return Container();
+                              },
+                            )
+                          : driversList == null
+                              ? const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : _buildDriverDropdown(driversList),
                       SizedBox(width: 20),
-                      //_buildYearDropdown()
+                      _buildYearDropdown()
                     ],
                   ),
 
@@ -190,13 +211,28 @@ class _DriversScreenState extends State<DriversScreen> {
         onChanged: (String? newValue) {
           setState(() {
             selectedSeason = newValue!;
+            seasonChanged = true;
+            _driversFuture =
+                APIService().getDriversInYear(int.parse(selectedSeason));
           });
         },
       ),
     );
   }
 
-  Widget _buildDriverDropdown(List<dynamic> drivers) {
+  Widget _buildDriverDropdown(List<dynamic> driversList) {
+    if (driversList.isNotEmpty) {
+      driversNames = [];
+      driversMap = {};
+      for (var driver in driversList) {
+        driversMap[driver['driver_id']] = driver['driver_name'];
+        driversNames.add(driver['driver_name']);
+      }
+      selectedDriver ??= driversNames[0];
+      if (!driversNames.contains(selectedDriver)) {
+        selectedDriver = driversNames[0];
+      }
+    }
     return Container(
       width: 200,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -213,12 +249,11 @@ class _DriversScreenState extends State<DriversScreen> {
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: drivers.map<DropdownMenuItem<String>>((dynamic driver) {
+        items: driversNames.map<DropdownMenuItem<String>>((String driverName) {
           return DropdownMenuItem<String>(
-            value:
-                driver['name'], // Assuming the driver object has a 'name' field
-            child: Text(driver['name'],
-                style: const TextStyle(color: Colors.black)),
+            value: driverName,
+            child:
+                Text(driverName, style: const TextStyle(color: Colors.black)),
           );
         }).toList(),
         onChanged: (String? newValue) {
