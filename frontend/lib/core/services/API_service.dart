@@ -158,7 +158,53 @@ class APIService {
     }
   }
 
+// Fetch driver race stats in a given year
+  Future<List<dynamic>> getDriverRaceStats(String driverId, int year) async {
+    final url = Uri.parse('$baseUrl/driver/$driverId/$year/races/');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return jsonDecode(response.body);
+      } else {
+        print('Failed to load race stats for driver $driverId');
+        print('Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to load race stats: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching driver race stats: $e');
+      rethrow;
+    }
+  }
+
   // TEAM SCREENS
+
+  // Fetch all teams in a given year
+  Future<List<dynamic>> getTeamsByYear(int year) async {
+    final url = Uri.parse('$baseUrl/teams/$year/');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return jsonDecode(response.body);
+      } else {
+        print('Failed to load teams for the season $year');
+        print('Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to load teams: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching teams: $e');
+      rethrow;
+    }
+  }
 
   // Fetch team stats for a specific year
   Future<List<dynamic>> getTeamStats(String teamId, int year) async {
