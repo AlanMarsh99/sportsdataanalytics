@@ -82,7 +82,7 @@ class DataProvider extends ChangeNotifier {
     }
   }*/
 
-  Future<void> getRacesyear(int year) async {
+  Future<void> getTeamsYear(int year) async {
     try {
       _teamsSeason = await apiService.getTeamsByYear(year);
 
