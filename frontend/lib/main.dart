@@ -9,19 +9,19 @@ import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  /*WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );
+  );*/
 
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider(
         create: (_) => NavigationProvider(),
       ),
-      /*ChangeNotifierProvider(
+      ChangeNotifierProvider(
         create: (_) => DataProvider(),
-      ),*/
+      ),
     ], child: const MyApp()),
   );
 }

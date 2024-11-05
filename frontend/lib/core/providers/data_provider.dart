@@ -1,140 +1,108 @@
-/*import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:frontend/core/services/API_service.dart';
 
 class DataProvider extends ChangeNotifier {
-  final String baseUrl = 'http://127.0.0.1:8000/api/v1';
+  Map<String, dynamic>? _upcomingRaceInfo;
+  Map<String, dynamic>? _lastRaceResults;
+  List<dynamic>? _driversList;
+  Map<String, dynamic>? _driverStats;
+  List<dynamic>? _driverAllRacesSeason;
+  List<dynamic>? _teamsSeason;
+  List<dynamic>? _racesSeason;
+  APIService apiService = APIService();
+  bool firstTime = true;
 
-  // Function to get all drivers with optional filters
-  // This one works
-  Future<List<dynamic>> getAllDrivers(
-      {String? search, String? nationality, int? limit, int? offset}) async {
-    String baseUrl = '$baseUrl/driver/';
-    Map<String, String> queryParams = {
-      if (search != null) 'search': search,
-      if (nationality != null) 'nationality': nationality,
-      if (limit != null) 'limit': limit.toString(),
-      if (offset != null) 'offset': offset.toString(),
-    };
-
-    Uri uri = Uri.parse(baseUrl).replace(queryParameters: queryParams);
-
-    try {
-      final response = await http.get(uri, headers: {
-        'Accept': 'application/json',
-      });
-
-      if (response.statusCode == 200) {
-        // Parse the entire response
-        Map<String, dynamic> data = jsonDecode(response.body);
-
-        // Extract the list of drivers from 'results'
-        List<dynamic> drivers = data['results'];
-
-        return drivers;
-      } else {
-        throw Exception('Failed to load drivers');
-      }
-    } catch (e) {
-      print('Error fetching drivers: $e');
-      throw Exception('Error fetching drivers: $e');
+  DataProvider() {
+    if (firstTime) {
+      getHomeScreenInfo();
+      getRacesYear(DateTime.now().year);
+      getDriversList();
+      firstTime = false;
     }
   }
 
-  Future<Map<String, dynamic>> getDriverDetails(String driverId) async {
-    String baseUrl = 'http://127.0.0.1:8000/api/v1/driver/$driverId/';
+  Map<String, dynamic>? get upcomingRaceInfo => _upcomingRaceInfo;
+  Map<String, dynamic>? get lastRaceResults => _lastRaceResults;
+  List<dynamic>? get driversList => _driversList;
+  Map<String, dynamic>? get driverStats => _driverStats;
+  List<dynamic>? get driverAllRacesSeason => _driverAllRacesSeason;
+  List<dynamic>? get teamsSeason => _teamsSeason;
+  List<dynamic>? get racesSeason => _racesSeason;
 
+  Future<void> getHomeScreenInfo() async {
     try {
-      final response = await http.get(Uri.parse(baseUrl), headers: {
-        'Accept': 'application/json',
-      });
+      // Wait for both API calls to complete before notifying listeners
+      final results = await Future.wait([
+        apiService.getUpcomingRace(),
+        apiService.getLastRaceResults(),
+      ]);
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to load driver details');
-      }
-    } catch (e) {
-      throw Exception('Error fetching driver details: $e');
+      _upcomingRaceInfo = results[0];
+      _lastRaceResults = results[1];
+
+      notifyListeners();
+    } catch (error) {
+      print("Error fetching home screen info: $error");
     }
   }
 
-  Future<List<dynamic>> getDriverResults(String driverId) async {
-    String baseUrl = 'http://127.0.0.1:8000/api/v1/driver/$driverId/results/';
-
+  Future<void> getDriversList() async {
     try {
-      final response = await http.get(Uri.parse(baseUrl), headers: {
-        'Accept': 'application/json',
-      });
+      int currentSeason = DateTime.now().year;
+      _driversList = await apiService.getDriversInYear(currentSeason);
+      if (_driversList != null) {
+        if (_driversList!.isNotEmpty) {
+          // Get the first driver's ID
+          String firstDriverId = _driversList![0]['driver_id'];
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to load driver results');
+          // Call the API for the first driver's stats
+          await getDriverStats(firstDriverId, currentSeason);
+        }
       }
-    } catch (e) {
-      throw Exception('Error fetching driver results: $e');
+
+    } catch (error) {
+      print("Error fetching _driversList: $error");
     }
   }
 
-  Future<List<dynamic>> getAllConstructors() async {
-    String baseUrl = 'http://127.0.0.1:8000/api/v1/constructor/';
-
+  Future<void> getDriverStats(String driverId, int year) async {
     try {
-      final response = await http.get(Uri.parse(baseUrl), headers: {
-        'Accept': 'application/json',
-      });
+      _driverStats = await apiService.getDriverStats(driverId, year);
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to load constructors');
-      }
-    } catch (e) {
-      throw Exception('Error fetching constructors: $e');
+      notifyListeners();
+    } catch (error) {
+      print("Error fetching _driverStats: $error");
     }
   }
 
-  Future<Map<String, dynamic>> getConstructorDetails(
-      String constructorId) async {
-    String baseUrl = 'http://127.0.0.1:8000/api/v1/constructor/$constructorId/';
-
+  /*Future<void> getDriverRaceStats(String driverId, int year) async {
     try {
-      final response = await http.get(Uri.parse(baseUrl), headers: {
-        'Accept': 'application/json',
-      });
+      _driverAllRacesSeason =
+          await apiService.getDriverRaceStats(driverId, year);
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Failed to load constructor details');
-      }
-    } catch (e) {
-      throw Exception('Error fetching constructor details: $e');
+      notifyListeners();
+    } catch (error) {
+      print("Error fetching _driverAllRacesSeason: $error");
+    }
+  }*/
+
+  Future<void> getTeamsYear(int year) async {
+    try {
+      _teamsSeason = await apiService.getTeamsByYear(year);
+
+      notifyListeners();
+    } catch (error) {
+      print("Error fetching _teamsSeason: $error");
+    }
+  }
+
+  Future<void> getRacesYear(int year) async {
+    try {
+      _racesSeason = await apiService.getAllRacesInYear(year);
+
+      notifyListeners();
+    } catch (error) {
+      print("Error fetching _racesSeason: $error");
     }
   }
 }
-
-Future<List<dynamic>> getRaces({
-    required int year,
-    String? search,
-    int limit = 10,
-    int offset = 0,
-  }) async {
-    final uri = Uri.parse('$baseUrl/race/').replace(queryParameters: {
-      'year': year.toString(),
-      if (search != null) 'search': search,
-      'limit': limit.toString(),
-      'offset': offset.toString(),
-    });
-
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      final List races = json.decode(response.body);
-      return races;
-    } else {
-      throw Exception('Failed to load races');
-    }
-  }
-*/

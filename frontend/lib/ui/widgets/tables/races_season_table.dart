@@ -7,10 +7,15 @@ import 'package:frontend/ui/theme.dart';
 class RacesSeasonTable extends StatelessWidget {
   const RacesSeasonTable({Key? key, required this.races}) : super(key: key);
 
-  final List<Race> races;
+  final List<dynamic> races;
+
+  List<Race> parseRaces(List<dynamic> jsonList) {
+    return jsonList.map((json) => Race.fromJson(json)).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
+    List<Race> racesList = parseRaces(races);
     return Scrollbar(
       thumbVisibility: true,
       child: SingleChildScrollView(
@@ -69,13 +74,12 @@ class RacesSeasonTable extends StatelessWidget {
                     ),
                   ),
                 ],
-                rows: races.map((race) {
+                rows: racesList.map((race) {
                   return DataRow(cells: [
                     DataCell(
                       Text(
-                        Globals.toDateFormat(race.date),
-                        style: const TextStyle(
-                            color: Colors.black),
+                        race.date,
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
@@ -90,16 +94,15 @@ class RacesSeasonTable extends StatelessWidget {
                           );
                         },
                         child: Text(
-                          race.name,
+                          race.raceName,
                           style: const TextStyle(
-                              color: secondary,
-                              fontWeight: FontWeight.bold),
+                              color: secondary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     DataCell(
                       Text(
-                        race.circuit,
+                        race.circuitName,
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
