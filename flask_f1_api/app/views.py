@@ -619,76 +619,110 @@ def get_teams_by_year(year):
 # Get detailed team stats
 @api_blueprint.route('/team/<string:team_id>/<int:year>/stats/', methods=['GET'])
 def get_team_stats(team_id, year):
-    # All-Time Stats
-    all_time_stats_url = f"{BASE_ERGAST_URL}/constructors/{team_id}/results.json"
-    response = requests.get(all_time_stats_url)
-
-    if response.status_code != 200:
-        return jsonify({"error": f"Failed to retrieve all-time stats for team {team_id}"}), response.status_code
-
-    races_data = response.json()['MRData']['RaceTable']['Races']
+    # Initialize all-time stats and season results
     all_time_stats = {
-        "total_races": len(races_data),
+        "total_races": 0,
         "total_wins": 0,
         "total_podiums": 0,
         "total_championships": 0,
         "total_pole_positions": 0
     }
     season_results = []
-    seasons = set()
 
-    # Loop through each race to calculate all-time stats
-    for race in races_data:
-        season = race['season']
-        if season not in seasons:
-            seasons.add(season)
-            season_summary = {
-                "year": season,
-                "num_races": 0,
-                "wins": 0,
-                "podiums": 0,
-                "pole_positions": 0,
-                "position": "N/A",
-                "points": "0",
-                "drivers": []
-            }
-            season_results.append(season_summary)
+    # Fetch all seasons the team has participated in
+    seasons_url = f"{BASE_ERGAST_URL}/constructors/{team_id}/seasons.json?limit=1000"
+    seasons_response = requests.get(seasons_url)
+    if seasons_response.status_code != 200:
+        return jsonify({"error": f"Failed to retrieve seasons for team {team_id}"}), seasons_response.status_code
 
-        result = race['Results'][0]
-        position = int(result['position'])
-        grid_position = int(result.get('grid', 0))
-        
-        # All-time accumulations
-        all_time_stats["total_wins"] += 1 if position == 1 else 0
-        all_time_stats["total_podiums"] += 1 if position <= 3 else 0
-        all_time_stats["total_pole_positions"] += 1 if grid_position == 1 else 0
+    seasons_data = seasons_response.json()['MRData']['SeasonTable']['Seasons']
+    seasons_list = [season['season'] for season in seasons_data]
 
-        # Update season summary for each season
-        for summary in season_results:
-            if summary["year"] == season:
-                summary["num_races"] += 1
-                summary["wins"] += 1 if position == 1 else 0
-                summary["podiums"] += 1 if position <= 3 else 0
-                summary["pole_positions"] += 1 if grid_position == 1 else 0
-                summary["points"] = result['points']
-                summary["position"] = result.get('position', "N/A")
+    # For each season, fetch race results and calculate stats
+    for season in seasons_list:
+        season_races_url = f"{BASE_ERGAST_URL}/{season}/constructors/{team_id}/results.json?limit=1000"
+        season_races_response = requests.get(season_races_url)
+        if season_races_response.status_code != 200:
+            continue  # Skip this season if data cannot be fetched
+
+        races_data = season_races_response.json()['MRData']['RaceTable']['Races']
+        season_summary = {
+            "year": season,
+            "num_races": 0,
+            "wins": 0,
+            "podiums": 0,
+            "pole_positions": 0,
+            "position": "N/A",  # Will be updated later
+            "points": 0.0,
+            "drivers": set()
+        }
+
+        for race in races_data:
+            # Process each driver result in the race
+            for result in race['Results']:
+                if result['Constructor']['constructorId'] != team_id:
+                    continue  # Skip if not the team we're interested in
+
+                season_summary["num_races"] += 1
+                all_time_stats["total_races"] += 1
+
+                position = int(result['position'])
+                grid_position = int(result.get('grid', 0))
+
+                # All-time accumulations
+                if position == 1:
+                    all_time_stats["total_wins"] += 1
+                    season_summary["wins"] += 1
+                if position <= 3:
+                    all_time_stats["total_podiums"] += 1
+                    season_summary["podiums"] += 1
+                if grid_position == 1:
+                    all_time_stats["total_pole_positions"] += 1
+                    season_summary["pole_positions"] += 1
+
+                # Accumulate points
+                points = float(result['points'])
+                season_summary["points"] += points
+
+                # Collect drivers
                 driver_name = f"{result['Driver']['givenName']} {result['Driver']['familyName']}"
-                if driver_name not in summary["drivers"]:
-                    summary["drivers"].append(driver_name)
+                season_summary["drivers"].add(driver_name)
 
-    # Calculate championships by checking if team had position 1 at the end of each season
-    standings_url = f"{BASE_ERGAST_URL}/constructors/{team_id}/constructorStandings.json"
-    standings_response = requests.get(standings_url)
-    if standings_response.status_code == 200:
-        standings_data = standings_response.json()['MRData']['StandingsTable']['StandingsLists']
-        for standing in standings_data:
-            if standing['ConstructorStandings'][0]['position'] == '1':
-                all_time_stats["total_championships"] += 1
+        # Convert drivers set to list
+        season_summary["drivers"] = list(season_summary["drivers"])
 
-    # Current Season Stats
+        # Fetch the constructor standings for this season
+        standings_url = f"{BASE_ERGAST_URL}/{season}/constructorStandings.json"
+        standings_response = requests.get(standings_url)
+        if standings_response.status_code == 200:
+            standings_data = standings_response.json()['MRData']['StandingsTable']['StandingsLists']
+            if standings_data:
+                # Find the team's position in the standings
+                constructor_standings = standings_data[0]['ConstructorStandings']
+                for constructor in constructor_standings:
+                    if constructor['Constructor']['constructorId'] == team_id:
+                        season_summary["position"] = constructor['position']
+                        season_summary["points"] = float(constructor['points'])  # Use total season points
+                        # Check if the team won the championship
+                        if season_summary["position"] == '1':
+                            all_time_stats["total_championships"] += 1
+                        break
+
+        season_results.append(season_summary)
+
+    # Find current season stats
     current_season_stats = next(
         (summary for summary in season_results if summary["year"] == str(year)),
-        {"num_races": 0, "wins": 0, "podiums": 0, "pole_positions": 0}
+        {
+            "year": str(year),
+            "num_races": 0,
+            "wins": 0,
+            "podiums": 0,
+            "pole_positions": 0,
+            "position": "N/A",
+            "points": 0.0,
+            "drivers": []
+        }
     )
 
     # Combine all stats for JSON response
