@@ -297,21 +297,58 @@ def get_driver_lap_times(year, round, driver_id):
 @api_blueprint.route('/race/<int:year>/<int:round>/pitstops/', methods=['GET'])
 def get_pit_stops(year, round):
     # Fetch pit stop data for a specific race
-    pitstop_url = f"{BASE_ERGAST_URL}/{year}/{round}/pitstops.json"
+    pitstop_url = f"{BASE_ERGAST_URL}/{year}/{round}/pitstops.json?limit=1000"
     response = requests.get(pitstop_url)
 
     if response.status_code != 200:
         return jsonify({"error": f"Failed to retrieve pit stops for round {round} in {year}"}), response.status_code
 
-    pit_stops = response.json()['MRData']['RaceTable']['Races'][0].get('PitStops', [])
+    pit_stops_data = response.json()['MRData']['RaceTable']['Races']
+    if not pit_stops_data:
+        return jsonify([])  # Return an empty list if no pit stop data is available
+
+    pit_stops = pit_stops_data[0].get('PitStops', [])
     driver_pit_data = {}
+
+    # Fetch race results to get team information
+    results_url = f"{BASE_ERGAST_URL}/{year}/{round}/results.json"
+    results_response = requests.get(results_url)
+
+    driver_team_map = {}
+    if results_response.status_code == 200:
+        results_data = results_response.json()['MRData']['RaceTable']['Races']
+        if results_data:
+            results = results_data[0]['Results']
+            # Build a mapping from driver_id to team_name and team_id
+            for result in results:
+                driver_id = result['Driver']['driverId']
+                team_id = result['Constructor']['constructorId']
+                team_name = result['Constructor']['name']
+                driver_team_map[driver_id] = {
+                    'team_name': team_name,
+                    'team_id': team_id
+                }
+
+    # Function to parse duration strings
+    def parse_duration(duration_str):
+        if ':' in duration_str:
+            # Duration is in 'mm:ss.sss' format
+            minutes, seconds = duration_str.split(':')
+            total_seconds = int(minutes) * 60 + float(seconds)
+            return total_seconds
+        else:
+            # Duration is in seconds
+            return float(duration_str)
 
     # Process each pit stop
     for pit_stop in pit_stops:
         driver_id = pit_stop['driverId']
         if driver_id not in driver_pit_data:
+            team_info = driver_team_map.get(driver_id, {'team_name': 'N/A', 'team_id': 'N/A'})
             driver_pit_data[driver_id] = {
                 "driver": driver_id,
+                "team": team_info['team_name'],
+                "team_id": team_info['team_id'],
                 "total_duration": 0.0,
                 "stops": []
             }
@@ -320,16 +357,16 @@ def get_pit_stops(year, round):
         driver_pit_data[driver_id]["stops"].append({
             "lap": pit_stop['lap'],
             "time_of_day": pit_stop['time'],
-            "duration": float(pit_stop['duration'])
+            "duration": parse_duration(pit_stop['duration'])
         })
         
         # Accumulate total duration
-        driver_pit_data[driver_id]["total_duration"] += float(pit_stop['duration'])
+        driver_pit_data[driver_id]["total_duration"] += parse_duration(pit_stop['duration'])
 
     # Convert to list for JSON response
-    pit_stops_data = list(driver_pit_data.values())
+    pit_stops_list = list(driver_pit_data.values())
     
-    return jsonify(pit_stops_data)
+    return jsonify(pit_stops_list)
 
 ## DRIVERS SCREEN VIEWS
 
