@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/team.dart';
-import 'package:frontend/ui/theme.dart';
+import 'package:frontend/core/models/team_season_result.dart';
 
 class TeamSeasonsTable extends StatelessWidget {
-  //const TeamSeasonsTable({Key? key, required this.teamSeasons}) : super(key: key);
+  const TeamSeasonsTable({Key? key, required this.seasonsData})
+      : super(key: key);
 
-  //final List<Team> teamSeasons;
+  final List<dynamic> seasonsData;
 
   @override
   Widget build(BuildContext context) {
-    return Container();
-    /*Scrollbar(
+    List<TeamSeasonResult> teamSeasons =
+        seasonsData.map((json) => TeamSeasonResult.fromJson(json)).toList();
+    return Scrollbar(
       thumbVisibility: true,
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -82,44 +83,44 @@ class TeamSeasonsTable extends StatelessWidget {
                     ),
                   ),
                 ],
-                rows: teamSeasons.map((teamSeason) {
+                rows: teamSeasons.map((teamSeasonResult) {
                   return DataRow(cells: [
                     DataCell(
                       Text(
-                        teamSeason.seasonYear.toString(),
+                        teamSeasonResult.year,
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
-                      _buildPositionContainer(teamSeason.position),
+                      _buildPositionContainer(teamSeasonResult.position),
                     ),
                     DataCell(
                       Text(
-                        teamSeason.points.toString(),
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    DataCell(
-                      Text(
-                        teamSeason.yearWins.toString(),
+                        teamSeasonResult.points.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        teamSeason.yearPodiums.toString(),
+                        teamSeasonResult.wins.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        teamSeason.polePositions.toString(),
+                        teamSeasonResult.podiums.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        teamSeason.drivers,
+                        teamSeasonResult.polePositions.toString(),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    DataCell(
+                      Text(
+                        teamSeasonResult.driversList.join(', '),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
@@ -129,28 +130,37 @@ class TeamSeasonsTable extends StatelessWidget {
             ),
           ),
         ),
-      ),*/
-   // );
+      ),
+    );
   }
 
-  Widget _buildPositionContainer(int position) {
+  Widget _buildPositionContainer(String position) {
     Color color;
     switch (position) {
-      case 1:
+      case "1":
         color = const Color.fromARGB(255, 220, 148, 4); // 1st position
         break;
-      case 2:
+      case "2":
         color = const Color.fromARGB(255, 136, 136, 136); // 2nd position
         break;
-      case 3:
+      case "3":
         color = const Color.fromARGB(255, 106, 74, 62); // 3rd position
         break;
       default:
         color = Colors.transparent; // Default color
         break;
     }
+
+    int pos = 4;
+
+    try {
+      pos = int.parse(position);
+    } catch (e) {
+      print(e);
+    }
+
     return Container(
-      width: 35,
+      width: position == "N/A" ? 42 : 35,
       height: 35,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -159,8 +169,8 @@ class TeamSeasonsTable extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          position.toString(),
-          style: TextStyle(color: position <= 3 ? Colors.white : Colors.black),
+          position,
+          style: TextStyle(color: pos <= 3 ? Colors.white : Colors.black),
         ),
       ),
     );
