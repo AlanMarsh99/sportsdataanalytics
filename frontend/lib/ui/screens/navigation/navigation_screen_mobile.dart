@@ -56,7 +56,6 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
                       ),
                     ),
                     child: Container(
-                      padding: const EdgeInsets.all(2),
                       child: const Center(
                         child: Text(
                           'Log in',

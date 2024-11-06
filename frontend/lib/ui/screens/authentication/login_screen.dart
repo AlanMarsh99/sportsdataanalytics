@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
           body: /*Consumer<AuthService>(builder: (context, auth, child) {
           return*/
               Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
             child: Column(
               children: [
 /*Padding(
@@ -84,23 +84,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     : */
                 _buildLogInButton(/*auth*/),
                 const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Don't have an account?  ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignUpScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SignUpScreen(),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Don't have an account?  ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      const Text(
                         'Sign up',
                         style: TextStyle(
                           color: redAccent,
@@ -108,9 +108,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontFamily: 'OpenSans',
                         ),
                       ),
-                    ),
-                  ],
-                )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -200,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 10.0),
+        const SizedBox(height: 6.0),
         TextButton(
           onPressed: () {
             Navigator.push(
