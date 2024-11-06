@@ -171,6 +171,7 @@ class DriverSeasonsTable extends StatelessWidget {
         color = Colors.transparent; // Default color
         break;
     }
+
     int pos = 4;
 
     try {
@@ -180,7 +181,7 @@ class DriverSeasonsTable extends StatelessWidget {
     }
 
     return Container(
-      width: 35,
+      width: position == "N/A" ? 42 : 35,
       height: 35,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(

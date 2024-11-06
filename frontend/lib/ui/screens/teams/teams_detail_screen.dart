@@ -21,7 +21,7 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Get the team by the id
+    // Get the team info by the id and current year
     _teamStatsFuture =
         APIService().getTeamStats(widget.teamId, DateTime.now().year);
   }
@@ -117,11 +117,30 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                   ),
 
                   const SizedBox(height: 10),
-                  Container(
-                    height: 400,
-                    child: Center(
-                      child: TeamSeasonsTable(),
-                    ),
+                  FutureBuilder<Map<String, dynamic>>(
+                    future: _teamStatsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        ); // Show loading while fetching
+                      } else if (snapshot.hasError) {
+                        return const Text(
+                          'Error: Failed to load team stats',
+                          style: TextStyle(color: Colors.white),
+                        ); // Error handling
+                      } else if (snapshot.hasData) {
+                        Map<String, dynamic> data = snapshot.data!;
+
+                        return Center(
+                          child: TeamSeasonsTable(
+                              seasonsData: data['season_results']),
+                        );
+                      }
+                      return Container();
+                    },
                   ),
                 ],
               ),
