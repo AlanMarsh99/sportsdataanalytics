@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/team.dart';
+import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/team_seasons_table.dart';
 
 class TeamsDetailScreen extends StatefulWidget {
   const TeamsDetailScreen(
-      {Key? key, required this.team, required this.teamsSeason})
+      {Key? key, required this.teamId, required this.teamName})
       : super(key: key);
 
-  final Team team;
-  final List<Team> teamsSeason;
+  final String teamId;
+  final String teamName;
 
   _TeamsDetailScreenState createState() => _TeamsDetailScreenState();
 }
 
 class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
-  Team? selectedTeam;
+  late Future<Map<String, dynamic>> _teamStatsFuture;
 
   @override
   void initState() {
     super.initState();
-    selectedTeam = widget.team;
+    // Get the team by the id
+    _teamStatsFuture =
+        APIService().getTeamStats(widget.teamId, DateTime.now().year);
   }
 
   @override
@@ -42,15 +45,15 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'TEAMS',
-                    style: TextStyle(
+                  Text(
+                    widget.teamName.toUpperCase(),
+                    style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
-                  const SizedBox(height: 16),
-                  _buildTeamDropdown(),
+                  //const SizedBox(height: 16),
+                  //_buildTeamDropdown(),
                   const SizedBox(height: 40),
                   const Text(
                     'STATISTICS',
@@ -77,14 +80,35 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                   ),
                   const SizedBox(height: 16),
                   // TabBarView for the content of each tab
-                  Container(
-                    height: 250,
-                    child: TabBarView(
-                      children: [
-                        _buildCareerStats(),
-                        _buildCareerStats(),
-                      ],
-                    ),
+                  FutureBuilder<Map<String, dynamic>>(
+                    future: _teamStatsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        ); // Show loading while fetching
+                      } else if (snapshot.hasError) {
+                        return const Text(
+                          'Error: Failed to load team stats',
+                          style: TextStyle(color: Colors.white),
+                        ); // Error handling
+                      } else if (snapshot.hasData) {
+                        Map<String, dynamic> data = snapshot.data!;
+
+                        return Container(
+                          height: 250,
+                          child: TabBarView(
+                            children: [
+                              _buildCareerStats(true, data),
+                              _buildCareerStats(false, data),
+                            ],
+                          ),
+                        );
+                      }
+                      return Container();
+                    },
                   ),
                   const SizedBox(height: 5),
                   const Text(
@@ -108,7 +132,7 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
     );
   }
 
-  Widget _buildTeamDropdown() {
+  /*Widget _buildTeamDropdown() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       decoration: BoxDecoration(
@@ -136,9 +160,28 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
         },
       ),
     );
-  }
+  }*/
 
-  Widget _buildCareerStats() {
+  Widget _buildCareerStats(bool allTime, Map<String, dynamic>? driversStats) {
+    int wins = 0;
+    int races = 0;
+    int podiums = 0;
+    int championships = 0;
+    int polePositions = 0;
+
+    if (allTime) {
+      wins = driversStats!['all_time_stats']['total_wins'];
+      races = driversStats!['all_time_stats']['total_races'];
+      podiums = driversStats!['all_time_stats']['total_podiums'];
+      championships = driversStats!['all_time_stats']['total_championships'];
+      polePositions = driversStats!['all_time_stats']['total_pole_positions'];
+    } else {
+      wins = driversStats!['current_season_stats']['wins'];
+      races = driversStats!['current_season_stats']['num_races'];
+      podiums = driversStats!['current_season_stats']['podiums'];
+      polePositions = driversStats!['current_season_stats']['pole_positions'];
+    }
+
     return Column(
       children: [
         Row(
@@ -147,13 +190,13 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(368, 700, 'WINS', true),
+              child: _buildStatCard(wins, races, 'WINS', true),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(584, 700, 'PODIUMS', true),
+              child: _buildStatCard(podiums, races, 'PODIUMS', true),
             ),
           ],
         ),
@@ -164,13 +207,14 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(1, 10, 'CHAMPIONSHIPS', false),
+              child: _buildStatCard(championships, 10, 'CHAMPIONSHIPS', false),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(683, 700, 'POLE POSITIONS', false),
+              child:
+                  _buildStatCard(polePositions, races, 'POLE POSITIONS', false),
             )
           ],
         ),

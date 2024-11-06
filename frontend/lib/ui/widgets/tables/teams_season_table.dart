@@ -67,13 +67,13 @@ class TeamsSeasonTable extends StatelessWidget {
                     DataCell(
                       TextButton(
                         onPressed: () {
-                          /*Navigator.push(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  TeamsDetailScreen(team: team, teamsSeason: teams),
+                                  TeamsDetailScreen(teamId: team.id, teamName: team.name,),
                             ),
-                          );*/
+                          );
                         },
                         child: Text(
                           team.name,

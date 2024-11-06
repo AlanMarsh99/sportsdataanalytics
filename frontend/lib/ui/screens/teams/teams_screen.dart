@@ -107,7 +107,7 @@ class _TeamsScreenState extends State<TeamsScreen> {
                               ); // Show loading while fetching
                             } else if (snapshot.hasError) {
                               return const Text(
-                                'Error: Failed to load drivers',
+                                'Error: Failed to load teams',
                                 style: TextStyle(color: Colors.white),
                               ); // Error handling
                             } else if (snapshot.hasData) {
