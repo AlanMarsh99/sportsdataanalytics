@@ -17,6 +17,7 @@ class DataProvider extends ChangeNotifier {
       getHomeScreenInfo();
       getRacesYear(DateTime.now().year);
       getDriversList();
+      getTeamsYear(DateTime.now().year);
       firstTime = false;
     }
   }

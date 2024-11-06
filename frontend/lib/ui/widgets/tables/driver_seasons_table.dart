@@ -2,88 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/ui/theme.dart';
 
 class DriverSeasonsTable extends StatelessWidget {
-  final List<Map<String, dynamic>> driverSeasons = [
-    {
-      'year': '2024',
-      'position': 1,
-      'points': 331,
-      'races': 18,
-      'wins': 7,
-      'podiums': 11,
-      'polePositions': 8,
-      'team': 'Red Bull',
-    },
-    {
-      'year': '2023',
-      'position': 1,
-      'points': 368,
-      'races': 20,
-      'wins': 8,
-      'podiums': 12,
-      'polePositions': 10,
-      'team': 'Red Bull',
-    },
-    {
-      'year': '2022',
-      'position': 2,
-      'points': 300,
-      'races': 18,
-      'wins': 7,
-      'podiums': 11,
-      'polePositions': 8,
-      'team': 'Red Bull',
-    },
-    {
-      'year': '2021',
-      'position': 2,
-      'points': 292,
-      'races': 18,
-      'wins': 7,
-      'podiums': 11,
-      'polePositions': 8,
-      'team': 'Red Bull',
-    },
-    {
-      'year': '2020',
-      'position': 3,
-      'points': 331,
-      'races': 18,
-      'wins': 7,
-      'podiums': 11,
-      'polePositions': 8,
-      'team': 'Red Bull',
-    },
-    {
-      'year': '2019',
-      'position': 5,
-      'points': 331,
-      'races': 18,
-      'wins': 7,
-      'podiums': 11,
-      'polePositions': 8,
-      'team': 'Red Bull',
-    },
-    {
-      'year': '2018',
-      'position': 6,
-      'points': 331,
-      'races': 18,
-      'wins': 7,
-      'podiums': 11,
-      'polePositions': 8,
-      'team': 'Red Bull',
-    },
-    {
-      'year': '2017',
-      'position': 8,
-      'points': 120,
-      'races': 14,
-      'wins': 0,
-      'podiums': 0,
-      'polePositions': 0,
-      'team': 'Red Bull',
-    },
-  ];
+  const DriverSeasonsTable({Key? key, required this.data}) : super(key: key);
+
+  final Map<String, dynamic> data;
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +87,8 @@ class DriverSeasonsTable extends StatelessWidget {
                     ),
                   ),
                 ],
-                rows: driverSeasons.map((race) {
+                rows: (data['season_results'] as List<dynamic>)
+                    .map((seasonResult) {
                   return DataRow(cells: [
                     DataCell(
                       TextButton(
@@ -178,48 +100,48 @@ class DriverSeasonsTable extends StatelessWidget {
                     );*/
                         },
                         child: Text(
-                          race['year'],
+                          seasonResult['year'],
                           style: const TextStyle(
                               color: secondary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     DataCell(
-                      _buildPositionContainer(race['position']),
+                      _buildPositionContainer(seasonResult['position']),
                     ),
                     DataCell(
                       Text(
-                        race['points'].toString(),
+                        seasonResult['points'].toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        race['races'].toString(),
+                        seasonResult['num_races'].toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        race['wins'].toString(),
+                        seasonResult['wins'].toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        race['podiums'].toString(),
+                        seasonResult['podiums'].toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        race['polePositions'].toString(),
+                        seasonResult['pole_positions'].toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        race['team'].toString(),
+                        seasonResult['team'].toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
@@ -233,22 +155,30 @@ class DriverSeasonsTable extends StatelessWidget {
     );
   }
 
-  Widget _buildPositionContainer(int position) {
+  Widget _buildPositionContainer(String position) {
     Color color;
     switch (position) {
-      case 1:
+      case "1":
         color = const Color.fromARGB(255, 220, 148, 4); // 1st position
         break;
-      case 2:
+      case "2":
         color = const Color.fromARGB(255, 136, 136, 136); // 2nd position
         break;
-      case 3:
+      case "3":
         color = const Color.fromARGB(255, 106, 74, 62); // 3rd position
         break;
       default:
         color = Colors.transparent; // Default color
         break;
     }
+    int pos = 4;
+
+    try {
+      pos = int.parse(position);
+    } catch (e) {
+      print(e);
+    }
+
     return Container(
       width: 35,
       height: 35,
@@ -260,7 +190,7 @@ class DriverSeasonsTable extends StatelessWidget {
       child: Center(
         child: Text(
           position.toString(),
-          style: TextStyle(color: position <= 3 ? Colors.white : Colors.black),
+          style: TextStyle(color: pos <= 3 ? Colors.white : Colors.black),
         ),
       ),
     );

@@ -316,7 +316,9 @@ When you run the Flask development server using the command `python run.py`, you
         "points": "310",
         "num_races": 13,
         "wins": 8,
-        "team": "Red Bull"
+        "team": "Red Bull",
+        "podiums": 10,
+        "pole_positions": 8
       },
       // ... previous seasons
     ]

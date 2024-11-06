@@ -7,142 +7,10 @@ class TeamSeasonsTable extends StatelessWidget {
 
   //final List<Team> teamSeasons;
 
-  List<Team> teamSeasons = [
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 5,
-        points: 516,
-        position: 1,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2024,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 302,
-        position: 4,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2023,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 159,
-        position: 5,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2022,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 275,
-        position: 4,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2021,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 202,
-        position: 3,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2020,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 145,
-        position: 4,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2019,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 62,
-        position: 1,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2018,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 30,
-        position: 6,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2017,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 76,
-        position: 9,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2016,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-    Team(
-        id: 1,
-        name: 'McLaren Racing',
-        wins: 5,
-        podiums: 18,
-        polePositions: 6,
-        points: 27,
-        position: 6,
-        drivers: 'Lando Norris & Oscar Piastri',
-        seasonYear: 2015,
-        championshipsWins: 8,
-        championshipsParticipated: 68,
-        totalRaces: 850),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
+    return Container();
+    /*Scrollbar(
       thumbVisibility: true,
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -233,13 +101,13 @@ class TeamSeasonsTable extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        teamSeason.wins.toString(),
+                        teamSeason.yearWins.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        teamSeason.podiums.toString(),
+                        teamSeason.yearPodiums.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
@@ -261,8 +129,8 @@ class TeamSeasonsTable extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      ),*/
+   // );
   }
 
   Widget _buildPositionContainer(int position) {
