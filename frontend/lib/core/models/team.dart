@@ -1,38 +1,26 @@
-
 class Team {
-  int id;
+  String id;
   String name;
-  int wins;
-  int podiums;
-  String drivers;
-  int seasonYear;
-  int polePositions;
-  int points;
-  int position;
-  int championshipsWins;
-  int championshipsParticipated;
-  int totalRaces;
-  // List<Results> results;
-  // List<Lap> laps;
-  // List<Pitstop> pitstops;
+  int yearWins;
+  int yearPodiums;
+  List<String> driversList;
 
+  Team({
+    required this.id,
+    required this.name,
+    required this.yearWins,
+    required this.yearPodiums,
+    required this.driversList,
+  });
 
-  Team(
-      {required this.id,
-      required this.name,
-      required this.wins,
-      required this.podiums,
-      required this.drivers,
-      required this.seasonYear,
-      required this.polePositions,
-      required this.points,
-      required this.position,
-      required this.championshipsWins,
-      required this.championshipsParticipated,
-      required this.totalRaces,
-      // required this.results,
-      // required this.laps,
-      // required this.pitstops,
-      });
-
+  // A factory constructor to create a Team from a JSON map
+  factory Team.fromJson(Map<String, dynamic> json) {
+    return Team(
+      driversList: List<String>.from(json['drivers'] as List),
+      id: json['team_id'],
+      name: json['team_name'],
+      yearPodiums: json['year_podiums'],
+      yearWins: json['year_wins'],
+    );
+  }
 }

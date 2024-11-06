@@ -16,7 +16,8 @@ class DriversScreen extends StatefulWidget {
 }
 
 class _DriversScreenState extends State<DriversScreen> {
-  late Future<List<dynamic>> _driversFuture;
+  late Future<List<dynamic>> _driversNamesFuture;
+  late Future<Map<String, dynamic>> _driversStatsFuture;
   String? selectedDriver;
   int currentOffset = 0;
   final int limit = 50;
@@ -27,6 +28,7 @@ class _DriversScreenState extends State<DriversScreen> {
   bool firstTime = true;
 
   bool seasonChanged = false;
+  bool driverChanged = false;
 
   @override
   void initState() {
@@ -80,7 +82,7 @@ class _DriversScreenState extends State<DriversScreen> {
                     children: [
                       seasonChanged
                           ? FutureBuilder<List<dynamic>>(
-                              future: _driversFuture,
+                              future: _driversNamesFuture,
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
@@ -138,15 +140,53 @@ class _DriversScreenState extends State<DriversScreen> {
                   ),
                   const SizedBox(height: 16),
                   // TabBarView for the content of each tab
-                  Container(
-                    height: 250,
-                    child: TabBarView(
-                      children: [
-                        _buildCareerStats(),
-                        _buildCareerStats(),
-                      ],
-                    ),
-                  ),
+                  driverChanged
+                      ? FutureBuilder<Map<String, dynamic>>(
+                          future: _driversStatsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ); // Show loading while fetching
+                            } else if (snapshot.hasError) {
+                              return const Text(
+                                'Error: Failed to load driver stats',
+                                style: TextStyle(color: Colors.white),
+                              ); // Error handling
+                            } else if (snapshot.hasData) {
+                              Map<String, dynamic> data = snapshot.data!;
+
+                              return Container(
+                                height: 250,
+                                child: TabBarView(
+                                  children: [
+                                    _buildCareerStats(true, data),
+                                    _buildCareerStats(false, data),
+                                  ],
+                                ),
+                              );
+                            }
+                            return Container();
+                          },
+                        )
+                      : driversStats == null
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : Container(
+                              height: 250,
+                              child: TabBarView(
+                                children: [
+                                  _buildCareerStats(true, driversStats),
+                                  _buildCareerStats(false, driversStats),
+                                ],
+                              ),
+                            ),
                   const SizedBox(height: 5),
                   const Text(
                     'SEASONS',
@@ -173,10 +213,41 @@ class _DriversScreenState extends State<DriversScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
+
                   Container(
-                    height: 400,
+                    //height: 400,
                     child: Center(
-                      child: DriverSeasonsTable(),
+                      child: driverChanged
+                      ? FutureBuilder<Map<String, dynamic>>(
+                          future: _driversStatsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ); // Show loading while fetching
+                            } else if (snapshot.hasError) {
+                              return const Text(
+                                'Error: Failed to load driver stats',
+                                style: TextStyle(color: Colors.white),
+                              ); // Error handling
+                            } else if (snapshot.hasData) {
+                              Map<String, dynamic> data = snapshot.data!;
+
+                              return DriverSeasonsTable(data: data);
+                            }
+                            return Container();
+                          },
+                        )
+                      : driversStats == null
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : DriverSeasonsTable(data: driversStats), 
                     ),
                   ),
                 ],
@@ -212,7 +283,7 @@ class _DriversScreenState extends State<DriversScreen> {
           setState(() {
             selectedSeason = newValue!;
             seasonChanged = true;
-            _driversFuture =
+            _driversNamesFuture =
                 APIService().getDriversInYear(int.parse(selectedSeason));
           });
         },
@@ -225,7 +296,7 @@ class _DriversScreenState extends State<DriversScreen> {
       driversNames = [];
       driversMap = {};
       for (var driver in driversList) {
-        driversMap[driver['driver_id']] = driver['driver_name'];
+        driversMap[driver['driver_name']] = driver['driver_id'];
         driversNames.add(driver['driver_name']);
       }
       selectedDriver ??= driversNames[0];
@@ -259,13 +330,35 @@ class _DriversScreenState extends State<DriversScreen> {
         onChanged: (String? newValue) {
           setState(() {
             selectedDriver = newValue;
+            driverChanged = true;
+            _driversStatsFuture = APIService().getDriverStats(
+                driversMap[selectedDriver], DateTime.now().year);
           });
         },
       ),
     );
   }
 
-  Widget _buildCareerStats() {
+  Widget _buildCareerStats(bool allTime, Map<String, dynamic>? driversStats) {
+    int wins = 0;
+    int races = 0;
+    int podiums = 0;
+    int championships = 0;
+    int polePositions = 0;
+
+    if (allTime) {
+      wins = driversStats!['all_time_stats']['total_wins'];
+      races = driversStats!['all_time_stats']['total_races'];
+      podiums = driversStats!['all_time_stats']['total_podiums'];
+      championships = driversStats!['all_time_stats']['total_championships'];
+      polePositions = driversStats!['all_time_stats']['total_pole_positions'];
+    } else {
+      wins = driversStats!['current_season_stats']['wins'];
+      races = driversStats!['current_season_stats']['num_races'];
+      podiums = driversStats!['current_season_stats']['podiums'];
+      polePositions = driversStats!['current_season_stats']['pole_positions'];
+    }
+
     return Column(
       children: [
         Row(
@@ -274,13 +367,13 @@ class _DriversScreenState extends State<DriversScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(61, 203, 'WINS', true),
+              child: _buildStatCard(wins, races, 'WINS', true),
             ),
             SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(109, 203, 'PODIUMS', true),
+              child: _buildStatCard(podiums, races, 'PODIUMS', true),
             ),
           ],
         ),
@@ -291,13 +384,14 @@ class _DriversScreenState extends State<DriversScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(3, 10, 'CHAMPIONSHIPS', false),
+              child: _buildStatCard(championships, 10, 'CHAMPIONSHIPS', false),
             ),
             SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(40, 203, 'POLE POSITIONS', false),
+              child:
+                  _buildStatCard(polePositions, races, 'POLE POSITIONS', false),
             )
           ],
         ),
@@ -306,7 +400,13 @@ class _DriversScreenState extends State<DriversScreen> {
   }
 
   Widget _buildStatCard(int stat, int total, String label, bool hasPercentage) {
-    int percentage = (stat * 100 / total).truncate();
+    int percentage = 0;
+    try {
+      percentage = (stat * 100 / total).truncate();
+    } catch (e) {
+      percentage = 0;
+    }
+
     return Container(
       width: 155,
       height: 100,

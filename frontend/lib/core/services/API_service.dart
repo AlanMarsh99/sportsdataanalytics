@@ -207,7 +207,7 @@ class APIService {
   }
 
   // Fetch team stats for a specific year
-  Future<List<dynamic>> getTeamStats(String teamId, int year) async {
+  Future<Map<String, dynamic>> getTeamStats(String teamId, int year) async {
     try {
       final response =
           await http.get(Uri.parse('$baseUrl/team/$teamId/$year/stats/'));
