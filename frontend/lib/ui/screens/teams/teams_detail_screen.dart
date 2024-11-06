@@ -147,13 +147,13 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(368, selectedTeam!.totalRaces, 'WINS', true),
+              child: _buildStatCard(368, 700, 'WINS', true),
             ),
             SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(584, selectedTeam!.totalRaces, 'PODIUMS', true),
+              child: _buildStatCard(584, 700, 'PODIUMS', true),
             ),
           ],
         ),
@@ -164,13 +164,13 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(selectedTeam!.championshipsWins, selectedTeam!.championshipsParticipated, 'CHAMPIONSHIPS', false),
+              child: _buildStatCard(1, 10, 'CHAMPIONSHIPS', false),
             ),
             SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(683, selectedTeam!.totalRaces, 'POLE POSITIONS', false),
+              child: _buildStatCard(683, 700, 'POLE POSITIONS', false),
             )
           ],
         ),

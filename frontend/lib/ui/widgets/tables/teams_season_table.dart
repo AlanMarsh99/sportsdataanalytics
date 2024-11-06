@@ -4,12 +4,13 @@ import 'package:frontend/ui/screens/teams/teams_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 class TeamsSeasonTable extends StatelessWidget {
-  const TeamsSeasonTable({Key? key, required this.teams}) : super(key: key);
+  const TeamsSeasonTable({Key? key, required this.data}) : super(key: key);
 
-  final List<Team> teams;
+  final List<dynamic> data;
 
   @override
   Widget build(BuildContext context) {
+    List<Team> teams = data.map((json) => Team.fromJson(json)).toList();
     return Scrollbar(
       thumbVisibility: true,
       child: SingleChildScrollView(
@@ -66,13 +67,13 @@ class TeamsSeasonTable extends StatelessWidget {
                     DataCell(
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
+                          /*Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                                   TeamsDetailScreen(team: team, teamsSeason: teams),
                             ),
-                          );
+                          );*/
                         },
                         child: Text(
                           team.name,
@@ -84,19 +85,19 @@ class TeamsSeasonTable extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        team.wins.toString(),
+                        team.yearWins.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        team.podiums.toString(),
+                        team.yearPodiums.toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(
                       Text(
-                        team.drivers,
+                        team.driversList.join(', '),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
