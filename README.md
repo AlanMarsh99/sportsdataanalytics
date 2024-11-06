@@ -15,7 +15,7 @@ This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing
 ## Technology Stack
 
 - **Frontend**: Flutter
-- **Backend**: Django
+- **Backend**: Flask
 - **Machine Learning**: Python for predictive analytics models
 - **Database**: PostgreSQL and Firebase Cloud Firestore for data storage
 - **Visualization Tools**: To be decided
@@ -25,7 +25,7 @@ This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing
 
 ### Prerequisites
 
-- Django
+- Flask
 - Flutter
 - Python
 - Git
@@ -46,9 +46,9 @@ This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing
 
     cd backend
 
-4. Run the Django development server using the command:
+4. Run the Flask development server using the command:
 
-    python manage.py runserver
+    python run.py
 
 5. Go back to the project directory and navigate to the frontend directory:
 
