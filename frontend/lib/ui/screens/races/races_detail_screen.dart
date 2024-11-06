@@ -198,7 +198,8 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                       Flexible(
                         flex: 2,
                         fit: FlexFit.tight,
-                        child: _buildSquareCard('Circuit', widget.race.circuitName),
+                        child: _buildSquareCard(
+                            'Circuit', widget.race.circuitName),
                       ),
                     ],
                   ),
@@ -216,7 +217,7 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                   _buildInfoContainer(
                       'Fastest lap time', widget.race.fastestLapTime),
                   //const SizedBox(height: 12),
-                 /* _buildInfoContainer(
+                  /* _buildInfoContainer(
                       'Fastest pitstop', widget.race.fastestPitStop),
                   const SizedBox(height: 12),
                   _buildInfoContainer(
@@ -251,13 +252,19 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                           ),
                         ),
                         Center(
-                          child: DriverSeasonsTable(),
+                          child: RaceResultsTable(
+                            results: raceResults,
+                          ),
                         ),
                         Center(
-                          child: DriverSeasonsTable(),
+                          child: RaceResultsTable(
+                            results: raceResults,
+                          ),
                         ),
                         Center(
-                          child: DriverSeasonsTable(),
+                          child: RaceResultsTable(
+                            results: raceResults,
+                          ),
                         ),
                       ],
                     ),
