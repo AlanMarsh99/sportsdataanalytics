@@ -93,16 +93,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white),
                 ),
                 const SizedBox(height: 16),
-                upcomingRaceInfo != null
-                    ? _countdownContainer(upcomingRaceInfo)
-                    : const CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                const SizedBox(height: 16),
-                lastRaceResults != null
-                    ? _lastRaceResultsContainer(lastRaceResults)
-                    : const CircularProgressIndicator(
-                        color: Colors.white,
+                upcomingRaceInfo != null && lastRaceResults != null
+                    ? Column(
+                        children: [
+                          _countdownContainer(upcomingRaceInfo),
+                          const SizedBox(height: 16),
+                          _lastRaceResultsContainer(lastRaceResults)
+                        ],
+                      )
+                    : Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height * 0.8,
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                 const SizedBox(height: 16),
               ],
@@ -218,8 +224,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // Convert date and time strings to DateTime object
     DateTime raceDate = DateTime.parse("$date $hour:00");
 
-    String formattedDate = DateFormat('EEEE MMMM d \a\t HH:mm z')
-        .format(raceDate);
+    String formattedDate =
+        DateFormat('EEEE MMMM d \a\t HH:mm z').format(raceDate);
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.all(16),
@@ -241,10 +247,10 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Padding(
-              padding: EdgeInsets.all(5),
+              padding: const EdgeInsets.all(5),
               child: Text(
                 'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -256,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 20),
           Text(
             formattedDate,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 14,

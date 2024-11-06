@@ -12,16 +12,6 @@ class DataProvider extends ChangeNotifier {
   APIService apiService = APIService();
   bool firstTime = true;
 
-  DataProvider() {
-    if (firstTime) {
-      getHomeScreenInfo();
-      getRacesYear(DateTime.now().year);
-      getDriversList();
-      getTeamsYear(DateTime.now().year);
-      firstTime = false;
-    }
-  }
-
   Map<String, dynamic>? get upcomingRaceInfo => _upcomingRaceInfo;
   Map<String, dynamic>? get lastRaceResults => _lastRaceResults;
   List<dynamic>? get driversList => _driversList;
@@ -29,6 +19,22 @@ class DataProvider extends ChangeNotifier {
   List<dynamic>? get driverAllRacesSeason => _driverAllRacesSeason;
   List<dynamic>? get teamsSeason => _teamsSeason;
   List<dynamic>? get racesSeason => _racesSeason;
+
+  DataProvider() {
+    if (firstTime) {
+      loadInitialData();
+      firstTime = false;
+    }
+  }
+
+  Future<void> loadInitialData() async {
+    getHomeScreenInfo();
+    await Future.wait([
+      getRacesYear(DateTime.now().year),
+      getDriversList(),
+      getTeamsYear(DateTime.now().year),
+    ]);
+  }
 
   Future<void> getHomeScreenInfo() async {
     try {
@@ -60,7 +66,6 @@ class DataProvider extends ChangeNotifier {
           await getDriverStats(firstDriverId, currentSeason);
         }
       }
-
     } catch (error) {
       print("Error fetching _driversList: $error");
     }

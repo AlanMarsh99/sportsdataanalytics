@@ -6,7 +6,6 @@ class DriverAllRacesScreen extends StatefulWidget {
   const DriverAllRacesScreen({
     Key? key,
     required this.driver,
-
   }) : super(key: key);
 
   final String driver;
@@ -49,14 +48,30 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 25, bottom: 10),
-                  child: Text(
-                    'DRIVERS',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                Padding(
+                  padding: const EdgeInsets.only(top: 25, bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 24.0,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        'DRIVERS',
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      )
+                    ],
                   ),
                 ),
                 _buildDriverDropdown(),
@@ -150,8 +165,12 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: <String>['Max Verstappen', 'Lewis Hamilton', 'Sebastian Vettel', widget.driver]
-            .map<DropdownMenuItem<String>>((String value) {
+        items: <String>[
+          'Max Verstappen',
+          'Lewis Hamilton',
+          'Sebastian Vettel',
+          widget.driver
+        ].map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value, style: const TextStyle(color: Colors.black)),
@@ -237,8 +256,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: seasons
-            .map<DropdownMenuItem<String>>((String value) {
+        items: seasons.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value, style: const TextStyle(color: Colors.black)),
