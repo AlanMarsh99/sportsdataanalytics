@@ -202,10 +202,10 @@ class _DriversScreenState extends State<DriversScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                DriverAllRacesScreen(driver: selectedDriver!),
+                                DriverAllRacesScreen(selectedDriver: selectedDriver!, driversMap: driversMap, driversNames: driversNames, driversStats: driversStats!,),
                           ),
                         );
-                      },
+                      }, 
                       child: const Text(
                         'All races >',
                         style: TextStyle(color: Colors.white),
@@ -213,7 +213,6 @@ class _DriversScreenState extends State<DriversScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-
                   Container(
                     //height: 400,
                     child: Center(
