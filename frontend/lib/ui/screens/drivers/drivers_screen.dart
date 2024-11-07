@@ -193,60 +193,101 @@ class _DriversScreenState extends State<DriversScreen> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   //const Spacer(),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // Navigate to the "All Races" screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                DriverAllRacesScreen(selectedDriver: selectedDriver!, driversMap: driversMap, driversNames: driversNames, driversStats: driversStats!,),
-                          ),
-                        );
-                      }, 
-                      child: const Text(
-                        'All races >',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+
                   Container(
                     //height: 400,
                     child: Center(
                       child: driverChanged
-                      ? FutureBuilder<Map<String, dynamic>>(
-                          future: _driversStatsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              ); // Show loading while fetching
-                            } else if (snapshot.hasError) {
-                              return const Text(
-                                'Error: Failed to load driver stats',
-                                style: TextStyle(color: Colors.white),
-                              ); // Error handling
-                            } else if (snapshot.hasData) {
-                              Map<String, dynamic> data = snapshot.data!;
+                          ? FutureBuilder<Map<String, dynamic>>(
+                              future: _driversStatsFuture,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  ); // Show loading while fetching
+                                } else if (snapshot.hasError) {
+                                  return const Text(
+                                    'Error: Failed to load driver stats',
+                                    style: TextStyle(color: Colors.white),
+                                  ); // Error handling
+                                } else if (snapshot.hasData) {
+                                  Map<String, dynamic> data = snapshot.data!;
 
-                              return DriverSeasonsTable(data: data);
-                            }
-                            return Container();
-                          },
-                        )
-                      : driversStats == null
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
+                                  return Column(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: TextButton(
+                                          onPressed: () {
+                                            // Navigate to the "All Races" screen
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DriverAllRacesScreen(
+                                                  selectedDriver:
+                                                      selectedDriver!,
+                                                  driversMap: driversMap,
+                                                  driversNames: driversNames,
+                                                  driversStats: data,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: const Text(
+                                            'All races >',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      DriverSeasonsTable(data: data)
+                                    ],
+                                  );
+                                }
+                                return Container();
+                              },
                             )
-                          : DriverSeasonsTable(data: driversStats), 
+                          : driversStats == null
+                              ? const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topRight,
+                                      child: TextButton(
+                                        onPressed: () {
+                                          // Navigate to the "All Races" screen
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DriverAllRacesScreen(
+                                                selectedDriver: selectedDriver!,
+                                                driversMap: driversMap,
+                                                driversNames: driversNames,
+                                                driversStats: driversStats!,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text(
+                                          'All races >',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    DriverSeasonsTable(data: driversStats)
+                                  ],
+                                ),
                     ),
                   ),
                 ],
