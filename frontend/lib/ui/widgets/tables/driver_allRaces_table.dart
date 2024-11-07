@@ -2,81 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:frontend/ui/theme.dart';
 
 class DriverAllRacesTableScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> races = [
-    {
-      'name': '2024 Singapore Grand Prix',
-      'result': 2,
-      'qualifying': 1,
-      'grid': 2,
-    },
-    {
-      'name': '2024 Azerbaijan Grand Prix',
-      'result': 5,
-      'qualifying': 3,
-      'grid': 6,
-    },
-    {
-      'name': '2024 Italian Grand Prix',
-      'result': 1,
-      'qualifying': 2,
-      'grid': 1,
-    },
-    {
-      'name': '2024 Singapore Grand Prix',
-      'result': 2,
-      'qualifying': 1,
-      'grid': 2,
-    },
-    {
-      'name': '2024 Azerbaijan Grand Prix',
-      'result': 5,
-      'qualifying': 3,
-      'grid': 6,
-    },
-    {
-      'name': '2024 Italian Grand Prix',
-      'result': 1,
-      'qualifying': 2,
-      'grid': 1,
-    },
-    {
-      'name': '2024 Singapore Grand Prix',
-      'result': 2,
-      'qualifying': 1,
-      'grid': 2,
-    },
-    {
-      'name': '2024 Azerbaijan Grand Prix',
-      'result': 5,
-      'qualifying': 3,
-      'grid': 6,
-    },
-    {
-      'name': '2024 Italian Grand Prix',
-      'result': 1,
-      'qualifying': 2,
-      'grid': 1,
-    },
-    {
-      'name': '2024 Singapore Grand Prix',
-      'result': 2,
-      'qualifying': 1,
-      'grid': 2,
-    },
-    {
-      'name': '2024 Azerbaijan Grand Prix',
-      'result': 5,
-      'qualifying': 3,
-      'grid': 6,
-    },
-    {
-      'name': '2024 Italian Grand Prix',
-      'result': 1,
-      'qualifying': 2,
-      'grid': 1,
-    },
-    // Add more races as needed
-  ];
+  const DriverAllRacesTableScreen({Key? key, required this.data})
+      : super(key: key);
+
+  final List<dynamic> data;
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +60,7 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-                rows: races.map((race) {
+                rows: data.map((race) {
                   return DataRow(cells: [
                     DataCell(
                       GestureDetector(
@@ -143,19 +72,18 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                     );*/
                         },
                         child: Text(
-                          race['name'],
+                          race['race_name'],
                           style: const TextStyle(
-                              color: secondary,
-                              fontWeight: FontWeight.bold),
+                              color: secondary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     DataCell(
-                      _buildPositionContainer(race['qualifying']),
+                      _buildPositionContainer(race['qualifying_position']),
                     ),
                     DataCell(
                       Text(
-                        race['grid'].toString(),
+                        race['grid'],
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
@@ -172,24 +100,33 @@ class DriverAllRacesTableScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPositionContainer(int position) {
+  Widget _buildPositionContainer(String position) {
     Color color;
     switch (position) {
-      case 1:
+      case "1":
         color = const Color.fromARGB(255, 220, 148, 4); // 1st position
         break;
-      case 2:
+      case "2":
         color = const Color.fromARGB(255, 136, 136, 136); // 2nd position
         break;
-      case 3:
+      case "3":
         color = const Color.fromARGB(255, 106, 74, 62); // 3rd position
         break;
       default:
         color = Colors.transparent; // Default color
         break;
     }
+
+    int pos = 4;
+
+    try {
+      pos = int.parse(position);
+    } catch (e) {
+      print(e);
+    }
+
     return Container(
-      width: 35,
+      width: position == "N/A" ? 42 : 35,
       height: 35,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -199,7 +136,7 @@ class DriverAllRacesTableScreen extends StatelessWidget {
       child: Center(
         child: Text(
           position.toString(),
-          style: TextStyle(color: position <= 3 ? Colors.white : Colors.black),
+          style: TextStyle(color: pos <= 3 ? Colors.white : Colors.black),
         ),
       ),
     );

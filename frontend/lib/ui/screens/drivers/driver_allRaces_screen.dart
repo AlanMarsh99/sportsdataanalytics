@@ -91,11 +91,12 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return const Center(
+                            /*return const Center(
                               child: CircularProgressIndicator(
                                 color: Colors.white,
                               ),
-                            ); // Show loading while fetching
+                            ); // Show loading while fetching*/
+                            return Container();
                           } else if (snapshot.hasError) {
                             return const Text(
                               'Error: Failed to load driver race stats',
@@ -153,7 +154,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                         child: CircularProgressIndicator(
                           color: Colors.white,
                         ),
-                      ); // Show loading while fetching
+                      ); // Show loading while fetching*/
                     } else if (snapshot.hasError) {
                       return const Text(
                         'Error: Failed to load driver race stats',
@@ -165,7 +166,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                       return Container(
                         height: 500,
                         child: Center(
-                          child: DriverAllRacesTableScreen(),
+                          child: DriverAllRacesTableScreen(data: data),
                         ),
                       );
                     }
