@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_allRaces_table.dart';
 
 class DriverAllRacesScreen extends StatefulWidget {
-  const DriverAllRacesScreen({
-    Key? key,
-    required this.driver,
-  }) : super(key: key);
+  const DriverAllRacesScreen(
+      {Key? key,
+      required this.selectedDriver,
+      required this.driversMap,
+      required this.driversNames,
+      required this.driversStats})
+      : super(key: key);
 
-  final String driver;
+  final String selectedDriver;
+  final Map<String, dynamic> driversMap;
+  final List<String> driversNames;
+  final Map<String, dynamic> driversStats;
 
   _DriverAllRacesScreenState createState() => _DriverAllRacesScreenState();
 }
@@ -17,17 +24,19 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
   List<String> seasons = [];
   String selectedSeason = '2024';
   String selectedDriver = '';
+  late Future<List<dynamic>> _driverRaceStats;
+  late Future<Map<String, dynamic>> _driversStatsFuture;
+  bool driverChanged = false;
+  bool seasonChanged = false;
 
   @override
   void initState() {
     super.initState();
-    // Generate a list with the years from 1950 to the current year
     int currentYear = DateTime.now().year;
-    for (int i = currentYear; i >= 1950; i--) {
-      seasons.add(i.toString());
-    }
+    _driverRaceStats = APIService().getDriverRaceStats(
+        widget.driversMap[widget.selectedDriver], currentYear);
+    selectedDriver = widget.selectedDriver;
     selectedSeason = currentYear.toString();
-    selectedDriver = widget.driver;
   }
 
   @override
@@ -76,27 +85,93 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                 ),
                 _buildDriverDropdown(),
                 const SizedBox(height: 40),
-                Row(
-                  children: [
-                    const Text(
-                      'RACES OVERVIEW',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
-                    const SizedBox(width: 29),
-                    _buildYearDropdown(),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                _buildRacesOverviewContainers(),
+                driverChanged || seasonChanged
+                    ? FutureBuilder<Map<String, dynamic>>(
+                        future: _driversStatsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            /*return const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ); // Show loading while fetching*/
+                            return Container();
+                          } else if (snapshot.hasError) {
+                            return const Text(
+                              'Error: Failed to load driver race stats',
+                              style: TextStyle(color: Colors.white),
+                            ); // Error handling
+                          } else if (snapshot.hasData) {
+                            Map<String, dynamic> data = snapshot.data!;
+
+                            return Column(children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    'RACES OVERVIEW',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                  const SizedBox(width: 29),
+                                  _buildYearDropdown(data),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              _buildRacesOverviewContainers(data),
+                            ]);
+                          }
+                          return Container();
+                        },
+                      )
+                    : Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                'RACES OVERVIEW',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              const SizedBox(width: 29),
+                              _buildYearDropdown(widget.driversStats),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          _buildRacesOverviewContainers(widget.driversStats),
+                        ],
+                      ),
                 const SizedBox(height: 30),
-                Container(
-                  height: 500,
-                  child: Center(
-                    child: DriverAllRacesTableScreen(),
-                  ),
+                FutureBuilder<List<dynamic>>(
+                  future: _driverRaceStats,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                      ); // Show loading while fetching*/
+                    } else if (snapshot.hasError) {
+                      return const Text(
+                        'Error: Failed to load driver race stats',
+                        style: TextStyle(color: Colors.white),
+                      ); // Error handling
+                    } else if (snapshot.hasData) {
+                      List<dynamic> data = snapshot.data!;
+
+                      return Container(
+                        height: 500,
+                        child: Center(
+                          child: DriverAllRacesTableScreen(data: data),
+                        ),
+                      );
+                    }
+                    return Container();
+                  },
                 ),
               ],
             ),
@@ -106,18 +181,30 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
     );
   }
 
-  Widget _buildRacesOverviewContainers() {
+  Widget _buildRacesOverviewContainers(Map<String, dynamic> driversStats) {
+    Map<String, dynamic> latestSeason = driversStats["season_results"].last;
+
+    // Extrae los valores que te interesan
+    //int numRaces = latestSeason["num_races"];
+    int podiums = latestSeason["podiums"];
+    String points = latestSeason["points"];
+    int polePositions = latestSeason["pole_positions"];
+    String position = latestSeason["position"];
+    //String team = latestSeason["team"];
+    int wins = latestSeason["wins"];
+    //int year = latestSeason["year"];
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: _buildRaceOverviewContainer('Position', 1, true),
+              child: _buildRaceOverviewContainer('Position', position, true),
             ),
             const SizedBox(width: 15),
             Expanded(
-              child: _buildRaceOverviewContainer('Points', 575, false),
+              child: _buildRaceOverviewContainer('Points', points, false),
             ),
           ],
         ),
@@ -126,17 +213,20 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: _buildRaceOverviewContainer('Wins', 19, false),
+              child:
+                  _buildRaceOverviewContainer('Wins', wins.toString(), false),
             ),
             const SizedBox(width: 15),
             Expanded(
-              child: _buildRaceOverviewContainer('Podiums', 21, false),
+              child: _buildRaceOverviewContainer(
+                  'Podiums', podiums.toString(), false),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        _buildRaceOverviewContainer('Pole positions', 12, false),
-        const SizedBox(height: 12),
+        _buildRaceOverviewContainer(
+            'Pole positions', polePositions.toString(), false),
+        /*const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -148,7 +238,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
               child: _buildRaceOverviewContainer('DNS', 0, false),
             ),
           ],
-        ),
+        ),*/
       ],
     );
   }
@@ -162,54 +252,60 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
       ),
       child: DropdownButton<String>(
         value: selectedDriver,
+        hint: const Text(
+          'Select a driver',
+          style: TextStyle(color: Colors.black),
+        ),
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: <String>[
-          'Max Verstappen',
-          'Lewis Hamilton',
-          'Sebastian Vettel',
-          widget.driver
-        ].map<DropdownMenuItem<String>>((String value) {
+        items: widget.driversNames
+            .map<DropdownMenuItem<String>>((String driverName) {
           return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value, style: const TextStyle(color: Colors.black)),
+            value: driverName,
+            child:
+                Text(driverName, style: const TextStyle(color: Colors.black)),
           );
         }).toList(),
         onChanged: (String? newValue) {
           setState(() {
             selectedDriver = newValue!;
+            _driversStatsFuture = APIService().getDriverStats(
+                widget.driversMap[selectedDriver], int.parse(selectedSeason));
+            _driverRaceStats = APIService().getDriverRaceStats(
+                widget.driversMap[selectedDriver], int.parse(selectedSeason));
+            driverChanged = true;
           });
         },
       ),
     );
   }
 
-  Widget _buildRaceOverviewContainer(String label, int stat, bool isPosition) {
-    String statString = stat.toString();
+  Widget _buildRaceOverviewContainer(
+      String label, String stat, bool isPosition) {
     if (isPosition) {
-      if (statString.endsWith('1')) {
-        if (statString == '11') {
-          statString += 'th';
+      if (stat.endsWith('1')) {
+        if (stat == '11') {
+          stat += 'th';
         } else {
-          statString += 'st';
+          stat += 'st';
         }
       } else {
-        if (statString.endsWith('2')) {
-          if (statString == '12') {
-            statString += 'th';
+        if (stat.endsWith('2')) {
+          if (stat == '12') {
+            stat += 'th';
           } else {
-            statString += 'nd';
+            stat += 'nd';
           }
         } else {
-          if (statString.endsWith('3')) {
-            if (statString == '13') {
-              statString += 'th';
+          if (stat.endsWith('3')) {
+            if (stat == '13') {
+              stat += 'th';
             } else {
-              statString += 'rd';
+              stat += 'rd';
             }
           } else {
-            statString += 'th';
+            stat += 'th';
           }
         }
       }
@@ -232,7 +328,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                   color: Colors.white),
             ),
             Text(
-              statString,
+              stat,
               style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -242,7 +338,15 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         ));
   }
 
-  Widget _buildYearDropdown() {
+  Widget _buildYearDropdown(Map<String, dynamic> driversStats) {
+    List<String> years = (driversStats["season_results"] as List)
+        .map((season) => season["year"].toString())
+        .toList();
+
+    if (!years.contains(selectedSeason)) {
+      selectedSeason = years.last;
+    }
+
     return Container(
       width: 100,
       height: 30,
@@ -256,7 +360,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
-        items: seasons.map<DropdownMenuItem<String>>((String value) {
+        items: years.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value, style: const TextStyle(color: Colors.black)),
@@ -265,6 +369,11 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         onChanged: (String? newValue) {
           setState(() {
             selectedSeason = newValue!;
+            seasonChanged = true;
+            _driversStatsFuture = APIService().getDriverStats(
+                widget.driversMap[selectedDriver], int.parse(selectedSeason));
+            _driverRaceStats = APIService().getDriverRaceStats(
+                widget.driversMap[selectedDriver], int.parse(selectedSeason));
           });
         },
       ),
