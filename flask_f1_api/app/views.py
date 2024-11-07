@@ -11,7 +11,7 @@ BASE_ERGAST_URL = "http://ergast.com/api/f1"
 
 # Get upcoming race information - WORKS
 @api_blueprint.route('/home/upcoming_race/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_upcoming_race():
     # Fetch the current season's schedule
     schedule_url = f"{BASE_ERGAST_URL}/current.json"
@@ -43,7 +43,7 @@ def get_upcoming_race():
 
 # Get last race results - WORKS
 @api_blueprint.route('/home/last_race_results/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_last_race_results():
     # Fetch the current season's schedule
     schedule_url = f"{BASE_ERGAST_URL}/current.json"
@@ -111,7 +111,7 @@ def get_last_race_results():
 
 # Get list of all races in selected year - WORKS
 @api_blueprint.route('/races/<int:year>/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_races_by_year(year):
     # Fetch all races in the selected year
     races_url = f"{BASE_ERGAST_URL}/{year}.json"
@@ -241,7 +241,7 @@ def get_races_by_year(year):
 
 # Get detailed results for a specific race - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/results/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_race_results(year, round):
     # Fetch race results for a specific race
     results_url = f"{BASE_ERGAST_URL}/{year}/{round}/results.json"
@@ -271,7 +271,7 @@ def get_race_results(year, round):
 
 # Get lap by lap details for specific driver in a race - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/driver/<string:driver_id>/laps/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_driver_lap_times(year, round, driver_id):
     lap = 1
     lap_times = []
@@ -301,7 +301,7 @@ def get_driver_lap_times(year, round, driver_id):
 
 # Get pit stop data - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/pitstops/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_pit_stops(year, round):
     # Fetch pit stop data for a specific race
     pitstop_url = f"{BASE_ERGAST_URL}/{year}/{round}/pitstops.json?limit=1000"
@@ -379,7 +379,7 @@ def get_pit_stops(year, round):
 
 # Get all drivers in a given year - WORKS
 @api_blueprint.route('/drivers/<int:year>/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_drivers_by_year(year):
     # Fetch all drivers who participated in the selected year
     drivers_url = f"{BASE_ERGAST_URL}/{year}/drivers.json"
@@ -401,7 +401,7 @@ def get_drivers_by_year(year):
 
 # Get driver career and season stats - WORKS
 @api_blueprint.route('/driver/<string:driver_id>/<int:year>/stats/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_driver_stats(driver_id, year):
     # Career Stats (all-time)
     career_stats_url = f"{BASE_ERGAST_URL}/drivers/{driver_id}/driverStandings.json?limit=1000"
@@ -542,7 +542,7 @@ def get_driver_stats(driver_id, year):
 
 # Get driver race stats for a given year - WORKS
 @api_blueprint.route('/driver/<string:driver_id>/<int:year>/races/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_driver_races(year, driver_id):
     # Fetch all races for the driver in the specified year
     race_results_url = f"{BASE_ERGAST_URL}/{year}/drivers/{driver_id}/results.json"
@@ -571,7 +571,7 @@ def get_driver_races(year, driver_id):
 
 # Get teams in a year - WORKS
 @api_blueprint.route('/teams/<int:year>/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_teams_by_year(year):
     # Fetch all constructors for the selected year
     constructors_url = f"{BASE_ERGAST_URL}/{year}/constructors.json"
@@ -629,7 +629,7 @@ def get_teams_by_year(year):
 
 # Get detailed team stats
 @api_blueprint.route('/team/<string:team_id>/<int:year>/stats/', methods=['GET'])
-@cache.cached(timeout=7200)
+@cache.cached(timeout=None)
 def get_team_stats(team_id, year):
     # Initialize all-time stats and season results
     all_time_stats = {
