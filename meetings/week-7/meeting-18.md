@@ -22,7 +22,7 @@
 ## Key Discussions:
 
 - **Work:**
-  - David is working on the driver/all races screen, user evaluation plan and the user testing and the presentation. Alan deployed the backend using a free hosting service called Render and is now working on refactoring the top 1 and top 3 modelling code so it is ready for production before moving on to the modelling process for fastest lap prediction.
+  - David is working on the driver/all races screen, user evaluation plan and the user testing and the presentation. Alan set up caching for all urls and is working on the presentation.
 
 - **Blockers:**
   - Nothing today.
@@ -32,7 +32,7 @@
 ## Tasks Assigned:
 
 - **David:** Work on the driver/all races screen, user evaluation plan and the user testing + the presentation.
-- **Alan:** Work on 
+- **Alan:** Work on the presentation, documenting transition from Django to Flask.
 
 ## Next Meeting:
 - Date: 08/11/2024
