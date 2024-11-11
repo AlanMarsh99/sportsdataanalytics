@@ -48,12 +48,11 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
             style: TextStyle(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-          
           Expanded(
-            child:  Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: _leaguesContainer(),)
-          ),
+              child: Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: _leaguesContainer(),
+          )),
         ],
       ),
     );
