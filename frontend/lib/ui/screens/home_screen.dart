@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/driver.dart';
 import 'package:frontend/core/providers/data_provider.dart';
+import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:intl/intl.dart';
@@ -120,38 +121,108 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDriverCard(Map<String, dynamic> fastestLapData) {
-    return Card(
-      color: Colors.white,
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      child: ListTile(
-        leading: const Icon(Icons.flag, color: secondary),
-        title: Text(
-          '${fastestLapData['driver_name']}',
-          style:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DriversScreen(
+                driverId: fastestLapData['driver_id'],
+                driverName: fastestLapData['driver_name']),
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.white,
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        child: ListTile(
+          leading: const Icon(Icons.flag, color: secondary),
+          title: Text(
+            '${fastestLapData['driver_name']}',
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            '${fastestLapData['team_name']}',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
         ),
-        subtitle: Text(
-          '${fastestLapData['team_name']}',
-          style: TextStyle(color: Colors.grey[600]),
+      ),
+    );
+  }
+
+  Widget _buildPositionContainer(String position) {
+    Color color;
+    switch (position) {
+      case "1":
+        color = const Color.fromARGB(255, 220, 148, 4); // 1st position
+        break;
+      case "2":
+        color = const Color.fromARGB(255, 136, 136, 136); // 2nd position
+        break;
+      case "3":
+        color = const Color.fromARGB(255, 106, 74, 62); // 3rd position
+        break;
+      default:
+        color = Colors.transparent; // Default color
+        break;
+    }
+
+    int pos = 4;
+
+    try {
+      pos = int.parse(position);
+    } catch (e) {
+      print(e);
+    }
+
+    return Container(
+      width: position == "N/A" ? 42 : 35,
+      height: 35,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Center(
+        child: Text(
+          position,
+          style: TextStyle(
+              color: pos <= 3 ? Colors.white : Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.bold),
         ),
       ),
     );
   }
 
   Widget _buildPodiumCard(int position, Map<String, dynamic> driverData) {
-    return Card(
-      color: Colors.white,
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      child: ListTile(
-        leading: const Icon(Icons.flag, color: secondary),
-        title: Text(
-          '${driverData['driver_name']}',
-          style:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(
-          '${driverData['team_name']}',
-          style: TextStyle(color: Colors.grey[600]),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DriversScreen(
+                driverId: driverData['driver_id'],
+                driverName: driverData['driver_name']),
+          ),
+        );
+      },
+      child: Card(
+        color: Colors.white,
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+        child: ListTile(
+          leading: const Icon(Icons.flag,
+              color: secondary), //_buildPositionContainer(position.toString()),
+          title: Text(
+            '${driverData['driver_name']}',
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            '${driverData['team_name']}',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
         ),
       ),
     );
@@ -224,8 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Convert date and time strings to DateTime object
     DateTime raceDate = DateTime.parse("$date $hour:00");
 
-    String formattedDate =
-        DateFormat('EEEE MMMM d').format(raceDate);
+    String formattedDate = DateFormat('EEEE MMMM d').format(raceDate);
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.all(16),
