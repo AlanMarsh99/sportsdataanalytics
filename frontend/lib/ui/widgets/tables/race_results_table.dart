@@ -4,12 +4,13 @@ import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 class RaceResultsTable extends StatelessWidget {
-  const RaceResultsTable({Key? key, required this.results}) : super(key: key);
+  const RaceResultsTable({Key? key, required this.data}) : super(key: key);
 
-  final List<Result> results;
+  final List<dynamic> data;
 
   @override
   Widget build(BuildContext context) {
+    List<Result> results = data.map((json) => Result.fromJson(json)).toList();
     return Scrollbar(
       thumbVisibility: true,
       child: SingleChildScrollView(
@@ -146,24 +147,33 @@ class RaceResultsTable extends StatelessWidget {
     );
   }
 
-  Widget _buildPositionContainer(int position) {
+  Widget _buildPositionContainer(String position) {
     Color color;
     switch (position) {
-      case 1:
+      case "1":
         color = const Color.fromARGB(255, 220, 148, 4); // 1st position
         break;
-      case 2:
+      case "2":
         color = const Color.fromARGB(255, 136, 136, 136); // 2nd position
         break;
-      case 3:
+      case "3":
         color = const Color.fromARGB(255, 106, 74, 62); // 3rd position
         break;
       default:
         color = Colors.transparent; // Default color
         break;
     }
+
+    int pos = 4;
+
+    try {
+      pos = int.parse(position);
+    } catch (e) {
+      print(e);
+    }
+
     return Container(
-      width: 35,
+      width: position == "N/A" ? 42 : 35,
       height: 35,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -172,8 +182,8 @@ class RaceResultsTable extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          position.toString(),
-          style: TextStyle(color: position <= 3 ? Colors.white : Colors.black),
+          position,
+          style: TextStyle(color: pos <= 3 ? Colors.white : Colors.black),
         ),
       ),
     );

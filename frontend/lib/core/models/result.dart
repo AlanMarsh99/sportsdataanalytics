@@ -1,23 +1,37 @@
 class Result {
-  int id;
-  String raceId;
   String driver;
+  String driverId;
   String team;
-  int position;
+  String teamId;
+  String position;
   String time;
-  int grid;
-  int laps;
-  int points;
+  String grid;
+  String laps;
+  String points;
 
   Result({
-    required this.id,
-    required this.raceId,
     required this.driver,
+    required this.driverId,
     required this.team,
+    required this.teamId,
     required this.position,
     required this.time,
     required this.grid,
     required this.laps,
     required this.points,
   });
+
+  factory Result.fromJson(Map<String, dynamic> json) {
+    return Result(
+      driver: json['driver'],
+      driverId: json['driver_id'],
+      team: json['team'],
+      teamId: json['team_id'],
+      position: json['position'],
+      time: json['time'],
+      grid: json['grid'],
+      laps: json['laps'],
+      points: json['points'],
+    );
+  }
 }

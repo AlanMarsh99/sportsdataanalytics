@@ -36,49 +36,32 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
           widget.nav.userAuthenticated
               ? GestureDetector(
                   onTap: () {},
-                  child: CircleAvatar(
+                  child: const CircleAvatar(
                     backgroundColor: Colors.white,
                     backgroundImage:
                         AssetImage('assets/images/placeholder.png'),
                   ),
                 )
-              : Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  width: 100,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.all<Color>(secondary),
-                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
+              : TextButton(
+                  child: const Text(
+                    'Log in',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                    child: Container(
-                      child: const Center(
-                        child: Text(
-                          'Log in',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    onPressed: () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LoginScreen(),
-                        ),
-                      );
-                    },
                   ),
+                  onPressed: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(),
+                      ),
+                    );
+                  },
                 ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
         ],
       ),
       drawer: Drawer(

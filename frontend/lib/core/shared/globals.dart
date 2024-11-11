@@ -7,8 +7,8 @@ class Globals {
 
   static String baseUrl = 'http://127.0.0.1:8000/api/v1';
 
-  static String toDateFormat(DateTime d) {
-    String date = DateFormat('dd/MM/yyyy').format(d);
+  static String toLocalDate(DateTime d) {
+    String date = DateFormat('dd/MM/yyyy HH:mm').format(d);
     return date;
   }
 

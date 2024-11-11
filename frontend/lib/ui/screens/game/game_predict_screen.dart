@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
+
+import 'package:provider/provider.dart';
 
 class GamePredictScreen extends StatefulWidget {
   const GamePredictScreen({
@@ -15,14 +18,32 @@ class GamePredictScreen extends StatefulWidget {
 class _GamePredictScreenState extends State<GamePredictScreen> {
   late Duration remainingTime;
   late Timer timer;
+  bool firstTime = true;
 
   @override
   void initState() {
     super.initState();
-    DateTime raceDate =
-        DateTime(2024, 11, 2, 14, 0); // Set the race date and time
-    remainingTime = raceDate.difference(DateTime.now());
+  }
 
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  void startCountdown(Map<String, dynamic> upcomingRaceInfo) {
+    // Parse the date and time from the JSON
+    String date = upcomingRaceInfo['date']; // e.g., "2023-08-27"
+    String hour = upcomingRaceInfo['hour']; // e.g., "13:00"
+
+    // Convert date and time strings to DateTime object
+    DateTime raceDate = DateTime.parse("$date $hour:00");
+
+    setState(() {
+      remainingTime = raceDate.difference(DateTime.now());
+    });
+
+    // Set up the timer to update every second
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         remainingTime = raceDate.difference(DateTime.now());
@@ -34,22 +55,18 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
   }
 
   @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
-
-  String formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String days = twoDigits(duration.inDays);
-    String hours = twoDigits(duration.inHours.remainder(24));
-    String minutes = twoDigits(duration.inMinutes.remainder(60));
-    String seconds = twoDigits(duration.inSeconds.remainder(60));
-    return "$days:$hours:$minutes:$seconds";
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // Access the provider
+    final dataProvider = Provider.of<DataProvider>(context);
+
+    // Extract data from provider
+    final upcomingRaceInfo = dataProvider.upcomingRaceInfo;
+
+    if (upcomingRaceInfo != null && firstTime) {
+      firstTime = false;
+      startCountdown(upcomingRaceInfo);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
