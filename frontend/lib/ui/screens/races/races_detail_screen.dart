@@ -18,6 +18,7 @@ class RacesDetailScreen extends StatefulWidget {
 
 class _RacesDetailScreenState extends State<RacesDetailScreen> {
   late Future<List<dynamic>> raceResults;
+  bool resultsError = false;
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
       raceResults = APIService().getRaceResults(year, round);
     } catch (e) {
       print(e);
+      resultsError = true;
     }
   }
 
@@ -135,12 +137,12 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                   const SizedBox(height: 12),
                   _buildInfoContainer(
                       'Fastest lap time', widget.race.fastestLapTime),
-                  //const SizedBox(height: 12),
-                  /* _buildInfoContainer(
-                      'Fastest pitstop', widget.race.fastestPitStop),
                   const SizedBox(height: 12),
                   _buildInfoContainer(
-                      'Fastest pitstop time', widget.race.fastestPitStopTime),*/
+                      'Fastest pitstop', widget.race.fastestPitStopDriver),
+                  const SizedBox(height: 12),
+                  _buildInfoContainer(
+                      'Fastest pitstop time', widget.race.fastestPitStopTime),
                   const SizedBox(height: 12),
                   Container(
                     alignment: Alignment.centerLeft,
@@ -165,29 +167,31 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                     height: 500,
                     child: TabBarView(
                       children: [
-                        FutureBuilder<List<dynamic>>(
-                            future: raceResults,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                );
-                              } else if (snapshot.hasError) {
-                                return const Text(
-                                  'Error: Failed to load',
-                                  style: TextStyle(color: Colors.white),
-                                );
-                              } else if (snapshot.hasData) {
-                                List<dynamic> results = snapshot.data!;
-                                return RaceResultsTable(
-                                  data: results,
-                                );
-                              }
-                              return Container();
-                            }),
+                        resultsError
+                            ? const Text('Error loading results')
+                            : FutureBuilder<List<dynamic>>(
+                                future: raceResults,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    return const Text(
+                                      'Error: Failed to load',
+                                      style: TextStyle(color: Colors.white),
+                                    );
+                                  } else if (snapshot.hasData) {
+                                    List<dynamic> results = snapshot.data!;
+                                    return RaceResultsTable(
+                                      data: results,
+                                    );
+                                  }
+                                  return Container();
+                                }),
                         Container(),
                         Container(),
                         Container(),
