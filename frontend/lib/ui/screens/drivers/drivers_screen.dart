@@ -8,9 +8,11 @@ import 'package:frontend/data/data_provider.dart';
 import 'package:provider/provider.dart';
 
 class DriversScreen extends StatefulWidget {
-  const DriversScreen({
-    Key? key,
-  }) : super(key: key);
+  const DriversScreen({Key? key, this.driverId, this.driverName})
+      : super(key: key);
+
+  final String? driverId;
+  final String? driverName;
 
   _DriversScreenState createState() => _DriversScreenState();
 }
@@ -35,12 +37,16 @@ class _DriversScreenState extends State<DriversScreen> {
     super.initState();
     // Generate a list with the years from 1950 to the current year
     int currentYear = DateTime.now().year;
+
+    if (widget.driverId != null) {
+      _driversStatsFuture =
+          APIService().getDriverStats(widget.driverId!, currentYear);
+      selectedDriver = widget.driverName;
+    }
     for (int i = currentYear; i >= 1950; i--) {
       seasons.add(i.toString());
     }
     selectedSeason = currentYear.toString();
-    /*_driversFuture = APIService().getAllDrivers(
-        /*limit: limit, offset: currentOffset*/); // Fetch the drivers*/
   }
 
   @override
@@ -50,7 +56,7 @@ class _DriversScreenState extends State<DriversScreen> {
 
     // Extract data from provider
     List<dynamic>? driversList = dataProvider.driversList;
-    Map<String, dynamic>? driversStats = dataProvider.driverStats;
+    Map<String, dynamic>? driverStats = dataProvider.driverStats;
 
     return DefaultTabController(
       length: 2, // Number of tabs
@@ -69,13 +75,40 @@ class _DriversScreenState extends State<DriversScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'DRIVERS',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
+                  widget.driverId == null
+                      ? const Text(
+                          'DRIVERS',
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 25, bottom: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'DRIVERS',
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              )
+                            ],
+                          ),
+                        ),
                   const SizedBox(height: 16),
 
                   Row(
@@ -140,7 +173,7 @@ class _DriversScreenState extends State<DriversScreen> {
                   ),
                   const SizedBox(height: 16),
                   // TabBarView for the content of each tab
-                  driverChanged
+                  driverChanged || widget.driverId != null
                       ? FutureBuilder<Map<String, dynamic>>(
                           future: _driversStatsFuture,
                           builder: (context, snapshot) {
@@ -172,7 +205,7 @@ class _DriversScreenState extends State<DriversScreen> {
                             return Container();
                           },
                         )
-                      : driversStats == null
+                      : driverStats == null
                           ? const Center(
                               child: CircularProgressIndicator(
                                 color: Colors.white,
@@ -182,8 +215,8 @@ class _DriversScreenState extends State<DriversScreen> {
                               height: 250,
                               child: TabBarView(
                                 children: [
-                                  _buildCareerStats(true, driversStats),
-                                  _buildCareerStats(false, driversStats),
+                                  _buildCareerStats(true, driverStats),
+                                  _buildCareerStats(false, driverStats),
                                 ],
                               ),
                             ),
@@ -197,7 +230,7 @@ class _DriversScreenState extends State<DriversScreen> {
                   Container(
                     //height: 400,
                     child: Center(
-                      child: driverChanged
+                      child: driverChanged || widget.driverId != null
                           ? FutureBuilder<Map<String, dynamic>>(
                               future: _driversStatsFuture,
                               builder: (context, snapshot) {
@@ -252,7 +285,7 @@ class _DriversScreenState extends State<DriversScreen> {
                                 return Container();
                               },
                             )
-                          : driversStats == null
+                          : driverStats == null
                               ? const Center(
                                   child: CircularProgressIndicator(
                                     color: Colors.white,
@@ -273,7 +306,7 @@ class _DriversScreenState extends State<DriversScreen> {
                                                 selectedDriver: selectedDriver!,
                                                 driversMap: driversMap,
                                                 driversNames: driversNames,
-                                                driversStats: driversStats!,
+                                                driversStats: driverStats!,
                                               ),
                                             ),
                                           );
@@ -285,7 +318,7 @@ class _DriversScreenState extends State<DriversScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 10),
-                                    DriverSeasonsTable(data: driversStats)
+                                    DriverSeasonsTable(data: driverStats)
                                   ],
                                 ),
                     ),

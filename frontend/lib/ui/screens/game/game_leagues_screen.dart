@@ -39,7 +39,7 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -48,10 +48,11 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
             style: TextStyle(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-          const SizedBox(height: 16),
           Expanded(
+              child: Padding(
+            padding: const EdgeInsets.only(top: 16.0),
             child: _leaguesContainer(),
-          ),
+          )),
         ],
       ),
     );
@@ -133,7 +134,11 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                             ),
                           ),
                           SizedBox(width: 30),
-                          const Icon(Icons.chevron_right, color: secondary, size: 28,),
+                          const Icon(
+                            Icons.chevron_right,
+                            color: secondary,
+                            size: 28,
+                          ),
                         ],
                       ),
                     ),

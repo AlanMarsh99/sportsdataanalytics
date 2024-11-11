@@ -213,15 +213,14 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.all(16.0),
+        const  Padding(
+          padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: Text(
             'GAME',
             style: TextStyle(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
-        const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Center(
