@@ -71,11 +71,12 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
                   style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               Align(
                 alignment: Alignment.center,
                 child: _buildTutorialButton(),
               ),
+              SizedBox(height: 10),
               Align(alignment: Alignment.center, child: _buildSkipTextButton())
             ],
           ),
@@ -86,9 +87,8 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
 
   Widget _buildTutorialButton() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 25.0),
+      padding: const EdgeInsets.only(top: 25.0),
       width: 200,
-      height: 100,
       child: ElevatedButton(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(secondary),

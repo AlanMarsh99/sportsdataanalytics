@@ -38,7 +38,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: Text(
             'GAME',
             style: TextStyle(
@@ -46,7 +46,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -121,20 +121,19 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child:
-              const Text(
-                'BADGES',
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),),
+                child: const Text(
+                  'BADGES',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ),
               const SizedBox(height: 5),
               Divider(
                 color: Colors.white,
                 thickness: 1,
               ),
-              
             ],
           ),
         ),
@@ -205,6 +204,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
             label,
             style: const TextStyle(
                 fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
