@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       )
                     : */
                 _buildLogInButton(/*auth*/),
-                const Spacer(),
+                //const Spacer(),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -100,27 +100,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         "Don't have an account?  ",
                         style: TextStyle(color: Colors.white),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignUpScreen(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          'Sign up',
-                          style: TextStyle(
-                            color: redAccent,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'OpenSans',
-                          ),
+                      const Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: redAccent,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'OpenSans',
                         ),
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(
+                  height: 10,
+                )
               ],
             ),
           ),
@@ -134,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        const Text(
           'Email',
           style: Globals.kLabelStyle,
         ),
@@ -149,10 +142,10 @@ class _LoginScreenState extends State<LoginScreen> {
               color: Colors.white,
               fontFamily: 'OpenSans',
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.only(top: 14.0),
-              prefixIcon: const Icon(
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
                 Icons.email,
                 color: Colors.white,
               ),
@@ -169,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        const Text(
           'Password',
           style: Globals.kLabelStyle,
         ),
@@ -238,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLogInButton(/*AuthService auth*/) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 25.0),
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
       width: double.infinity,
       child: ElevatedButton(
         style: ButtonStyle(
@@ -254,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
               'LOG IN',
               textAlign: TextAlign.center,
               style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   letterSpacing: 1),
