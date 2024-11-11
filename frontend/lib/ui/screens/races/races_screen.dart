@@ -97,12 +97,6 @@ class _RacesScreenState extends State<RacesScreen> {
                                 style: TextStyle(color: Colors.white),
                               ); // Error handling
                             } else if (snapshot.hasData) {
-                              //selectedRace ??= snapshot.data![0]['name'];
-                              //racesSeason = [];
-                              /*for (var item in snapshot.data!) {
-                                //Race race = Race();
-                                print(item);
-                              }*/
                               List<dynamic> races =
                                   snapshot.data as List<dynamic>;
                               return RacesSeasonTable(races: races);
