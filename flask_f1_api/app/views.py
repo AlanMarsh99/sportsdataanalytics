@@ -107,7 +107,7 @@ def get_last_race_results():
 
     return jsonify(last_race_results)
 
-# Get single specific race details (See More on home screen)
+# Get single specific race details (See More on home screen) - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/', methods=['GET'])
 @cache.cached(timeout=0)
 def get_race_by_year_and_round(year, round):
@@ -221,6 +221,65 @@ def get_race_by_year_and_round(year, round):
                     race_info["fastest_pit_stop"] = driver_id
 
     return jsonify(race_info)
+
+# Get current season constructors standings - WORKS
+@api_blueprint.route('/constructors/<int:year>/standings/', methods=['GET'])
+def get_constructors_standings(year):
+    # Retrieve constructors' current points tally and names for the specified season
+    standings_url = f"{BASE_ERGAST_URL}/{year}/constructorStandings.json"
+    response = requests.get(standings_url)
+    
+    if response.status_code != 200:
+        return jsonify({"error": f"Failed to retrieve constructors standings for year {year}"}), response.status_code
+
+    standings_data = response.json()['MRData']['StandingsTable']['StandingsLists']
+    if standings_data:
+        constructors_standings = []
+        for standing in standings_data[0]['ConstructorStandings']:
+            constructors_standings.append({
+                "position": standing['position'],
+                "points": standing['points'],
+                "wins": standing['wins'],
+                "constructor_name": standing['Constructor']['name']
+            })
+        return jsonify({"constructors_standings": constructors_standings})
+    else:
+        return jsonify({"error": f"No constructors standings found for year {year}"}), 404
+
+# Get drivers' current points tally and names for the given season - WORKS
+@api_blueprint.route('/drivers/<int:year>/standings/', methods=['GET'])
+def get_drivers_current_points(year):
+    # Define the Ergast API endpoint for driver standings
+    driver_standings_url = f"{BASE_ERGAST_URL}/{year}/driverStandings.json"
+    response = requests.get(driver_standings_url)
+    
+    if response.status_code != 200:
+        return jsonify({"error": f"Failed to retrieve driver standings for the year {year}"}), response.status_code
+    
+    # Parse the JSON response
+    standings_data = response.json()['MRData']['StandingsTable']['StandingsLists']
+    if not standings_data:
+        return jsonify({"error": f"No driver standings data available for the year {year}"}), 404
+
+    # Extract the driver standings
+    driver_standings = []
+    for standing in standings_data[0]['DriverStandings']:
+        driver = standing['Driver']
+        constructor = standing['Constructors'][0] if standing.get('Constructors') else {}
+        driver_standings.append({
+            "position": standing['position'],
+            "points": standing['points'],
+            "wins": standing['wins'],
+            "driver_id": driver['driverId'],
+            "driver_name": f"{driver['givenName']} {driver['familyName']}",
+            "driver_nationality": driver['nationality'],
+            "constructor_id": constructor.get('constructorId', 'N/A'),
+            "constructor_name": constructor.get('name', 'N/A'),
+            "constructor_nationality": constructor.get('nationality', 'N/A')
+        })
+
+    # Return the standings as a JSON response
+    return jsonify({"driver_standings": driver_standings})
 
 ## RACE SCREEN VIEWS
 
