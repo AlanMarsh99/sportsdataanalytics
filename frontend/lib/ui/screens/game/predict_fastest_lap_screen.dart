@@ -271,9 +271,8 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
           Visibility(
             visible: selectedDriver != null,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 30.0),
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
               width: 200,
-              height: 100,
               child: ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.all<Color>(secondary),
@@ -323,7 +322,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
           children: [
             Container(
               width: MediaQuery.of(context).size.width * 0.25,
-              height: 70,
+              height: 75,
               padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: driver == null ? Colors.transparent : Colors.white,
