@@ -91,19 +91,9 @@ class DriverSeasonsTable extends StatelessWidget {
                     .map((seasonResult) {
                   return DataRow(cells: [
                     DataCell(
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to the race details screen
-                          /*Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RaceDetailsScreen(race['name'])),
-                    );*/
-                        },
-                        child: Text(
-                          seasonResult['year'],
-                          style: const TextStyle(
-                              color: secondary, fontWeight: FontWeight.bold),
-                        ),
+                      Text(
+                        seasonResult['year'],
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     DataCell(

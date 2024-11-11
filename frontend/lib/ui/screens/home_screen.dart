@@ -225,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
     DateTime raceDate = DateTime.parse("$date $hour:00");
 
     String formattedDate =
-        DateFormat('EEEE MMMM d \a\t HH:mm z').format(raceDate);
+        DateFormat('EEEE MMMM d').format(raceDate);
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.all(16),
@@ -261,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 20),
           Text(
-            formattedDate,
+            '$formattedDate at $hour',
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,

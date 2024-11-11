@@ -100,12 +100,22 @@ class _LoginScreenState extends State<LoginScreen> {
                         "Don't have an account?  ",
                         style: TextStyle(color: Colors.white),
                       ),
-                      const Text(
-                        'Sign up',
-                        style: TextStyle(
-                          color: redAccent,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'OpenSans',
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignUpScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Sign up',
+                          style: TextStyle(
+                            color: redAccent,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'OpenSans',
+                          ),
                         ),
                       ),
                     ],

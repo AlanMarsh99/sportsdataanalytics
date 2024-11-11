@@ -24,59 +24,61 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
         ),
       ),
       child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'GAME',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-            ),
-            const SizedBox(height: 16),
-            //Image
-            Container(
-              width: double.infinity,
-              height: 250,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/f1car.jpg'),
-                  fit: BoxFit.cover,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'GAME',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
-            ),
-
-            const SizedBox(height: 25),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'DIVE INTO THE THRILL OF F1 RACING!',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+              const SizedBox(height: 16),
+              //Image
+              Container(
+                width: double.infinity,
+                height: 220,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/f1car.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
 
-            const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                "Join the excitement of the 2024 Formula 1 season with F1 Prediction Challenge. Test your F1 knowledge by predicting the outcomes of upcoming races and earn points to climb the leaderboard!",
-                style: TextStyle(fontSize: 14, color: Colors.white),
+              const SizedBox(height: 25),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'DIVE INTO THE THRILL OF F1 RACING!',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               ),
-            ),
-            const SizedBox(height: 100),
-            Align(
-              alignment: Alignment.center,
-              child: _buildTutorialButton(),
-            ),
-            Align(alignment: Alignment.center, child: _buildSkipTextButton())
-          ],
+
+              const SizedBox(height: 12),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  "Join the excitement of the 2024 Formula 1 season with F1 Prediction Challenge. Test your F1 knowledge by predicting the outcomes of upcoming races and earn points to climb the leaderboard!",
+                  style: TextStyle(fontSize: 14, color: Colors.white),
+                ),
+              ),
+              const SizedBox(height: 30),
+              Align(
+                alignment: Alignment.center,
+                child: _buildTutorialButton(),
+              ),
+              Align(alignment: Alignment.center, child: _buildSkipTextButton())
+            ],
+          ),
         ),
       ),
     );
@@ -113,10 +115,9 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
         onPressed: () async {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => F1Carousel()
-              //GamePredictScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => F1Carousel()
+                //GamePredictScreen(),
+                ),
           );
         },
       ),
@@ -128,9 +129,7 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => F1Carousel()
-          ),
+          MaterialPageRoute(builder: (context) => F1Carousel()),
         );
       },
       child: const Text(
