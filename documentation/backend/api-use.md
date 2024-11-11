@@ -80,6 +80,41 @@ When you run the Flask development server using the command `python run.py`, you
   }
   ```
 
+#### 3. Get Race Information by Year and Round
+
+- **URL**: `/race/<int:year>/<int:round>/`
+- **Method**: `GET`
+- **Description**: Retrieves detailed information about a specific race in a given year and round.
+- **Sample Request**:
+
+  ```
+  GET /race/2023/10/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  {
+    "date": "2023-10-08",
+    "race_name": "Japanese Grand Prix",
+    "race_id": 10,
+    "circuit_name": "Suzuka International Racing Course",
+    "round": "10/22",
+    "location": "Suzuka, Japan",
+    "winner": "Max Verstappen",
+    "winner_driver_id": "max_verstappen",
+    "winning_time": "1:34:23.456",
+    "fastest_lap": "Lewis Hamilton",
+    "fastest_lap_driver_id": "lewis_hamilton",
+    "fastest_lap_time": "1:32.345",
+    "pole_position": "Charles Leclerc",
+    "pole_position_driver_id": "charles_leclerc",
+    "fastest_pit_stop": "Sergio Perez",
+    "fastest_pit_stop_driver_id": "sergio_perez",
+    "fastest_pit_stop_time": "2.345"
+  }
+  ```
+  
 ---
 
 ### Race Screen Views
