@@ -514,10 +514,64 @@ def get_drivers_by_year(year):
 
     return jsonify(driver_list)
 
-# Get driver career and season stats - WORKS
+## Get driver career and season stats - WORKS
 @api_blueprint.route('/driver/<string:driver_id>/<int:year>/stats/', methods=['GET'])
-@cache.cached(timeout=0)
 def get_driver_stats(driver_id, year):
+    def fetch_race_results(driver_id, season_year):
+        # Fetch race results for a driver in a given season
+        season_races_url = f"{BASE_ERGAST_URL}/{season_year}/drivers/{driver_id}/results.json?limit=1000"
+        season_races_response = requests.get(season_races_url)
+        if season_races_response.status_code == 200:
+            season_races = season_races_response.json()['MRData']['RaceTable']['Races']
+            return season_races
+        return []
+
+    def fetch_qualifying_results(driver_id, season_year):
+        # Fetch qualifying results for a driver in a given season
+        qualifying_url = f"{BASE_ERGAST_URL}/{season_year}/drivers/{driver_id}/qualifying.json?limit=1000"
+        qualifying_response = requests.get(qualifying_url)
+        if qualifying_response.status_code == 200:
+            qualifying_data = qualifying_response.json()['MRData']['RaceTable']['Races']
+            return qualifying_data
+        return []
+
+    def calculate_wins_podiums(race_results, driver_id):
+        # Calculate wins and podiums from race results
+        wins = 0
+        podiums = 0
+        for race in race_results:
+            results = race['Results']
+            for result in results:
+                if result['Driver']['driverId'] == driver_id:
+                    position = result['position']
+                    if position == '1':
+                        wins += 1
+                    if int(position) <= 3:
+                        podiums += 1
+                    break  # Found the driver's result
+        return wins, podiums
+
+    def calculate_pole_positions(qualifying_data, driver_id):
+        # Calculate pole positions from qualifying results.
+        pole_positions = 0
+        for race in qualifying_data:
+            for qual_result in race['QualifyingResults']:
+                if qual_result['Driver']['driverId'] == driver_id and qual_result['position'] == '1':
+                    pole_positions += 1
+                    break  # Found the driver's result
+        return pole_positions
+
+    def fetch_driver_standing(driver_id, season_year):
+        # Fetch driver standing for a given season.
+        standings_url = f"{BASE_ERGAST_URL}/{season_year}/drivers/{driver_id}/driverStandings.json"
+        standings_response = requests.get(standings_url)
+        if standings_response.status_code == 200:
+            standings_data = standings_response.json()['MRData']['StandingsTable']['StandingsLists']
+            if standings_data:
+                driver_standing = standings_data[0]['DriverStandings'][0]
+                return driver_standing
+        return None
+
     # Career Stats (all-time)
     career_stats_url = f"{BASE_ERGAST_URL}/drivers/{driver_id}/driverStandings.json?limit=1000"
     response = requests.get(career_stats_url)
@@ -539,53 +593,23 @@ def get_driver_stats(driver_id, year):
     for season in standings_data:
         season_year = season['season']
         driver_standing = season['DriverStandings'][0]
-        
-        # Initialize per-season stats
-        wins = 0
-        podiums = 0
-        pole_positions = 0
 
-        # Fetch total races and race results in the season for the driver
-        season_races_url = f"{BASE_ERGAST_URL}/{season_year}/drivers/{driver_id}/results.json?limit=1000"
-        season_races_response = requests.get(season_races_url)
+        # Fetch race results
+        race_results = fetch_race_results(driver_id, season_year)
+        num_races = len(race_results)
+        wins, podiums = calculate_wins_podiums(race_results, driver_id)
 
-        if season_races_response.status_code == 200:
-            season_races = season_races_response.json()['MRData']['RaceTable']['Races']
-            num_races = len(season_races)
-
-            for race in season_races:
-                results = race['Results']
-                for result in results:
-                    if result['Driver']['driverId'] == driver_id:
-                        position = result['position']
-                        if position == '1':
-                            wins += 1
-                        if int(position) <= 3:
-                            podiums += 1
-                        break  # Found the driver's result in this race
-
-        else:
-            num_races = 0  # Default if unable to fetch data
-
-        # Fetch qualifying results for the driver in the season to count pole positions
-        qualifying_url = f"{BASE_ERGAST_URL}/{season_year}/drivers/{driver_id}/qualifying.json?limit=1000"
-        qualifying_response = requests.get(qualifying_url)
-
-        if qualifying_response.status_code == 200:
-            qualifying_data = qualifying_response.json()['MRData']['RaceTable']['Races']
-            for race in qualifying_data:
-                for qual_result in race['QualifyingResults']:
-                    if qual_result['Driver']['driverId'] == driver_id and qual_result['position'] == '1':
-                        pole_positions += 1
-        else:
-            pole_positions = 0
+        # Fetch qualifying results
+        qualifying_data = fetch_qualifying_results(driver_id, season_year)
+        pole_positions = calculate_pole_positions(qualifying_data, driver_id)
 
         # Update all-time stats
         all_time_stats["total_races"] += num_races
         all_time_stats["total_wins"] += wins
         all_time_stats["total_podiums"] += podiums
-        all_time_stats["total_championships"] += 1 if driver_standing['position'] == '1' else 0
         all_time_stats["total_pole_positions"] += pole_positions
+        if driver_standing['position'] == '1':
+            all_time_stats["total_championships"] += 1
 
         # Season result summary
         season_results.append({
@@ -600,53 +624,52 @@ def get_driver_stats(driver_id, year):
         })
 
     # Current Season Stats
-    current_season_url = f"{BASE_ERGAST_URL}/{year}/drivers/{driver_id}/results.json?limit=1000"
-    season_response = requests.get(current_season_url)
+    race_results = fetch_race_results(driver_id, year)
+    num_races = len(race_results)
+    wins, podiums = calculate_wins_podiums(race_results, driver_id)
 
-    if season_response.status_code == 200:
-        races = season_response.json()['MRData']['RaceTable']['Races']
-        num_races = len(races)
-        wins = 0
-        podiums = 0
+    qualifying_data = fetch_qualifying_results(driver_id, year)
+    pole_positions = calculate_pole_positions(qualifying_data, driver_id)
 
-        for race in races:
-            results = race['Results']
-            for result in results:
-                if result['Driver']['driverId'] == driver_id:
-                    position = result['position']
-                    if position == '1':
-                        wins += 1
-                    if int(position) <= 3:
-                        podiums += 1
-                    break  # Found the driver's result
+    current_season_stats = {
+        "num_races": num_races,
+        "wins": wins,
+        "podiums": podiums,
+        "pole_positions": pole_positions
+    }
 
-        # Fetch qualifying results for the driver in the current season
-        qualifying_url = f"{BASE_ERGAST_URL}/{year}/drivers/{driver_id}/qualifying.json?limit=1000"
-        qualifying_response = requests.get(qualifying_url)
-
-        if qualifying_response.status_code == 200:
-            qualifying_data = qualifying_response.json()['MRData']['RaceTable']['Races']
-            pole_positions = 0
-            for race in qualifying_data:
-                for qual_result in race['QualifyingResults']:
-                    if qual_result['Driver']['driverId'] == driver_id and qual_result['position'] == '1':
-                        pole_positions += 1
-        else:
-            pole_positions = 0
-
-        current_season_stats = {
-            "num_races": num_races,
-            "wins": wins,
-            "podiums": podiums,
-            "pole_positions": pole_positions
-        }
+    driver_standing = fetch_driver_standing(driver_id, year)
+    if driver_standing:
+        position = driver_standing['position']
+        points = driver_standing['points']
+        team = driver_standing['Constructors'][0]['name'] if driver_standing.get('Constructors') else "N/A"
+        if position == '1':
+            all_time_stats["total_championships"] += 1
     else:
-        current_season_stats = {
-            "num_races": 0,
-            "wins": 0,
-            "podiums": 0,
-            "pole_positions": 0
-        }
+        position = "N/A"
+        points = "0"
+        team = "N/A"
+
+    # Update all-time stats with current season stats
+    all_time_stats["total_races"] += current_season_stats["num_races"]
+    all_time_stats["total_wins"] += current_season_stats["wins"]
+    all_time_stats["total_podiums"] += current_season_stats["podiums"]
+    all_time_stats["total_pole_positions"] += current_season_stats["pole_positions"]
+
+    # Create season result for current season
+    current_season_result = {
+        "year": str(year),
+        "position": position,
+        "points": points,
+        "num_races": current_season_stats['num_races'],
+        "wins": current_season_stats['wins'],
+        "podiums": current_season_stats['podiums'],
+        "pole_positions": current_season_stats['pole_positions'],
+        "team": team
+    }
+
+    # Append current season result to season_results
+    season_results.append(current_season_result)
 
     # Combine all stats for JSON response
     return jsonify({
