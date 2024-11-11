@@ -107,6 +107,121 @@ def get_last_race_results():
 
     return jsonify(last_race_results)
 
+# Get single specific race details (See More on home screen)
+@api_blueprint.route('/race/<int:year>/<int:round>/', methods=['GET'])
+@cache.cached(timeout=0)
+def get_race_by_year_and_round(year, round):
+    # Fetch race data for the specific year and round
+    race_url = f"{BASE_ERGAST_URL}/{year}/{round}.json"
+    response = requests.get(race_url)
+
+    if response.status_code != 200:
+        return jsonify({"error": f"Failed to retrieve details for race in year {year}, round {round}"}), response.status_code
+
+    race_data = response.json()['MRData']['RaceTable']['Races']
+    if not race_data:
+        return jsonify({"error": "No race data found"}), 404
+
+    # Function to parse duration strings
+    def parse_duration(duration_str):
+        if ':' in duration_str:
+            # Duration is in 'mm:ss.sss' format
+            minutes, seconds = duration_str.split(':')
+            total_seconds = int(minutes) * 60 + float(seconds)
+            return total_seconds
+        else:
+            # Duration is in seconds
+            return float(duration_str)
+
+    # Initialize the race information dictionary
+    race = race_data[0]
+    race_info = {
+        "date": race['date'],
+        "race_name": race['raceName'],
+        "race_id": round,
+        "circuit_name": race['Circuit']['circuitName'],
+        "round": f"{round}/{len(race_data)}",
+        "location": f"{race['Circuit']['Location']['locality']}, {race['Circuit']['Location']['country']}",
+        # Fields for additional race details
+        "winner": "N/A",
+        "winner_driver_id": "N/A",
+        "winning_time": "N/A",
+        "fastest_lap": "N/A",
+        "fastest_lap_driver_id": "N/A",
+        "fastest_lap_time": "N/A",
+        "pole_position": "N/A",
+        "pole_position_driver_id": "N/A",
+        "fastest_pit_stop": "N/A",
+        "fastest_pit_stop_driver_id": "N/A",
+        "fastest_pit_stop_time": "N/A"
+    }
+
+    # Fetch winner, pole position, and fastest lap data
+    race_results_url = f"{BASE_ERGAST_URL}/{year}/{round}/results.json"
+    results_response = requests.get(race_results_url)
+
+    if results_response.status_code == 200:
+        results_data = results_response.json()['MRData']['RaceTable']['Races']
+        if results_data:
+            results = results_data[0]['Results']
+            winner_info = results[0]
+            race_info["winner"] = f"{winner_info['Driver']['givenName']} {winner_info['Driver']['familyName']}"
+            race_info["winner_driver_id"] = winner_info['Driver']['driverId']
+            race_info["winning_time"] = winner_info.get('Time', {}).get('time', "N/A")
+
+            # Determine the fastest lap
+            fastest_lap_time = None
+            for result in results:
+                if 'FastestLap' in result:
+                    current_fastest_lap_time = result['FastestLap']['Time']['time']
+                    if fastest_lap_time is None or current_fastest_lap_time < fastest_lap_time:
+                        fastest_lap_time = current_fastest_lap_time
+                        race_info["fastest_lap"] = f"{result['Driver']['givenName']} {result['Driver']['familyName']}"
+                        race_info["fastest_lap_driver_id"] = result['Driver']['driverId']
+                        race_info["fastest_lap_time"] = fastest_lap_time
+
+    # Fetch qualifying data for pole position
+    qualifying_url = f"{BASE_ERGAST_URL}/{year}/{round}/qualifying.json"
+    qualifying_response = requests.get(qualifying_url)
+
+    if qualifying_response.status_code == 200:
+        qualifying_data = qualifying_response.json()['MRData']['RaceTable']['Races']
+        if qualifying_data:
+            pole_position = qualifying_data[0]['QualifyingResults'][0]
+            race_info["pole_position"] = f"{pole_position['Driver']['givenName']} {pole_position['Driver']['familyName']}"
+            race_info["pole_position_driver_id"] = pole_position['Driver']['driverId']
+
+    # Fetch pit stop data to find the fastest pit stop
+    pit_stop_url = f"{BASE_ERGAST_URL}/{year}/{round}/pitstops.json?limit=1000"
+    pit_stop_response = requests.get(pit_stop_url)
+
+    if pit_stop_response.status_code == 200:
+        pit_stop_data = pit_stop_response.json()['MRData']['RaceTable']['Races']
+        if pit_stop_data:
+            pit_stops = pit_stop_data[0].get('PitStops', [])
+            if pit_stops:
+                # Find the pit stop with the shortest duration
+                fastest_pit_stop = min(pit_stops, key=lambda x: parse_duration(x['duration']))
+                race_info["fastest_pit_stop_time"] = fastest_pit_stop['duration']
+                race_info["fastest_pit_stop_driver_id"] = fastest_pit_stop['driverId']
+
+                # Fetch the driver’s full name for the fastest pit stop (if not cached)
+                driver_id = fastest_pit_stop['driverId']
+                driver_url = f"{BASE_ERGAST_URL}/drivers/{driver_id}.json"
+                driver_response = requests.get(driver_url)
+                if driver_response.status_code == 200:
+                    driver_data = driver_response.json()['MRData']['DriverTable']['Drivers']
+                    if driver_data:
+                        driver = driver_data[0]
+                        full_name = f"{driver['givenName']} {driver['familyName']}"
+                        race_info["fastest_pit_stop"] = full_name
+                    else:
+                        race_info["fastest_pit_stop"] = driver_id
+                else:
+                    race_info["fastest_pit_stop"] = driver_id
+
+    return jsonify(race_info)
+
 ## RACE SCREEN VIEWS
 
 # Get list of all races in selected year - WORKS
