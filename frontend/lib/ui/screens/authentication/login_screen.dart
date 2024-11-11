@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       )
                     : */
                 _buildLogInButton(/*auth*/),
-                const Spacer(),
+                //const Spacer(),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -100,28 +100,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         "Don't have an account?  ",
                         style: TextStyle(color: Colors.white),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignUpScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Sign up',
-                          style: TextStyle(
-                            color: redAccent,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'OpenSans',
-                          ),
+                      const Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: redAccent,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'OpenSans',
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 10,)
+                const SizedBox(
+                  height: 10,
+                )
               ],
             ),
           ),
@@ -255,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
               'LOG IN',
               textAlign: TextAlign.center,
               style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   letterSpacing: 1),
