@@ -261,7 +261,13 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
   }
 
   Widget _buildStatCard(int stat, int total, String label, bool hasPercentage) {
-    int percentage = (stat * 100 / total).truncate();
+    int percentage = -1;
+    try {
+      percentage = ((stat / total) * 100).round();
+    } catch (e) {
+      print('Error calculating percentage: $e');
+    }
+
     return Container(
       width: 155,
       height: 100,
@@ -296,7 +302,7 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                 child: const SizedBox(width: 10),
               ),
               Visibility(
-                visible: hasPercentage,
+                visible: hasPercentage && percentage != -1,
                 child: Text(
                   '($percentage %)',
                   style: const TextStyle(
