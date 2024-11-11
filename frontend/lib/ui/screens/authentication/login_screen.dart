@@ -84,23 +84,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     : */
                 _buildLogInButton(/*auth*/),
                 //const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SignUpScreen(),
-                      ),
-                    );
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Don't have an account?  ",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      const Text(
+                SizedBox(
+                  height: 5,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don't have an account?  ",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignUpScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
                         'Sign up',
                         style: TextStyle(
                           color: redAccent,
@@ -108,8 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontFamily: 'OpenSans',
                         ),
                       ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
                 const SizedBox(
                   height: 10,
