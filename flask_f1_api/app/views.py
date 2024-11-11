@@ -72,11 +72,16 @@ def get_last_race_results():
     if results_response.status_code != 200:
         return jsonify({"error": "Failed to retrieve last race results"}), results_response.status_code
 
-    results = results_response.json()['MRData']['RaceTable']['Races'][0]['Results']
+    race_data = results_response.json()['MRData']['RaceTable']['Races'][0]
+    results = race_data['Results']
+
+    # Extract the year from the race data
+    year = race_data['season']
 
     # Extract details for the top 3 finishers and fastest lap
     last_race_results = {
         "race_id": last_race,
+        "year": year,
         "first_position": {
             "driver_name": f"{results[0]['Driver']['givenName']} {results[0]['Driver']['familyName']}",
             "team_name": results[0]['Constructor']['name'],
