@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'RACEVISION',
+                  'HOME',
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,

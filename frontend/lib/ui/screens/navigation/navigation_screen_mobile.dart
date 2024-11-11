@@ -32,6 +32,12 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
             );
           },
         ),
+        title: InkWell(
+          onTap: () {
+            widget.nav.updateIndex(0);
+          },
+          child: Image.asset('assets/logo/logo.png', height: 30, fit: BoxFit.cover),
+        ),
         actions: [
           widget.nav.userAuthenticated
               ? GestureDetector(
