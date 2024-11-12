@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/authentication/forget_password_screen.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
@@ -38,92 +39,84 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          body: /*Consumer<AuthService>(builder: (context, auth, child) {
-          return*/
-              Padding(
+          body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
-            child: Column(
-              children: [
-/*Padding(
-                                  padding: const EdgeInsets.only(bottom: 40.0),
-                                  child: Image.asset(
-                                      'assets/devalirian_logo.png',
-                                      fit: BoxFit.cover,
-                                      scale: 14)),*/
-                const Text(
-                  'Welcome back',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'OpenSans',
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 28.0),
-                const Text(
-                  'Log in to play the F1 Predictions Challenge with your friends and win prizes!',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'OpenSans',
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 25.0),
-                _buildEmailTF(),
-                const SizedBox(
-                  height: 30.0,
-                ),
-                _buildPasswordTF(),
-                const SizedBox(
-                  height: 15,
-                ),
-                /* auth.status == Status.Authenticating
-                    ? const CircularProgressIndicator(
-                        color: secondary,
-                      )
-                    : */
-                _buildLogInButton(/*auth*/),
-                //const Spacer(),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            child: Consumer<AuthService>(
+              builder: (context, auth, child) {
+                return Column(
                   children: [
                     const Text(
-                      "Don't have an account?  ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignUpScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(
-                          color: redAccent,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'OpenSans',
-                        ),
+                      'Welcome back',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'OpenSans',
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    const SizedBox(height: 28.0),
+                    const Text(
+                      'Log in to play the F1 Predictions Challenge with your friends and win prizes!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'OpenSans',
+                        fontSize: 16.0,
+                      ),
+                    ),
+                    const SizedBox(height: 25.0),
+                    _buildEmailTF(),
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    _buildPasswordTF(),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    auth.status == Status.Authenticating
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : _buildLogInButton(auth),
+                    //const Spacer(),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Don't have an account?  ",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SignUpScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Sign up',
+                            style: TextStyle(
+                              color: redAccent,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'OpenSans',
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 10,
                     )
                   ],
-                ),
-                const SizedBox(
-                  height: 10,
-                )
-              ],
+                );
+              },
             ),
           ),
-        )
-        //}),
-
-        );
+        ));
   }
 
   Widget _buildEmailTF() {
@@ -232,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLogInButton(/*AuthService auth*/) {
+  Widget _buildLogInButton(AuthService auth) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
       width: double.infinity,
@@ -258,36 +251,32 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         onPressed: () async {
-          signIn(/*auth*/);
+          signIn(auth);
         },
       ),
     );
   }
 
-  void signIn(/*AuthService auth*/) async {
-    final provider = Provider.of<NavigationProvider>(context, listen: false);
-    provider.authenticateUser();
-    /*await auth.signIn(
+  void signIn(AuthService auth) async {
+    await auth.signIn(
       _emailController.text.trim(),
       _passwordController.text,
-    );*/
-
-    //if (auth.status == Status.Authenticated) {
-    await Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const NavigationScreen()
-          //NavigationScreen(),
-          ),
     );
-    //}
 
-    /*if (auth.status == Status.Unauthenticated) {
+    if (auth.status == Status.Authenticated) {
+      await Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const NavigationScreen()),
+      );
+    }
+
+    if (auth.status == Status.Unauthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Wrong email or password.'),
           backgroundColor: Colors.red,
         ),
       );
-    }*/
+    }
   }
 }

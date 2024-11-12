@@ -14,11 +14,10 @@ class Validators {
     return regExp.hasMatch(value) ? true : false;
   }
 
-  static bool validPassword(String value) {
-    if (value.isEmpty) return false;
-    // Any alphanumerical, any special chars, min 6 chars
-    Pattern pattern = r"^(?=.*[a-zA-Z0-9\W-]).{6,}$";
-    var regex = RegExp(pattern.toString());
-    return regex.hasMatch(value) ? true : false;
+  bool isStrongPassword(String password) {
+    final RegExp passwordRegExp = RegExp(
+      r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$',
+    );
+    return passwordRegExp.hasMatch(password);
   }
 }

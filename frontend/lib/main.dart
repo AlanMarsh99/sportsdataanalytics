@@ -1,21 +1,23 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/firebase_options.dart';
-import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  /*WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );*/
+  );
 
   runApp(
     MultiProvider(providers: [
+      ChangeNotifierProvider.value(value: AuthService()),
       ChangeNotifierProvider(
         create: (_) => NavigationProvider(),
       ),
