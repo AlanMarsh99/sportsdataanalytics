@@ -73,6 +73,29 @@ class APIService {
     }
   }
 
+  // Fetch race information
+  Future<Map<String, dynamic>> getRaceInfo(int year, int round) async {
+    try {
+      final response =
+          await http.get(Uri.parse('$baseUrl/race/$year/$round/'));
+
+      if (response.statusCode == 200) {
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return jsonDecode(response.body);
+      } else {
+        // Log the error details if the status is not 200
+        print('Failed to load race info');
+        print('Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to load race ingo');
+      }
+    } catch (e) {
+      print('Exception caught: $e');
+      rethrow;
+    }
+  }
+
   // Fetch detailed results for a specific race
   Future<List<dynamic>> getRaceResults(int year, int round) async {
     try {

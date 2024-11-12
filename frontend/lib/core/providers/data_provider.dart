@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/services/API_service.dart';
 
 class DataProvider extends ChangeNotifier {
@@ -11,6 +12,7 @@ class DataProvider extends ChangeNotifier {
   List<dynamic>? _racesSeason;
   APIService apiService = APIService();
   bool firstTime = true;
+  Race? _lastRaceInfo;
 
   Map<String, dynamic>? get upcomingRaceInfo => _upcomingRaceInfo;
   Map<String, dynamic>? get lastRaceResults => _lastRaceResults;
@@ -19,6 +21,8 @@ class DataProvider extends ChangeNotifier {
   List<dynamic>? get driverAllRacesSeason => _driverAllRacesSeason;
   List<dynamic>? get teamsSeason => _teamsSeason;
   List<dynamic>? get racesSeason => _racesSeason;
+  Race? get lastRaceInfo => _lastRaceInfo;
+
 
   DataProvider() {
     if (firstTime) {
@@ -46,6 +50,15 @@ class DataProvider extends ChangeNotifier {
 
       _upcomingRaceInfo = results[0];
       _lastRaceResults = results[1];
+
+      if (_lastRaceResults != null) {
+        int lastRaceYear = int.parse(_lastRaceResults!['year']);
+        int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
+
+        Map<String, dynamic> raceInfo = await apiService.getRaceInfo(lastRaceYear, lastRaceRound);
+        _lastRaceInfo = Race.fromJson(raceInfo);
+        
+      }
 
       notifyListeners();
     } catch (error) {
