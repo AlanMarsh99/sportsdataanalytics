@@ -76,7 +76,8 @@ When you run the Flask development server using the command `python run.py`, you
       "driver_name": "Lando Norris",
       "team_name": "McLaren",
       "driver_id": "lando_norris"
-    }
+    },
+    "year": "2024"
   }
   ```
 
@@ -112,6 +113,99 @@ When you run the Flask development server using the command `python run.py`, you
     "fastest_pit_stop": "Sergio Perez",
     "fastest_pit_stop_driver_id": "sergio_perez",
     "fastest_pit_stop_time": "2.345"
+  }
+  ```
+
+#### 4. Get Drivers' Standings for a Specific Year
+
+- **URL**: `/drivers/<int:year>/standings/`
+- **Method**: `GET`
+- **Description**: Retrieves drivers' current points tally and names for the given season.
+- **Sample Request**:
+
+  ```
+  GET /drivers/2023/standings/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  {
+    "driver_standings": [
+      {
+        "position": "1",
+        "points": "365",
+        "wins": "11",
+        "driver_id": "max_verstappen",
+        "driver_name": "Max Verstappen",
+        "driver_nationality": "Dutch",
+        "constructor_id": "red_bull",
+        "constructor_name": "Red Bull Racing",
+        "constructor_nationality": "Austrian"
+      },
+      {
+        "position": "2",
+        "points": "280",
+        "wins": "4",
+        "driver_id": "lewis_hamilton",
+        "driver_name": "Lewis Hamilton",
+        "driver_nationality": "British",
+        "constructor_id": "mercedes",
+        "constructor_name": "Mercedes",
+        "constructor_nationality": "German"
+      },
+      {
+        "position": "3",
+        "points": "210",
+        "wins": "2",
+        "driver_id": "charles_leclerc",
+        "driver_name": "Charles Leclerc",
+        "driver_nationality": "Monégasque",
+        "constructor_id": "ferrari",
+        "constructor_name": "Ferrari",
+        "constructor_nationality": "Italian"
+      }
+      // More driver standings...
+    ]
+  }
+  ```
+
+#### 5. Get Constructors' Standings for a Specific Year
+
+- **URL**: `/constructors/<int:year>/standings/`
+- **Method**: `GET`
+- **Description**: Retrieves constructors' current points tally and names for the specified season.
+- **Sample Request**:
+
+  ```
+  GET /constructors/2023/standings/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  {
+    "constructors_standings": [
+      {
+        "position": "1",
+        "points": "675",
+        "wins": "13",
+        "constructor_name": "Red Bull Racing"
+      },
+      {
+        "position": "2",
+        "points": "590",
+        "wins": "5",
+        "constructor_name": "Mercedes"
+      },
+      {
+        "position": "3",
+        "points": "480",
+        "wins": "3",
+        "constructor_name": "Ferrari"
+      }
+      // More constructors standings...
+    ]
   }
   ```
   
