@@ -214,7 +214,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                       child: const Divider(color: Colors.grey, height: 20),
                     ),
                     _buildResultRow('Fastest lap', ['Ricciardo, D'],
-                        ['Verstappen, M'], ['Verstappen, M'], '+10'),
+                        ['Verstappen, M'], ['Verstappen, M'], '+5'),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
@@ -319,7 +319,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
   Color _getLabelColor(String label) {
     switch (label) {
       case 'Podium':
-        return Colors.orange;
+        return Colors.green;
       case 'Winner':
         return Colors.red;
       case 'Fastest lap':

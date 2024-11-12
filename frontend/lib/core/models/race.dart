@@ -42,7 +42,7 @@ class Race {
     return Race(
       date: json['date'],
       raceName: json['race_name'],
-      raceId: json['race_id'],
+      raceId: json['race_id'].toString(),
       circuitName: json['circuit_name'],
       round: json['round'],
       location: json['location'],

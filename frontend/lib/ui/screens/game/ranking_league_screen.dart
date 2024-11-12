@@ -120,7 +120,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
   }
 
   Widget _rankingUserContainer(int index) {
-    List<Color> indicators = [Colors.green, Colors.yellow, Colors.red];
+    List<Color> indicators = [Colors.green, Colors.red, Colors.orange,];
     return GestureDetector(
       onTap: () {
         // Navigate to another screen when the card is tapped

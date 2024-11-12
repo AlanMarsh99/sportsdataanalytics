@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/driver.dart';
+import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
+import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
@@ -21,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Duration remainingTime;
   late Timer timer;
   bool firstTime = true;
+  Race? lastRaceInfo;
 
   @override
   void initState() {
@@ -70,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final lastRaceResults = dataProvider.lastRaceResults;
+    lastRaceInfo = dataProvider.lastRaceInfo;
 
     return Container(
       decoration: const BoxDecoration(
@@ -249,7 +253,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (lastRaceInfo != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              RacesDetailScreen(race: lastRaceInfo!),
+                        ),
+                      );
+                    }
+                  },
                   child: const Text(
                     "See more",
                     style: TextStyle(

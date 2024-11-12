@@ -20,18 +20,11 @@ class TeamSeasonsTable extends StatelessWidget {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Container(
-              //padding: const EdgeInsets.symmetric(horizontal: 16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                /*dataRowColor: MaterialStateProperty.resolveWith<Color?>(
-            (Set<MaterialState> states) {
-        
-            return Colors.white;
-      
-        }),*/
                 columns: const [
                   DataColumn(
                     label: Text(
