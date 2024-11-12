@@ -143,7 +143,7 @@ def get_race_by_year_and_round(year, round):
     race_info = {
         "date": race['date'],
         "race_name": race['raceName'],
-        "race_id": round,
+        "race_id": str(round),
         "circuit_name": race['Circuit']['circuitName'],
         "round": f"{round}/{len(race_data)}",
         "location": f"{race['Circuit']['Location']['locality']}, {race['Circuit']['Location']['country']}",
