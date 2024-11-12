@@ -98,7 +98,7 @@ When you run the Flask development server using the command `python run.py`, you
   {
     "date": "2023-10-08",
     "race_name": "Japanese Grand Prix",
-    "race_id": 10,
+    "race_id": "10",
     "circuit_name": "Suzuka International Racing Course",
     "round": "10/22",
     "location": "Suzuka, Japan",
