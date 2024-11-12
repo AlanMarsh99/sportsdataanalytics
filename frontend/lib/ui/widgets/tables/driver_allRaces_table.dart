@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/race.dart';
+import 'package:frontend/core/services/API_service.dart';
+import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 class DriverAllRacesTableScreen extends StatelessWidget {
@@ -18,18 +21,11 @@ class DriverAllRacesTableScreen extends StatelessWidget {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Container(
-              //padding: const EdgeInsets.symmetric(horizontal: 16.0),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                /*dataRowColor: MaterialStateProperty.resolveWith<Color?>(
-            (Set<MaterialState> states) {
-        
-            return Colors.white;
-      
-        }),*/
                 columns: const [
                   DataColumn(
                     label: Text(
@@ -64,17 +60,25 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                   return DataRow(cells: [
                     DataCell(
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           // Navigate to the race details screen
-                          /*Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RaceDetailsScreen(race['name'])),
-                    );*/
+                          int year = int.parse(race['year']);
+                          int round = int.parse(race['round']);
+
+                          Map<String, dynamic> json =
+                              await APIService().getRaceInfo(year, round);
+                          Race r = Race.fromJson(json);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    RacesDetailScreen(race: r)),
+                          );
                         },
                         child: Text(
                           race['race_name'],
                           style: const TextStyle(
-                              color: secondary, fontWeight: FontWeight.bold),
+                              color: primary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),

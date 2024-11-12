@@ -26,12 +26,6 @@ class RaceResultsTable extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                /*dataRowColor: MaterialStateProperty.resolveWith<Color?>(
-            (Set<MaterialState> states) {
-        
-            return Colors.white;
-      
-        }),*/
                 columns: const [
                   DataColumn(
                     label: Text(
@@ -95,15 +89,17 @@ class RaceResultsTable extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  DriversScreen(/*driver: result.driver*/),
+                              builder: (context) => DriversScreen(
+                                driverId: result.driverId,
+                                driverName: result.driver,
+                              ),
                             ),
                           );
                         },
                         child: Text(
                           result.driver,
                           style: const TextStyle(
-                              color: secondary, fontWeight: FontWeight.bold),
+                              color: primary, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
