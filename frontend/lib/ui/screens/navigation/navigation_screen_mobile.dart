@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
@@ -45,7 +46,9 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
             builder: (context, auth, child) {
               if (auth.status == Status.Authenticated) {
                 return GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Scaffold.of(context).openEndDrawer();
+                  },
                   child: const CircleAvatar(
                     backgroundColor: Colors.white,
                     backgroundImage:
@@ -116,6 +119,38 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
           ),
         ),
       ),
+      endDrawer: Drawer(
+        child: Container(
+          color: const Color(0xFF1B222C),
+          child: Column(
+            children: [
+              // Icono de cerrar (cruz) en la parte superior derecha
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(); // Cierra el Drawer al hacer clic
+                  },
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    /*_buildDrawerItem(context, 'PROFILE', 6),
+                    const SizedBox(height: 10),
+                    _buildDrawerItem(context, 'SETTINGS', 7),
+                    const SizedBox(height: 10),*/
+                    _buildLogOutItem(context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -138,6 +173,23 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
         Navigator.pop(context); // Cierra el drawer
         // Aquí puedes agregar lógica para navegar entre pantallas
         widget.nav.updateIndex(value);
+      },
+    );
+  }
+
+  Widget _buildLogOutItem(BuildContext context) {
+    return TextButton(
+      child: const Text(
+        'LOG OUT',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      onPressed: () async {
+        await AuthService().signOut();
+        Phoenix.rebirth(context);
       },
     );
   }
