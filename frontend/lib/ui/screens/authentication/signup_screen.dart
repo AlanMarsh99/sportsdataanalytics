@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
@@ -41,64 +42,62 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          body: /*Consumer<AuthService>(builder: (context, auth, child) {
-          return*/
-              Padding(
+          body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
-            child: Column(
-              children: [
+            child: Consumer<AuthService>(
+              builder: (context, auth, child) {
+                return Column(
+                  children: [
 /*Padding(
                                   padding: const EdgeInsets.only(bottom: 40.0),
                                   child: Image.asset(
                                       'assets/devalirian_logo.png',
                                       fit: BoxFit.cover,
                                       scale: 14)),*/
-                const Text(
-                  'Create an account',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'OpenSans',
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 30.0),
-                _buildEmailTF(),
-                const SizedBox(
-                  height: 30.0,
-                ),
-                _buildUsernameTF(),
-                const SizedBox(
-                  height: 30.0,
-                ),
-                _buildPasswordTF(),
-                const SizedBox(
-                  height: 30.0,
-                ),
-                _buildRepeatPasswordTF(),
-                const SizedBox(
-                  height: 15,
-                ),
-                /* auth.status == Status.Authenticating
-                    ? const CircularProgressIndicator(
-                        color: secondary,
-                      )
-                    : */
-                _buildSignUpButton(/*auth*/),
-              ],
+                    const Text(
+                      'Create an account',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'OpenSans',
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 30.0),
+                    _buildEmailTF(),
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    _buildUsernameTF(),
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    _buildPasswordTF(),
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    _buildRepeatPasswordTF(),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    auth.status == Status.Authenticating
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : _buildSignUpButton(auth),
+                  ],
+                );
+              },
             ),
           ),
-        )
-        //}),
-
-        );
+        ));
   }
 
   Widget _buildEmailTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        const Text(
           'Email',
           style: Globals.kLabelStyle,
         ),
@@ -113,10 +112,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               color: Colors.white,
               fontFamily: 'OpenSans',
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.only(top: 14.0),
-              prefixIcon: const Icon(
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
                 Icons.email,
                 color: Colors.white,
               ),
@@ -133,7 +132,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        const Text(
           'Username',
           style: Globals.kLabelStyle,
         ),
@@ -148,10 +147,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               color: Colors.white,
               fontFamily: 'OpenSans',
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.only(top: 14.0),
-              prefixIcon: const Icon(
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
                 Icons.person,
                 color: Colors.white,
               ),
@@ -168,7 +167,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        const Text(
           'Password',
           style: Globals.kLabelStyle,
         ),
@@ -217,7 +216,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        const Text(
           'Repeat password',
           style: Globals.kLabelStyle,
         ),
@@ -264,7 +263,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildSignUpButton(/*AuthService auth*/) {
+  Widget _buildSignUpButton(AuthService auth) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
@@ -292,26 +291,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
         onPressed: () async {
           // Check if the passwords match
 
-          signUp(/*auth*/);
+          signUp(auth);
         },
       ),
     );
   }
 
-  void signUp(/*AuthService auth*/) async {
-    final provider = Provider.of<NavigationProvider>(context, listen: false);
-    provider.authenticateUser();
-    /*await auth.signUp(
+  void signUp(AuthService auth) async {
+    await auth.signUp(
+      context,
       _emailController.text.trim(),
       _usernameController.text.trim(),
       _passwordController.text,
-    );*/
+    );
 
     await Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const NavigationScreen()
-          //NavigationScreen(),
-          ),
+      MaterialPageRoute(builder: (context) => const NavigationScreen()),
     );
   }
 }

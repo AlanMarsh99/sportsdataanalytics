@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
@@ -36,19 +37,23 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
           onTap: () {
             widget.nav.updateIndex(0);
           },
-          child: Image.asset('assets/logo/logo.png', height: 30, fit: BoxFit.cover),
+          child: Image.asset('assets/logo/logo.png',
+              height: 30, fit: BoxFit.cover),
         ),
         actions: [
-          widget.nav.userAuthenticated
-              ? GestureDetector(
+          Consumer<AuthService>(
+            builder: (context, auth, child) {
+              if (auth.status == Status.Authenticated) {
+                return GestureDetector(
                   onTap: () {},
                   child: const CircleAvatar(
                     backgroundColor: Colors.white,
                     backgroundImage:
                         AssetImage('assets/images/placeholder.png'),
                   ),
-                )
-              : TextButton(
+                );
+              } else {
+                return TextButton(
                   child: const Text(
                     'Log in',
                     textAlign: TextAlign.center,
@@ -66,7 +71,10 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
                       ),
                     );
                   },
-                ),
+                );
+              }
+            },
+          ),
           const SizedBox(width: 10),
         ],
       ),
