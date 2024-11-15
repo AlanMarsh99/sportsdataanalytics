@@ -98,6 +98,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.white),
                 ),
                 const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                        style: TextStyle(fontSize: 14, color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Image.asset('assets/logo/formula-1-logo.png',
+                        width: 50, fit: BoxFit.cover),
+                  ],
+                ),
+                const SizedBox(height: 20),
                 upcomingRaceInfo != null && lastRaceResults != null
                     ? Column(
                         children: [
@@ -216,8 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.white,
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
         child: ListTile(
-          leading: const Icon(Icons.flag,
-              color: secondary), //_buildPositionContainer(position.toString()),
+          leading: _buildPositionContainer(position.toString()),
           title: Text(
             '${driverData['driver_name']}',
             style: const TextStyle(
@@ -332,14 +345,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(5),
-              child: Text(
-                'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+              child: Expanded(
+                child: Text(
+                  'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
           ),
@@ -462,8 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 25),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
-            width: 200,
-            //height: 100,
+            width: 270,
             child: ElevatedButton(
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all<Color>(secondary),
