@@ -245,6 +245,55 @@ When you run the Flask development server using the command `python run.py`, you
     ]
   }
   ```
+
+#### 7. Get Driver's Lap-by-Lap Data
+
+- **URL**: `/race/<int:year>/<int:round>/driver/<string:driver_id>/lap_data/`
+- **Method**: `GET`
+- **Description**: Retrieves lap-by-lap data for a specific driver in a given race, including their lap times, positions, and basic driver information.
+
+- **URL Parameters**:
+  - `year` (int): The year of the race (e.g., `2023`).
+  - `round` (int): The round number of the race in that season (e.g., `1` for the first race).
+  - `driver_id` (string): The unique identifier of the driver (e.g., `max_verstappen`).
+
+- **Sample Request**:
+
+  ```
+  GET /race/2023/1/driver/max_verstappen/lap_data/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  {
+    "driver_id": "max_verstappen",
+    "driver_name": "Max Verstappen",
+    "laps": [
+      {
+        "lap_number": 1,
+        "lap_time": "1:32.123",
+        "position": 1
+      },
+      {
+        "lap_number": 2,
+        "lap_time": "1:31.987",
+        "position": 1
+      },
+      {
+        "lap_number": 3,
+        "lap_time": "1:32.045",
+        "position": 1
+      },
+      {
+        "lap_number": 4,
+        "lap_time": "1:31.897",
+        "position": 1
+      }
+      // ... additional laps ...
+    ]
+  }
+  ```
   
 ---
 
