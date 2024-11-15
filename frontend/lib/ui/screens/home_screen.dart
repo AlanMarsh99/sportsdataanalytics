@@ -99,6 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Expanded(
                       child: Text(
