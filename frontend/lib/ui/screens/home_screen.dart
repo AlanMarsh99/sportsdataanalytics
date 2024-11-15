@@ -346,16 +346,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(5),
-              child: Expanded(
-                child: Text(
-                  'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                  textAlign: TextAlign.center,
+              child: Text(
+                'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
           ),
