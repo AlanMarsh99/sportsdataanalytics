@@ -229,6 +229,7 @@ def get_race_by_year_and_round(year, round):
 
 # Get current season constructors standings - WORKS
 @api_blueprint.route('/constructors/<int:year>/standings/', methods=['GET'])
+@cache.cached(timeout=0)
 def get_constructors_standings(year):
     # Retrieve constructors' current points tally and names for the specified season
     standings_url = f"{BASE_ERGAST_URL}/{year}/constructorStandings.json"
@@ -253,6 +254,7 @@ def get_constructors_standings(year):
 
 # Get drivers' current points tally and names for the given season - WORKS
 @api_blueprint.route('/drivers/<int:year>/standings/', methods=['GET'])
+@cache.cached(timeout=0)
 def get_drivers_current_points(year):
     # Define the Ergast API endpoint for driver standings
     driver_standings_url = f"{BASE_ERGAST_URL}/{year}/driverStandings.json"
@@ -285,6 +287,82 @@ def get_drivers_current_points(year):
 
     # Return the standings as a JSON response
     return jsonify({"driver_standings": driver_standings})
+
+# Get lap-by-lap positions for a specific race - WORKS
+@api_blueprint.route('/race/<int:year>/<int:round>/positions/', methods=['GET'])
+@cache.cached(timeout=0)
+def get_race_positions(year, round):
+    # Fetch race results to determine the total number of laps
+    results_url = f"{BASE_ERGAST_URL}/{year}/{round}/results.json"
+    results_response = requests.get(results_url)
+    if results_response.status_code != 200:
+        return jsonify({"error": f"Failed to retrieve race results for round {round} in {year}"}), results_response.status_code
+
+    results_data = results_response.json()['MRData']['RaceTable']['Races']
+    if not results_data:
+        return jsonify({"error": "No race results data found"}), 404
+
+    race_results = results_data[0]['Results']
+
+    # Find the maximum number of laps completed by any driver
+    max_laps = max(int(result['laps']) for result in race_results)
+
+    # Generate a list of lap numbers we want to fetch (every 3rd lap)
+    lap_numbers = list(range(1, max_laps + 1, 3))  # Laps 1, 4, 7, ...
+
+    # Initialize data structures
+    laps = {}
+    drivers_set = set()
+
+    # Fetch lap data for every 3rd lap
+    for lap_number in lap_numbers:
+        lap_url = f"{BASE_ERGAST_URL}/{year}/{round}/laps/{lap_number}.json?limit=1000"
+        lap_response = requests.get(lap_url)
+        if lap_response.status_code != 200:
+            continue  # Skip if data is not available for this lap
+        lap_data = lap_response.json()
+        race_table = lap_data['MRData']['RaceTable']['Races']
+        if not race_table or not race_table[0]['Laps']:
+            continue
+        lap_timings = race_table[0]['Laps'][0]['Timings']
+        laps[lap_number] = lap_timings
+        for timing in lap_timings:
+            drivers_set.add(timing['driverId'])
+
+    if not laps:
+        return jsonify({"error": "No lap data found for the specified laps."}), 404
+
+    # Initialize drivers data
+    drivers = {}
+    for driver_id in drivers_set:
+        drivers[driver_id] = {
+            "driver_id": driver_id,
+            "positions": []
+        }
+
+    # Populate positions for each driver per lap
+    for lap_number in lap_numbers:
+        lap_timings = laps.get(lap_number, [])
+        lap_positions = {timing['driverId']: int(timing['position']) for timing in lap_timings}
+        for driver_id in drivers.keys():
+            position = lap_positions.get(driver_id)
+            drivers[driver_id]['positions'].append(position)
+
+    # Fetch driver names from race results
+    for result in race_results:
+        driver_id = result['Driver']['driverId']
+        driver_name = f"{result['Driver']['givenName']} {result['Driver']['familyName']}"
+        if driver_id in drivers:
+            drivers[driver_id]['driver_name'] = driver_name
+
+    # Prepare the final data
+    drivers_list = list(drivers.values())
+    race_positions = {
+        "laps": lap_numbers,
+        "drivers": drivers_list
+    }
+
+    return jsonify(race_positions)
 
 ## RACE SCREEN VIEWS
 

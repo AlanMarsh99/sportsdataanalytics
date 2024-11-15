@@ -208,6 +208,43 @@ When you run the Flask development server using the command `python run.py`, you
     ]
   }
   ```
+
+#### 6. Get Lap-by-Lap Positions (Every 3rd Lap)
+
+- **URL**: `/race/<int:year>/<int:round>/positions/`
+- **Method**: `GET`
+- **Description**: Retrieves the positions of each driver at every 3rd lap of a specified race.
+- **Sample Request**:
+
+  ```
+  GET /race/2023/1/positions/
+  ```
+
+- **Sample Response**:
+
+  ```json
+  {
+    "laps": [1, 4, 7, 10, 13, 16, 19, 22, 25, 28],
+    "drivers": [
+      {
+        "driver_id": "max_verstappen",
+        "driver_name": "Max Verstappen",
+        "positions": [15, 7, 5, 3, 2, 2, 1, 1, 1, 1]
+      },
+      {
+        "driver_id": "lewis_hamilton",
+        "driver_name": "Lewis Hamilton",
+        "positions": [5, 5, 4, 2, 3, 3, 3, 2, 2, 2]
+      },
+      {
+        "driver_id": "charles_leclerc",
+        "driver_name": "Charles Leclerc",
+        "positions": [1, 1, 1, 1, 1, 1, 2, 3, 3, 3]
+      },
+      // ... additional drivers ...
+    ]
+  }
+  ```
   
 ---
 
