@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
@@ -28,6 +29,7 @@ class _DriversScreenState extends State<DriversScreen> {
   Map<String, dynamic> driversMap = {};
   List<String> driversNames = [];
   bool firstTime = true;
+  Color buttonColor = Colors.white;
 
   bool seasonChanged = false;
   bool driverChanged = false;
@@ -162,6 +164,10 @@ class _DriversScreenState extends State<DriversScreen> {
                       //padding: EdgeInsets.only(left: 6),
                       labelColor: redAccent,
                       unselectedLabelColor: Colors.white,
+                      unselectedLabelStyle: TextStyle(
+                        fontWeight: FontWeight.normal,
+                      ),
+                      labelStyle: TextStyle(fontWeight: FontWeight.bold),
                       indicatorColor: redAccent,
                       dividerHeight: 0,
                       isScrollable: true,
@@ -225,12 +231,8 @@ class _DriversScreenState extends State<DriversScreen> {
                     'SEASONS',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  //const Spacer(),
-
                   Container(
-                    //height: 400,
-                    child: Center(
-                      child: driverChanged || widget.driverId != null
+                    child: driverChanged || widget.driverId != null
                           ? FutureBuilder<Map<String, dynamic>>(
                               future: _driversStatsFuture,
                               builder: (context, snapshot) {
@@ -253,27 +255,76 @@ class _DriversScreenState extends State<DriversScreen> {
                                     children: [
                                       Align(
                                         alignment: Alignment.topRight,
-                                        child: TextButton(
-                                          onPressed: () {
-                                            // Navigate to the "All Races" screen
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    DriverAllRacesScreen(
-                                                  selectedDriver:
-                                                      selectedDriver!,
-                                                  driversMap: driversMap,
-                                                  driversNames: driversNames,
-                                                  driversStats: data,
+                                        child: MouseRegion(
+                                          onEnter: (_) => setState(() {
+                                            buttonColor = Colors.redAccent;
+                                          }),
+                                          onExit: (_) => setState(() {
+                                            buttonColor = Colors.white;
+                                          }),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .center, 
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  // Navigate to the "All Races" screen
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DriverAllRacesScreen(
+                                                        selectedDriver:
+                                                            selectedDriver!,
+                                                        driversMap: driversMap,
+                                                        driversNames:
+                                                            driversNames,
+                                                        driversStats:
+                                                            driverStats!,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Text(
+                                                  'All races',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: buttonColor,
+                                                  ),
                                                 ),
                                               ),
-                                            );
-                                          },
-                                          child: const Text(
-                                            'All races >',
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                              IconButton(
+                                                padding: EdgeInsets.zero,
+                                                constraints:
+                                                    const BoxConstraints(),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DriverAllRacesScreen(
+                                                        selectedDriver:
+                                                            selectedDriver!,
+                                                        driversMap: driversMap,
+                                                        driversNames:
+                                                            driversNames,
+                                                        driversStats:
+                                                            driverStats!,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                icon: Icon(
+                                                  Icons.arrow_forward_ios,
+                                                  color: buttonColor,
+                                                  size: 12,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -294,35 +345,86 @@ class _DriversScreenState extends State<DriversScreen> {
                               : Column(
                                   children: [
                                     Align(
-                                      alignment: Alignment.topRight,
-                                      child: TextButton(
-                                        onPressed: () {
-                                          // Navigate to the "All Races" screen
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DriverAllRacesScreen(
-                                                selectedDriver: selectedDriver!,
-                                                driversMap: driversMap,
-                                                driversNames: driversNames,
-                                                driversStats: driverStats!,
+                                        alignment: Alignment.topRight,
+                                        child: MouseRegion(
+                                          onEnter: (_) => setState(() {
+                                            buttonColor = Colors.redAccent;
+                                          }),
+                                          onExit: (_) => setState(() {
+                                            buttonColor = Colors.white;
+                                          }),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .center, // Ensures vertical alignment
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  // Navigate to the "All Races" screen
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DriverAllRacesScreen(
+                                                        selectedDriver:
+                                                            selectedDriver!,
+                                                        driversMap: driversMap,
+                                                        driversNames:
+                                                            driversNames,
+                                                        driversStats:
+                                                            driverStats!,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: Text(
+                                                  'All races',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: buttonColor,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          );
-                                        },
-                                        child: const Text(
-                                          'All races >',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
+                                              const SizedBox(width: 4),
+                                              IconButton(
+                                                padding: EdgeInsets.zero,
+                                                constraints:
+                                                    const BoxConstraints(),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DriverAllRacesScreen(
+                                                        selectedDriver:
+                                                            selectedDriver!,
+                                                        driversMap: driversMap,
+                                                        driversNames:
+                                                            driversNames,
+                                                        driversStats:
+                                                            driverStats!,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                icon: Icon(
+                                                  Icons.arrow_forward_ios,
+                                                  color: buttonColor,
+                                                  size: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )),
                                     const SizedBox(height: 10),
                                     DriverSeasonsTable(data: driverStats)
                                   ],
                                 ),
                     ),
-                  ),
+                  
                 ],
               ),
             ),

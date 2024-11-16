@@ -303,20 +303,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   "LAST RACE RESULTS",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment:
-                      CrossAxisAlignment.center, // Ensures vertical alignment
-                  children: [
-                    MouseRegion(
-                      onEnter: (_) => setState(() {
-                        buttonColor = Colors.redAccent;
-                      }),
-                      onExit: (_) => setState(() {
-                        buttonColor = Colors.white;
-                      }),
-                      child: TextButton(
+                MouseRegion(
+                  onEnter: (_) => setState(() {
+                    buttonColor = Colors.redAccent;
+                  }),
+                  onExit: (_) => setState(() {
+                    buttonColor = Colors.white;
+                  }),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Ensures vertical alignment
+                    children: [
+                      TextButton(
                         onPressed: () {
                           if (lastRaceInfo != null) {
                             Navigator.push(
@@ -341,30 +341,30 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () {
-                        if (lastRaceInfo != null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  RacesDetailScreen(race: lastRaceInfo!),
-                            ),
-                          );
-                        }
-                      },
-                      icon: Icon(
-                        Icons.arrow_forward_ios,
-                        color: buttonColor,
-                        size: 12,
+                      const SizedBox(width: 4),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          if (lastRaceInfo != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RacesDetailScreen(race: lastRaceInfo!),
+                              ),
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: buttonColor,
+                          size: 12,
+                        ),
                       ),
-                    ),
-                  ],
-                )
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 20),

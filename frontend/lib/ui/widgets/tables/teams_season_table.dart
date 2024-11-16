@@ -63,8 +63,10 @@ class TeamsSeasonTable extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  TeamsDetailScreen(teamId: team.id, teamName: team.name,),
+                              builder: (context) => TeamsDetailScreen(
+                                teamId: team.id,
+                                teamName: team.name,
+                              ),
                             ),
                           );
                         },
@@ -72,7 +74,8 @@ class TeamsSeasonTable extends StatelessWidget {
                           team.name,
                           style: const TextStyle(
                               color: primary,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
                         ),
                       ),
                     ),
