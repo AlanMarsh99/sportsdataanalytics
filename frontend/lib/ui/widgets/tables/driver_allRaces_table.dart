@@ -59,7 +59,7 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                 rows: data.map((race) {
                   return DataRow(cells: [
                     DataCell(
-                      GestureDetector(
+                      InkWell(
                         onTap: () async {
                           // Navigate to the race details screen
                           int year = int.parse(race['year']);
@@ -78,7 +78,7 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                         child: Text(
                           race['race_name'],
                           style: const TextStyle(
-                              color: primary, fontWeight: FontWeight.bold),
+                              color: primary, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
                         ),
                       ),
                     ),

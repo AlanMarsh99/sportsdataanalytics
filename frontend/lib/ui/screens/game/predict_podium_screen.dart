@@ -253,10 +253,10 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "Select drivers",
+              "Select 3 drivers",
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold),
             ),
           ),

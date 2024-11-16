@@ -24,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Timer timer;
   bool firstTime = true;
   Race? lastRaceInfo;
+  Color buttonColor = Colors.white;
 
   @override
   void initState() {
@@ -140,31 +141,49 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDriverCard(Map<String, dynamic> fastestLapData) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DriversScreen(
-                driverId: fastestLapData['driver_id'],
-                driverName: fastestLapData['driver_name']),
-          ),
-        );
-      },
-      child: Card(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5.0),
+      decoration: BoxDecoration(
         color: Colors.white,
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        child: ListTile(
-          leading: const Icon(Icons.flag, color: secondary),
-          title: Text(
-            '${fastestLapData['driver_name']}',
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DriversScreen(
+                  driverId: fastestLapData['driver_id'],
+                  driverName: fastestLapData['driver_name']),
+            ),
+          );
+        },
+        leading: const Icon(Icons.flag, color: secondary),
+        title: Text(
+          '${fastestLapData['driver_name']}',
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '${fastestLapData['team_name']}',
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+        trailing: IconButton(
+          icon: const Icon(
+            Icons.arrow_forward_ios,
+            color: secondary,
+            size: 20,
           ),
-          subtitle: Text(
-            '${fastestLapData['team_name']}',
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DriversScreen(
+                    driverId: fastestLapData['driver_id'],
+                    driverName: fastestLapData['driver_name']),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -216,31 +235,49 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPodiumCard(int position, Map<String, dynamic> driverData) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DriversScreen(
-                driverId: driverData['driver_id'],
-                driverName: driverData['driver_name']),
-          ),
-        );
-      },
-      child: Card(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5.0),
+      decoration: BoxDecoration(
         color: Colors.white,
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        child: ListTile(
-          leading: _buildPositionContainer(position.toString()),
-          title: Text(
-            '${driverData['driver_name']}',
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DriversScreen(
+                  driverId: driverData['driver_id'],
+                  driverName: driverData['driver_name']),
+            ),
+          );
+        },
+        leading: _buildPositionContainer(position.toString()),
+        title: Text(
+          '${driverData['driver_name']}',
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '${driverData['team_name']}',
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+        trailing: IconButton(
+          icon: const Icon(
+            Icons.arrow_forward_ios,
+            color: secondary,
+            size: 20,
           ),
-          subtitle: Text(
-            '${driverData['team_name']}',
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DriversScreen(
+                    driverId: driverData['driver_id'],
+                    driverName: driverData['driver_name']),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -266,25 +303,67 @@ class _HomeScreenState extends State<HomeScreen> {
                   "LAST RACE RESULTS",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
-                TextButton(
-                  onPressed: () {
-                    if (lastRaceInfo != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              RacesDetailScreen(race: lastRaceInfo!),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.center, // Ensures vertical alignment
+                  children: [
+                    MouseRegion(
+                      onEnter: (_) => setState(() {
+                        buttonColor = Colors.redAccent;
+                      }),
+                      onExit: (_) => setState(() {
+                        buttonColor = Colors.white;
+                      }),
+                      child: TextButton(
+                        onPressed: () {
+                          if (lastRaceInfo != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RacesDetailScreen(race: lastRaceInfo!),
+                              ),
+                            );
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 0),
                         ),
-                      );
-                    }
-                  },
-                  child: const Text(
-                    "See more",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: redAccent),
-                  ),
+                        child: Text(
+                          "View full results",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: buttonColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        if (lastRaceInfo != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  RacesDetailScreen(race: lastRaceInfo!),
+                            ),
+                          );
+                        }
+                      },
+                      icon: Icon(
+                        Icons.arrow_forward_ios,
+                        color: buttonColor,
+                        size: 12,
+                      ),
+                    ),
+                  ],
                 )
               ],
             ),
