@@ -250,10 +250,10 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
           const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "Select a driver",
+              "Select the driver with the fastest lap",
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold),
             ),
           ),

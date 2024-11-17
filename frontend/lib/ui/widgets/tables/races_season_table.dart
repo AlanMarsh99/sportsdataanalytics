@@ -89,7 +89,9 @@ class RacesSeasonTable extends StatelessWidget {
                         child: Text(
                           race.raceName,
                           style: const TextStyle(
-                              color: primary, fontWeight: FontWeight.bold),
+                              color: primary,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
                         ),
                       ),
                     ),

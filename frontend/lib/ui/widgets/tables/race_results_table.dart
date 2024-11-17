@@ -99,7 +99,9 @@ class RaceResultsTable extends StatelessWidget {
                         child: Text(
                           result.driver,
                           style: const TextStyle(
-                              color: primary, fontWeight: FontWeight.bold),
+                              color: primary,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
                         ),
                       ),
                     ),

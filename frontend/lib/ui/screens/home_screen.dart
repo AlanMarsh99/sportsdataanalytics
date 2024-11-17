@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/driver.dart';
 import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/providers/data_provider.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
-
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Timer timer;
   bool firstTime = true;
   Race? lastRaceInfo;
+  Color buttonColor = Colors.white;
 
   @override
   void initState() {
@@ -87,84 +87,159 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'HOME',
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                        style: TextStyle(fontSize: 14, color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Image.asset('assets/logo/formula-1-logo.png',
-                        width: 50, fit: BoxFit.cover),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                upcomingRaceInfo != null && lastRaceResults != null
-                    ? Column(
-                        children: [
-                          _countdownContainer(upcomingRaceInfo),
-                          const SizedBox(height: 16),
-                          _lastRaceResultsContainer(lastRaceResults)
-                        ],
-                      )
-                    : Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * 0.8,
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                          ),
+              child: Responsive.isMobile(context)
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'HOME',
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
                         ),
-                      ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Flexible(
+                              child: Text(
+                                'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Image.asset('assets/logo/formula-1-logo.png',
+                                width: 50, fit: BoxFit.cover),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        upcomingRaceInfo != null && lastRaceResults != null
+                            ? Column(
+                                children: [
+                                  _countdownContainer(upcomingRaceInfo, true),
+                                  const SizedBox(height: 16),
+                                  _lastRaceResultsContainer(
+                                      lastRaceResults, true)
+                                ],
+                              )
+                            : Container(
+                                width: MediaQuery.of(context).size.width,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.8,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                        const SizedBox(height: 16),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'HOME',
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Flexible(
+                              child: Text(
+                                'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Image.asset('assets/logo/formula-1-logo.png',
+                                width: 50, fit: BoxFit.cover),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        upcomingRaceInfo != null && lastRaceResults != null
+                            ? Row(
+                                children: [
+                                  Flexible(
+                                    child: _countdownContainer(
+                                        upcomingRaceInfo, false),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Flexible(
+                                    child: _lastRaceResultsContainer(
+                                        lastRaceResults, false),
+                                  )
+                                ],
+                              )
+                            : Container(
+                                width: MediaQuery.of(context).size.width,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.8,
+                                child: const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                        const SizedBox(height: 16),
+                      ],
+                    )),
         ),
       ),
     );
   }
 
   Widget _buildDriverCard(Map<String, dynamic> fastestLapData) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DriversScreen(
-                driverId: fastestLapData['driver_id'],
-                driverName: fastestLapData['driver_name']),
-          ),
-        );
-      },
-      child: Card(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5.0),
+      decoration: BoxDecoration(
         color: Colors.white,
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        child: ListTile(
-          leading: const Icon(Icons.flag, color: secondary),
-          title: Text(
-            '${fastestLapData['driver_name']}',
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DriversScreen(
+                  driverId: fastestLapData['driver_id'],
+                  driverName: fastestLapData['driver_name']),
+            ),
+          );
+        },
+        leading: const Icon(Icons.flag, color: secondary),
+        title: Text(
+          '${fastestLapData['driver_name']}',
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '${fastestLapData['team_name']}',
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+        trailing: IconButton(
+          icon: const Icon(
+            Icons.arrow_forward_ios,
+            color: secondary,
+            size: 20,
           ),
-          subtitle: Text(
-            '${fastestLapData['team_name']}',
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DriversScreen(
+                    driverId: fastestLapData['driver_id'],
+                    driverName: fastestLapData['driver_name']),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -216,39 +291,59 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPodiumCard(int position, Map<String, dynamic> driverData) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DriversScreen(
-                driverId: driverData['driver_id'],
-                driverName: driverData['driver_name']),
-          ),
-        );
-      },
-      child: Card(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5.0),
+      decoration: BoxDecoration(
         color: Colors.white,
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-        child: ListTile(
-          leading: _buildPositionContainer(position.toString()),
-          title: Text(
-            '${driverData['driver_name']}',
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DriversScreen(
+                  driverId: driverData['driver_id'],
+                  driverName: driverData['driver_name']),
+            ),
+          );
+        },
+        leading: _buildPositionContainer(position.toString()),
+        title: Text(
+          '${driverData['driver_name']}',
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          '${driverData['team_name']}',
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+        trailing: IconButton(
+          icon: const Icon(
+            Icons.arrow_forward_ios,
+            color: secondary,
+            size: 20,
           ),
-          subtitle: Text(
-            '${driverData['team_name']}',
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DriversScreen(
+                    driverId: driverData['driver_id'],
+                    driverName: driverData['driver_name']),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _lastRaceResultsContainer(Map<String, dynamic> lastRaceResults) {
+  Widget _lastRaceResultsContainer(
+      Map<String, dynamic> lastRaceResults, bool isMobile) {
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
+      height: isMobile ? 480 : 480,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primary,
@@ -266,26 +361,68 @@ class _HomeScreenState extends State<HomeScreen> {
                   "LAST RACE RESULTS",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
-                TextButton(
-                  onPressed: () {
-                    if (lastRaceInfo != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              RacesDetailScreen(race: lastRaceInfo!),
+                MouseRegion(
+                  onEnter: (_) => setState(() {
+                    buttonColor = Colors.redAccent;
+                  }),
+                  onExit: (_) => setState(() {
+                    buttonColor = Colors.white;
+                  }),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Ensures vertical alignment
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          if (lastRaceInfo != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RacesDetailScreen(race: lastRaceInfo!),
+                              ),
+                            );
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 0),
                         ),
-                      );
-                    }
-                  },
-                  child: const Text(
-                    "See more",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: redAccent),
+                        child: Text(
+                          "View full results",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: buttonColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          if (lastRaceInfo != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RacesDetailScreen(race: lastRaceInfo!),
+                              ),
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: buttonColor,
+                          size: 12,
+                        ),
+                      ),
+                    ],
                   ),
-                )
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -316,7 +453,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _countdownContainer(Map<String, dynamic> upcomingRaceInfo) {
+  Widget _countdownContainer(
+      Map<String, dynamic> upcomingRaceInfo, bool isMobile) {
     String date = upcomingRaceInfo['date']; // e.g., "2023-08-27"
     String hour = upcomingRaceInfo['hour']; // e.g., "13:00"
 
@@ -326,12 +464,14 @@ class _HomeScreenState extends State<HomeScreen> {
     String formattedDate = DateFormat('EEEE MMMM d').format(raceDate);
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
+      height: isMobile ? 350 : 480,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primary,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
@@ -367,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 25),
+          SizedBox(height: isMobile ? 25 : 40),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             decoration: BoxDecoration(
@@ -382,7 +522,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: isMobile ? 18 : 25),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -473,7 +613,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 25),
+          SizedBox(height: isMobile ? 25 : 35),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
             width: 270,
@@ -494,12 +634,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               },
-              child: const Text(
-                'PLAY',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: isMobile ? 0 : 5.0),
+                child: const Text(
+                  'PLAY',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),

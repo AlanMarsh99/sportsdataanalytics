@@ -101,35 +101,46 @@ class _F1CarouselState extends State<F1Carousel> {
                 },
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Container(
               alignment: Alignment.center,
               color: primary,
               width: double.infinity,
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Align(
-                alignment: Alignment.center,
-                child: CarouselSlider(
-                  carouselController: carouselController,
-                  options: CarouselOptions(
-                    viewportFraction: 0.4,
-                    height: 45.0,
-                    enableInfiniteScroll: true,
-                    initialPage: _currentIndex,
-                    enlargeCenterPage: true,
-                    scrollDirection: Axis.horizontal,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentIndex = index;
-                        _pageController.jumpToPage(index);
-                      });
-                    },
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.arrow_back_ios,
+                      color: Colors.white, size: 18),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: CarouselSlider(
+                        carouselController: carouselController,
+                        options: CarouselOptions(
+                          viewportFraction: 0.4,
+                          height: 45.0,
+                          enableInfiniteScroll: true,
+                          initialPage: _currentIndex,
+                          enlargeCenterPage: true,
+                          scrollDirection: Axis.horizontal,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _currentIndex = index;
+                              _pageController.jumpToPage(index);
+                            });
+                          },
+                        ),
+                        items: _buildCarouselItems(),
+                      ),
+                    ),
                   ),
-                  items: _buildCarouselItems(),
-                ),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white, size: 18),
+                ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             GestureDetector(
               onPanUpdate: (details) {
                 if (!_hasChangedScreen) {
@@ -160,7 +171,7 @@ class _F1CarouselState extends State<F1Carousel> {
           return Text(
             tab,
             style: TextStyle(
-              fontSize: tab == _tabs[_currentIndex] ? 24.0 : 14,
+              fontSize: tab == _tabs[_currentIndex] ? 21.0 : 14,
               fontWeight: FontWeight.bold,
               color:
                   tab == _tabs[_currentIndex] ? Colors.redAccent : Colors.white,
@@ -174,20 +185,20 @@ class _F1CarouselState extends State<F1Carousel> {
   Widget _buildPage(String text) {
     switch (text) {
       case 'Predict':
-        return GamePredictScreen();
+        return const GamePredictScreen();
       case 'Leaderboard':
-        return GameLeaderboardScreen();
+        return const GameLeaderboardScreen();
       case 'Leagues':
-        return GameLeaguesScreen();
+        return const GameLeaguesScreen();
       case 'My Stats':
-        return GameMyStatsScreen();
+        return const GameMyStatsScreen();
       default:
         return Container(
           color: Colors.white,
           child: Center(
             child: Text(
               text,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -207,7 +218,8 @@ class _F1CarouselState extends State<F1Carousel> {
         _currentIndex++;
         carouselController.jumpToPage(_currentIndex);
         _pageController.nextPage(
-            duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut);
       }
     });
   }
@@ -222,7 +234,8 @@ class _F1CarouselState extends State<F1Carousel> {
         _currentIndex--;
         carouselController.jumpToPage(_currentIndex);
         _pageController.previousPage(
-            duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut);
       }
     });
   }

@@ -85,9 +85,12 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                   Container(
                     alignment: Alignment.centerLeft,
                     child: const TabBar(
-                      //padding: EdgeInsets.only(left: 6),
                       labelColor: redAccent,
                       unselectedLabelColor: Colors.white,
+                      unselectedLabelStyle: TextStyle(
+                        fontWeight: FontWeight.normal,
+                      ),
+                      labelStyle: TextStyle(fontWeight: FontWeight.bold),
                       indicatorColor: redAccent,
                       dividerHeight: 0,
                       isScrollable: true,
