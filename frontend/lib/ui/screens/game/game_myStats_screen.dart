@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
+import 'package:provider/provider.dart';
 
 class GameMyStatsScreen extends StatefulWidget {
   const GameMyStatsScreen({
@@ -71,7 +74,29 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                           ),
                           SizedBox(height: 5),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Provider.of<AuthService>(context, listen: false)
+                                          .status ==
+                                      Status.Authenticated
+                                  ? showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return LogInDialog();
+                                      },
+                                    )
+                                  /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PredictPodiumScreen(),
+                        ),
+                      )*/
+                                  : showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return LogInDialog();
+                                      },
+                                    );
+                            },
                             child: Text(
                               'Change avatar',
                               style: TextStyle(
