@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/team.dart';
 import 'package:frontend/core/services/API_service.dart';
+import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/team_seasons_table.dart';
-import 'package:frontend/core/constants/team_assets.dart'; // Added this import
 
 class TeamsDetailScreen extends StatefulWidget {
   const TeamsDetailScreen(
@@ -19,28 +19,13 @@ class TeamsDetailScreen extends StatefulWidget {
 class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
   late Future<Map<String, dynamic>> _teamStatsFuture;
 
-  // Added the mapping and functions below
-  Map<String, String> teamNameMapping = {
-    'Red Bull Racing': 'Red Bull',
-    'Scuderia Ferrari': 'Ferrari',
-    'Mercedes AMG Petronas': 'Mercedes',
-    'McLaren F1 Team': 'McLaren',
-    'Aston Martin': 'Aston Martin',
-    'Alpine F1 Team': 'Alpine F1 Team',
-    'Williams Racing': 'Williams',
-    'Haas F1 Team': 'Haas F1 Team',
-    'Alfa Romeo': 'Sauber',
-    'AlphaTauri': 'RB F1 Team',
-    // Add other mappings as needed
-  };
-
   String getMappedTeamName(String apiTeamName) {
-    return teamNameMapping[apiTeamName] ?? apiTeamName;
+    return Globals.teamNameMapping[apiTeamName] ?? apiTeamName;
   }
 
   String getLogoPath() {
     String mappedName = getMappedTeamName(widget.teamName);
-    return teamLogos[mappedName] ?? 'assets/teams/logos/placeholder.png';
+    return Globals.teamLogos[mappedName] ?? 'assets/teams/logos/placeholder.png';
   }
 
   // End of added mapping and functions
@@ -89,25 +74,27 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                         ),
                         const SizedBox(width: 10),
                         // Added the logo display here
-                          Image.asset(
-                            getLogoPath(),
-                            width: 100,
-                            height: 100,
-                          ),
-                        const SizedBox(width: 10),
+                         
+                        
                         Text(
                           widget.teamName.toUpperCase(),
                           style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.white),
-                        )
+                        ),
+                        const SizedBox(width: 10),
+                         Image.asset(
+                            getLogoPath(),
+                            width: 100,
+                         
+                          ),
                       ],
                     ),
                   ),
                   //const SizedBox(height: 16),
                   //_buildTeamDropdown(),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
                   const Text(
                     'STATISTICS',
                     style: TextStyle(
