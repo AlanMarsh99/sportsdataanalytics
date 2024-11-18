@@ -62,6 +62,29 @@ class Globals {
     'AlphaTauri': 'RB F1 Team',
   };
 
+  static const Map<String, String> driverImages = {
+    'Hamilton': 'assets/drivers/hamilton.webp',
+    'Verstappen': 'assets/drivers/max-verstappen.webp',
+    'Russell': 'assets/drivers/russell.webp',
+    'Pérez': 'assets/drivers/perez.webp',
+    'Leclerc': 'assets/drivers/leclerc.webp',
+    'Sainz': 'assets/drivers/sainz.webp',
+    'Norris': 'assets/drivers/norris.webp',
+    'Piastri': 'assets/drivers/piastri.webp',
+    'Alonso': 'assets/drivers/alonso.webp',
+    'Ocon': 'assets/drivers/ocon.webp',
+    'Bottas': 'assets/drivers/bottas.webp',
+    'Zhou': 'assets/drivers/zhou.webp',
+    'Sargeant': 'assets/drivers/sargeant.webp',
+    'Albon': 'assets/drivers/albon.webp',
+    'Ricciardo': 'assets/drivers/ricciardo.webp',
+    'Tsunoda': 'assets/drivers/tsunoda.webp',
+    'Stroll': 'assets/drivers/stroll.webp',
+    'Gasly': 'assets/drivers/gasly.webp',
+    'Hülkenberg': 'assets/drivers/hulkenberg.webp',
+    'Magnussen': 'assets/drivers/magnussen.webp',
+  };
+
   static String toLocalDate(DateTime d) {
     String date = DateFormat('dd/MM/yyyy HH:mm').format(d);
     return date;
