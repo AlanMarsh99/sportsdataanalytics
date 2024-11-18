@@ -7,6 +7,7 @@ import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
 import 'package:frontend/data/data_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/core/shared/globals.dart';
 
 class DriversScreen extends StatefulWidget {
   const DriversScreen({Key? key, this.driverId, this.driverName})
@@ -22,6 +23,17 @@ class _DriversScreenState extends State<DriversScreen> {
   late Future<List<dynamic>> _driversNamesFuture;
   late Future<Map<String, dynamic>> _driversStatsFuture;
   String? selectedDriver;
+  /// Helper function to extract last name and retrieve image path
+  String getDriverImagePath(String driverFullName) {
+    // Split the full name into parts
+    List<String> nameParts = driverFullName.trim().split(' ');
+
+    // Assume the last part is the last name
+    String lastName = nameParts.last;
+
+    // Retrieve the image path from Globals.driverImages
+    return Globals.driverImages[lastName] ?? 'assets/images/placeholder.png';
+  }
   int currentOffset = 0;
   final int limit = 50;
   List<String> seasons = [];
@@ -480,7 +492,7 @@ class _DriversScreenState extends State<DriversScreen> {
       }
     }
     return Container(
-      width: 200,
+      width: 250, // Increased width to accommodate images
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -495,11 +507,28 @@ class _DriversScreenState extends State<DriversScreen> {
         dropdownColor: Colors.white,
         isExpanded: true,
         underline: const SizedBox(),
+        // Updated items to include images
         items: driversNames.map<DropdownMenuItem<String>>((String driverName) {
           return DropdownMenuItem<String>(
             value: driverName,
-            child:
-                Text(driverName, style: const TextStyle(color: Colors.black)),
+            child: Row(
+              children: [
+                Image.asset(
+                  getDriverImagePath(driverName),
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    driverName,
+                    style: const TextStyle(color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           );
         }).toList(),
         onChanged: (String? newValue) {
