@@ -78,7 +78,9 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                         child: Text(
                           race['race_name'],
                           style: const TextStyle(
-                              color: primary, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+                              color: primary,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
                         ),
                       ),
                     ),
