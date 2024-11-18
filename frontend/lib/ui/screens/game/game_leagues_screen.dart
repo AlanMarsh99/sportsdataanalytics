@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/screens/game/ranking_league_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 
@@ -162,7 +164,26 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                     ),
                   ),
                   onPressed: () {
-                    // Add create league functionality
+                    Provider.of<AuthService>(context, listen: false).status ==
+                            Status.Authenticated
+                        ? showDialog(
+                            context: context,
+                            builder: (context) {
+                              return LogInDialog();
+                            },
+                          )
+                        /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PredictPodiumScreen(),
+                        ),
+                      )*/
+                        : showDialog(
+                            context: context,
+                            builder: (context) {
+                              return LogInDialog();
+                            },
+                          );
                   },
                   child: const Text(
                     'CREATE LEAGUE',
@@ -184,7 +205,26 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                     ),
                   ),
                   onPressed: () {
-                    // Add join league functionality
+                    Provider.of<AuthService>(context, listen: false).status ==
+                            Status.Authenticated
+                        ? showDialog(
+                            context: context,
+                            builder: (context) {
+                              return LogInDialog();
+                            },
+                          )
+                        /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PredictPodiumScreen(),
+                        ),
+                      )*/
+                        : showDialog(
+                            context: context,
+                            builder: (context) {
+                              return LogInDialog();
+                            },
+                          );
                   },
                   child: const Text(
                     'JOIN LEAGUE',

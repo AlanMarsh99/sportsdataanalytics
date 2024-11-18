@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/providers/data_provider.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
+import 'package:frontend/ui/widgets/dialogs/warning_error_dialog.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
@@ -627,12 +630,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const PredictPodiumScreen(),
-                  ),
-                );
+                Provider.of<AuthService>(context, listen: false).status ==
+                        Status.Authenticated
+                    ? Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PredictPodiumScreen(),
+                        ),
+                      )
+                    : showDialog(
+                        context: context,
+                        builder: (context) {
+                          return LogInDialog();
+                        },
+                      );
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: isMobile ? 0 : 5.0),

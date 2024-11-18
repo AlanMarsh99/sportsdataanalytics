@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/data_provider.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 
@@ -70,7 +72,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const  Padding(
+        const Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: Text(
             'GAME',
@@ -253,12 +255,20 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PredictPodiumScreen(),
-                    ),
-                  );
+                  Provider.of<AuthService>(context, listen: false).status ==
+                          Status.Authenticated
+                      ? Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PredictPodiumScreen(),
+                          ),
+                        )
+                      : showDialog(
+                          context: context,
+                          builder: (context) {
+                            return LogInDialog();
+                          },
+                        );
                 },
                 child: const Text(
                   'PLAY',
