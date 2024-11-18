@@ -8,7 +8,6 @@ import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
-import 'package:frontend/ui/widgets/dialogs/warning_error_dialog.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
