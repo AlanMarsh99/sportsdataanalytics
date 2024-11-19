@@ -37,16 +37,16 @@ class Globals {
   };
 
   static final Map<String, Color> teamColors = {
-    'Alpine F1 Team': const Color(0xFF0090FF),
+    'Alpine F1 Team': Color.fromARGB(255, 0, 208, 255),
     'Aston Martin': const Color(0xFF006F62),
     'Ferrari': const Color(0xFFDC0000),
     'Haas F1 Team': const Color(0xFFFFFFFF),
     'McLaren': const Color(0xFFFF8700),
     'Mercedes': const Color(0xFF00D2BE),
-    'RB F1 Team': const Color(0xFF1E41FF),
+    'RB F1 Team': const Color.fromARGB(255, 57, 85, 247),
     'Red Bull': const Color(0xFF1E41FF),
-    'Sauber': const Color(0xFF9B0000),
-    'Williams': const Color(0xFF005AFF),
+    'Sauber': Color.fromARGB(255, 136, 0, 0),
+    'Williams': Color.fromARGB(255, 14, 104, 222),
   };
 
   static final Map<String, String> teamBadges = {
