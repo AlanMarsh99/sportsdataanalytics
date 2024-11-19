@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
@@ -20,6 +21,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _repeatPasswordController = TextEditingController();
   bool _passwordVisible = false;
   bool _repeatPasswordVisible = false;
+  bool isMobile = false;
 
   @override
   void dispose() {
@@ -32,6 +34,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    isMobile = Responsive.isMobile(context);
+
     return Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -43,49 +47,71 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
+            padding: EdgeInsets.symmetric(
+                horizontal: 40, vertical: isMobile ? 40 : 80),
             child: Consumer<AuthService>(
               builder: (context, auth, child) {
-                return Column(
-                  children: [
-/*Padding(
-                                  padding: const EdgeInsets.only(bottom: 40.0),
-                                  child: Image.asset(
-                                      'assets/devalirian_logo.png',
-                                      fit: BoxFit.cover,
-                                      scale: 14)),*/
-                    const Text(
-                      'Create an account',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'OpenSans',
-                        fontSize: 30.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                return Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Image.asset('assets/logo/logo-detail.png',
+                            width: isMobile ? 150 : 200, fit: BoxFit.cover),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        Row(
+                          mainAxisAlignment: isMobile
+                              ? MainAxisAlignment.start
+                              : MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 30.0,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            SizedBox(width: 10),
+                            const Text(
+                              'Create an account',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'OpenSans',
+                                fontSize: 30.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 30),
+                        _buildEmailTF(),
+                        const SizedBox(
+                          height: 30.0,
+                        ),
+                        _buildUsernameTF(),
+                        const SizedBox(
+                          height: 30.0,
+                        ),
+                        _buildPasswordTF(),
+                        const SizedBox(
+                          height: 30.0,
+                        ),
+                        _buildRepeatPasswordTF(),
+                        SizedBox(
+                          height: isMobile ? 25 : 50,
+                        ),
+                        auth.status == Status.Authenticating
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : _buildSignUpButton(auth),
+                      ],
                     ),
-                    const SizedBox(height: 30.0),
-                    _buildEmailTF(),
-                    const SizedBox(
-                      height: 30.0,
-                    ),
-                    _buildUsernameTF(),
-                    const SizedBox(
-                      height: 30.0,
-                    ),
-                    _buildPasswordTF(),
-                    const SizedBox(
-                      height: 30.0,
-                    ),
-                    _buildRepeatPasswordTF(),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    auth.status == Status.Authenticating
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-                        : _buildSignUpButton(auth),
-                  ],
+                  ),
                 );
               },
             ),
@@ -106,8 +132,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
+          width: isMobile ? double.infinity : 500,
           child: TextField(
             controller: _emailController,
+            cursorColor: Colors.white,
             style: const TextStyle(
               color: Colors.white,
               fontFamily: 'OpenSans',
@@ -141,8 +169,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
+          width: isMobile ? double.infinity : 500,
           child: TextField(
             controller: _usernameController,
+            cursorColor: Colors.white,
             style: const TextStyle(
               color: Colors.white,
               fontFamily: 'OpenSans',
@@ -176,8 +206,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
+          width: isMobile ? double.infinity : 500,
           child: TextField(
             controller: _passwordController,
+            cursorColor: Colors.white,
             obscureText: !_passwordVisible,
             style: const TextStyle(
               color: Colors.white,
@@ -225,8 +257,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
+          width: isMobile ? double.infinity : 500,
           child: TextField(
             controller: _repeatPasswordController,
+            cursorColor: Colors.white,
             obscureText: !_repeatPasswordVisible,
             style: const TextStyle(
               color: Colors.white,
@@ -266,7 +300,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildSignUpButton(AuthService auth) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25.0),
-      width: double.infinity,
+      width: isMobile ? double.infinity : 500,
       child: ElevatedButton(
         style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all<Color>(secondary),
