@@ -94,6 +94,7 @@ class TeamsSeasonTable extends StatelessWidget {
                               style: const TextStyle(
                                 color: primary,
                                 fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline
                               ),
                             ),
                           ],
