@@ -36,6 +36,19 @@ class Globals {
     'Williams': 'assets/teams/logos/williams-logo.png',
   };
 
+  static final Map<String, Color> teamColors = {
+    'Alpine F1 Team': const Color(0xFF0090FF),
+    'Aston Martin': const Color(0xFF006F62),
+    'Ferrari': const Color(0xFFDC0000),
+    'Haas F1 Team': const Color(0xFFFFFFFF),
+    'McLaren': const Color(0xFFFF8700),
+    'Mercedes': const Color(0xFF00D2BE),
+    'RB F1 Team': const Color(0xFF1E41FF),
+    'Red Bull': const Color(0xFF1E41FF),
+    'Sauber': const Color(0xFF9B0000),
+    'Williams': const Color(0xFF005AFF),
+  };
+
   static final Map<String, String> teamBadges = {
     'Red Bull': 'assets/teams/badges/red-bull-badge.png',
     'Mercedes': 'assets/teams/badges/mercedes-badge.png',
