@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
@@ -27,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool firstTime = true;
   Race? lastRaceInfo;
   Color buttonColor = Colors.white;
+  List<dynamic>? driversStandings;
+  List<dynamic>? constructorsStandings;
 
   @override
   void initState() {
@@ -39,6 +42,21 @@ class _HomeScreenState extends State<HomeScreen> {
       timer.cancel();
     }
     super.dispose();
+  }
+
+  static String getMappedTeamName(String apiTeamName) {
+    return Globals.teamNameMapping[apiTeamName] ?? apiTeamName;
+  }
+
+  static String? getBadgePath(String teamName) {
+    String mappedName = getMappedTeamName(teamName);
+    return Globals.teamBadges[mappedName] ??
+        'assets/teams/logos/placeholder.png';
+  }
+
+  static Color getTeamColour(String teamName) {
+    Color teamColor = Globals.teamColors[teamName] ?? Colors.black;
+    return teamColor;
   }
 
   void startCountdown(Map<String, dynamic> upcomingRaceInfo) {
@@ -79,6 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final lastRaceResults = dataProvider.lastRaceResults;
     lastRaceInfo = dataProvider.lastRaceInfo;
+    driversStandings = dataProvider.driversStandings;
+    constructorsStandings = dataProvider.constructorsStandings;
 
     return Container(
       decoration: const BoxDecoration(
@@ -139,6 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
+                      const SizedBox(height: 16),
+                      _driversStandingsContainer(true),
                       const SizedBox(height: 16),
                     ],
                   )
@@ -649,6 +671,138 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _driversStandingsContainer(bool isMobile) {
+    int currentYear = DateTime.now().year;
+    return Container(
+      width: double.infinity,
+      height: isMobile ? 450 : 550,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "DRIVERS' STANDINGS $currentYear",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            driversStandings != null
+                ? Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: driversStandings!.length,
+                      itemBuilder: (context, index) {
+                        final driver = driversStandings![index];
+                        final teamBadgePath =
+                            getBadgePath(driver['constructor_name']);
+                        final positionColor =
+                            getTeamColour(driver['constructor_name'])
+                                .withOpacity(0.5); // Adjusted background color
+                        final points = driver['points'];
+                        final driverName = driver['driver_name']
+                            .split(' ')
+                            .last
+                            .toUpperCase(); // Show last name
+
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DriversScreen(
+                                    driverId: driver['driver_id'],
+                                    driverName: driver['driver_name']),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 4,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: positionColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Position and Logo
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 25,
+                                      child: Text(
+                                        driver['position'],
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    Container(
+                                      width: 50,
+                                      child: Image.asset(
+                                        teamBadgePath!,
+                                        height: 20,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // Driver Name
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: Text(
+                                      driverName,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                                // Points
+                                Text(
+                                  points.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+          ],
+        ),
+      ),
     );
   }
 }

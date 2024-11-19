@@ -25,8 +25,7 @@ class DataProvider extends ChangeNotifier {
   List<dynamic>? get racesSeason => _racesSeason;
   Race? get lastRaceInfo => _lastRaceInfo;
   List<dynamic>? get driversStandings => _driversStandings;
-  List<dynamic>? get constructorsStandings =>
-      _constructorsStandings;
+  List<dynamic>? get constructorsStandings => _constructorsStandings;
 
   DataProvider() {
     if (firstTime) {
