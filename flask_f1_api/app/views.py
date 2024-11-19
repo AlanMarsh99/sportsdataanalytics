@@ -311,6 +311,13 @@ def get_race_positions(year, round):
     # Generate a list of lap numbers we want to fetch (every 3rd lap)
     lap_numbers = list(range(1, max_laps + 1, 3))  # Laps 1, 4, 7, ...
 
+    # Ensure the final lap is included
+    if max_laps not in lap_numbers:
+        lap_numbers.append(max_laps)
+
+    # Optional: Sort the lap_numbers to maintain order
+    lap_numbers.sort()
+
     # Initialize data structures
     laps = {}
     drivers_set = set()

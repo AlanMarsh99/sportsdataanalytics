@@ -1,6 +1,7 @@
 import 'package:frontend/core/shared/globals.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../models/race_positions.dart';
 
 class APIService {
   static String baseUrl = 'https://sportsdataanalytics.onrender.com';
@@ -93,6 +94,20 @@ class APIService {
       print('Exception caught: $e');
       rethrow;
     }
+  }
+
+    // Fetch lap by lap race positions
+  Future<RacePositions?> fetchRacePositions(int year, int round) async {
+    final url = Uri.parse('$baseUrl/race/$year/$round/positions/');
+    final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        return RacePositions.fromJson(json.decode(response.body));
+      } else {
+        // Handle errors as needed
+        print('Failed to load race positions: ${response.body}');
+        return null;
+      }
   }
 
   // RACES SCREENS
