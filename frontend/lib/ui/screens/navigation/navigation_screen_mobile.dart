@@ -45,7 +45,7 @@ class _NavigationScreenMobileState extends State<NavigationScreenMobile> {
           Consumer<AuthService>(
             builder: (context, auth, child) {
               if (auth.status == Status.Authenticated) {
-                return GestureDetector(
+                return InkWell(
                   onTap: () {
                     Scaffold.of(context).openEndDrawer();
                   },
