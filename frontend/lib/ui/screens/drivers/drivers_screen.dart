@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
-import 'package:frontend/data/data_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/core/shared/globals.dart';
 

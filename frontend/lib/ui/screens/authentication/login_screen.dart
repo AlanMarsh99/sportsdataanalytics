@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
-import 'package:frontend/ui/screens/authentication/forget_password_screen.dart';
-import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
+import 'package:frontend/ui/screens/authentication/forgot_password_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
@@ -43,104 +41,105 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           body: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40, vertical: isMobile ? 40 : 80),
+            padding: EdgeInsets.symmetric(
+                horizontal: 40, vertical: isMobile ? 40 : 80),
             child: Consumer<AuthService>(
               builder: (context, auth, child) {
-                return 
-                SingleChildScrollView(child:
-                Column(
-                  children: [
-                    Image.asset('assets/logo/logo-detail.png',
-                        width: isMobile ? 150 : 200, fit: BoxFit.cover),
-                    const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: isMobile
-                          ? MainAxisAlignment.start
-                          : MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 30.0,
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        SizedBox(width: 10),
-                        const Text(
-                          'Welcome back',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'OpenSans',
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15.0),
-                    const Text(
-                      'Log in to play the F1 Predictions Challenge with your friends and win prizes!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'OpenSans',
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    SizedBox(height: isMobile ? 30.0 : 50),
-                    _buildEmailTF(),
-                    const SizedBox(
-                      height: 30.0,
-                    ),
-                    _buildPasswordTF(),
-                    SizedBox(
-                      height: isMobile ? 25 : 50,
-                    ),
-                    auth.status == Status.Authenticating
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-                        : _buildLogInButton(auth),
-                    //const Spacer(),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account?  ",
-                          style: TextStyle(
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Image.asset('assets/logo/logo-detail.png',
+                          width: isMobile ? 150 : 200, fit: BoxFit.cover),
+                      const SizedBox(height: 30),
+                      Row(
+                        mainAxisAlignment: isMobile
+                            ? MainAxisAlignment.start
+                            : MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back,
                               color: Colors.white,
-                              fontSize: isMobile ? 14 : 16),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SignUpScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'Sign up',
+                              size: 30.0,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          SizedBox(width: 10),
+                          const Text(
+                            'Welcome back',
                             style: TextStyle(
-                                color: redAccent,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'OpenSans',
+                              color: Colors.white,
+                              fontFamily: 'OpenSans',
+                              fontSize: 30.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15.0),
+                      const Text(
+                        'Log in to play the F1 Predictions Challenge with your friends and win prizes!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'OpenSans',
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 30.0 : 50),
+                      _buildEmailTF(),
+                      const SizedBox(
+                        height: 30.0,
+                      ),
+                      _buildPasswordTF(),
+                      SizedBox(
+                        height: isMobile ? 25 : 50,
+                      ),
+                      auth.status == Status.Authenticating
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : _buildLogInButton(auth),
+                      //const Spacer(),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account?  ",
+                            style: TextStyle(
+                                color: Colors.white,
                                 fontSize: isMobile ? 14 : 16),
                           ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    )
-                  ],
-                ),);
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SignUpScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Sign up',
+                              style: TextStyle(
+                                  color: redAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'OpenSans',
+                                  fontSize: isMobile ? 14 : 16),
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      )
+                    ],
+                  ),
+                );
               },
             ),
           ),

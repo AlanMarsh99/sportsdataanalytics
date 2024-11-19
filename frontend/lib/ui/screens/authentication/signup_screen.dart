@@ -1,9 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
-import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
@@ -51,65 +50,68 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 horizontal: 40, vertical: isMobile ? 40 : 80),
             child: Consumer<AuthService>(
               builder: (context, auth, child) {
-                return Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Image.asset('assets/logo/logo-detail.png',
-                            width: isMobile ? 150 : 200, fit: BoxFit.cover),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        Row(
-                          mainAxisAlignment: isMobile
-                              ? MainAxisAlignment.start
-                              : MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back,
-                                color: Colors.white,
-                                size: 30.0,
+                return Form(
+                  key: _formKey,
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Image.asset('assets/logo/logo-detail.png',
+                              width: isMobile ? 150 : 200, fit: BoxFit.cover),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          Row(
+                            mainAxisAlignment: isMobile
+                                ? MainAxisAlignment.start
+                                : MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                  size: 30.0,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
                               ),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                            SizedBox(width: 10),
-                            const Text(
-                              'Create an account',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'OpenSans',
-                                fontSize: 30.0,
-                                fontWeight: FontWeight.bold,
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Create an account',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'OpenSans',
+                                  fontSize: 30.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 30),
-                        _buildEmailTF(),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
-                        _buildUsernameTF(),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
-                        _buildPasswordTF(),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
-                        _buildRepeatPasswordTF(),
-                        SizedBox(
-                          height: isMobile ? 25 : 50,
-                        ),
-                        auth.status == Status.Authenticating
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : _buildSignUpButton(auth),
-                      ],
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          _buildEmailTF(),
+                          const SizedBox(
+                            height: 30.0,
+                          ),
+                          _buildUsernameTF(),
+                          const SizedBox(
+                            height: 30.0,
+                          ),
+                          _buildPasswordTF(),
+                          const SizedBox(
+                            height: 30.0,
+                          ),
+                          _buildRepeatPasswordTF(),
+                          SizedBox(
+                            height: isMobile ? 25 : 50,
+                          ),
+                          auth.status == Status.Authenticating
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : _buildSignUpButton(auth),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -133,7 +135,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
           width: isMobile ? double.infinity : 500,
-          child: TextField(
+          child: TextFormField(
             controller: _emailController,
             cursorColor: Colors.white,
             style: const TextStyle(
@@ -150,6 +152,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
               hintText: 'Enter your email',
               hintStyle: Globals.kHintTextStyle,
             ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter an email';
+              }
+              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+              if (!emailRegex.hasMatch(value)) {
+                return 'Please enter a valid email';
+              }
+              return null;
+            },
           ),
         ),
       ],
@@ -170,7 +182,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
           width: isMobile ? double.infinity : 500,
-          child: TextField(
+          child: TextFormField(
             controller: _usernameController,
             cursorColor: Colors.white,
             style: const TextStyle(
@@ -187,6 +199,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
               hintText: 'Enter your username',
               hintStyle: Globals.kHintTextStyle,
             ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a username';
+              }
+              return null;
+            },
           ),
         ),
       ],
@@ -207,7 +225,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
           width: isMobile ? double.infinity : 500,
-          child: TextField(
+          child: TextFormField(
             controller: _passwordController,
             cursorColor: Colors.white,
             obscureText: !_passwordVisible,
@@ -238,6 +256,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
               hintText: 'Enter a password',
               hintStyle: Globals.kHintTextStyle,
             ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a password';
+              }
+              if (value.length < 6) {
+                return 'Password must be at least 6 characters long';
+              }
+              if (!RegExp(r'[A-Za-z]').hasMatch(value) ||
+                  !RegExp(r'[0-9]').hasMatch(value)) {
+                return 'Password must contain both letters and numbers';
+              }
+              return null;
+            },
           ),
         ),
       ],
@@ -258,7 +289,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
           width: isMobile ? double.infinity : 500,
-          child: TextField(
+          child: TextFormField(
             controller: _repeatPasswordController,
             cursorColor: Colors.white,
             obscureText: !_repeatPasswordVisible,
@@ -291,6 +322,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
               hintText: 'Enter the password',
               hintStyle: Globals.kHintTextStyle,
             ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please repeat the password';
+              }
+              if (value != _passwordController.text) {
+                return 'Passwords do not match';
+              }
+              return null;
+            },
           ),
         ),
       ],
@@ -323,25 +363,64 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
         onPressed: () async {
-          // Check if the passwords match
+          if (_formKey.currentState!.validate()) {
+            try {
+              // Query Firestore to check if the username or email is already taken.
+              final usersCollection =
+                  FirebaseFirestore.instance.collection('users');
 
-          signUp(auth);
+              // Check for username.
+              final usernameQuery = await usersCollection
+                  .where('username', isEqualTo: _usernameController.text.trim())
+                  .get();
+              if (usernameQuery.docs.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Error: Username is already taken'),
+                      backgroundColor: secondary),
+                );
+                return;
+              }
+
+              // Check for email.
+              final emailQuery = await usersCollection
+                  .where('email', isEqualTo: _emailController.text.trim())
+                  .get();
+              if (emailQuery.docs.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Error: Email is already registered'),
+                    backgroundColor: secondary,
+                  ),
+                );
+                return;
+              }
+
+              // Proceed with sign-up if username and email are unique.
+              await auth.signUp(context, _emailController.text,
+                  _usernameController.text, _passwordController.text);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Account created successfully!')),
+              );
+
+              // Navigate to the next screen.
+              await Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const NavigationScreen()),
+              );
+            } catch (e) {
+              // Handle errors and inform the user.
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('Error: ${e.toString()}'),
+                    backgroundColor: secondary),
+              );
+            }
+          }
         },
       ),
-    );
-  }
-
-  void signUp(AuthService auth) async {
-    await auth.signUp(
-      context,
-      _emailController.text.trim(),
-      _usernameController.text.trim(),
-      _passwordController.text,
-    );
-
-    await Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const NavigationScreen()),
     );
   }
 }

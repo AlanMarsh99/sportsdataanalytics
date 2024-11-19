@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/screens/game/game_leagues_screen.dart';
-import 'package:frontend/ui/screens/game/game_predict_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/carousel_game_options.dart';
 
