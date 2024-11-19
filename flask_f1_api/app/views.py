@@ -246,6 +246,7 @@ def get_constructors_standings(year):
                 "position": standing['position'],
                 "points": standing['points'],
                 "wins": standing['wins'],
+                "constructor_id": standing['Constructor']['constructorId'],
                 "constructor_name": standing['Constructor']['name']
             })
         return jsonify({"constructors_standings": constructors_standings})

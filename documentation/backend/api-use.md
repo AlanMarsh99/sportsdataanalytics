@@ -190,19 +190,22 @@ When you run the Flask development server using the command `python run.py`, you
         "position": "1",
         "points": "675",
         "wins": "13",
-        "constructor_name": "Red Bull Racing"
+        "constructor_name": "Red Bull",
+        "constructor_id": "red_bull"
       },
       {
         "position": "2",
         "points": "590",
         "wins": "5",
-        "constructor_name": "Mercedes"
+        "constructor_name": "Mercedes",
+        "constructor_id": "mercedes"
       },
       {
         "position": "3",
         "points": "480",
         "wins": "3",
-        "constructor_name": "Ferrari"
+        "constructor_name": "Ferrari",
+        "constructor_id": "ferrari"
       }
       // More constructors standings...
     ]
