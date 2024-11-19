@@ -89,7 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       child: Scaffold(
-        backgroundColor: Colors.transparent, // Make scaffold background transparent
+        backgroundColor:
+            Colors.transparent, // Make scaffold background transparent
         body: Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: SingleChildScrollView(
@@ -111,7 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Flexible(
                             child: Text(
                               'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                              style: TextStyle(fontSize: 14, color: Colors.white),
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -157,7 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Flexible(
                             child: Text(
                               'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                              style: TextStyle(fontSize: 14, color: Colors.white),
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white),
                             ),
                           ),
                           const SizedBox(width: 20),
@@ -170,11 +173,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? Row(
                               children: [
                                 Flexible(
-                                  child: _countdownContainer(upcomingRaceInfo, false),
+                                  child: _countdownContainer(
+                                      upcomingRaceInfo, false),
                                 ),
                                 const SizedBox(width: 16),
                                 Flexible(
-                                  child: _lastRaceResultsContainer(lastRaceResults, false),
+                                  child: _lastRaceResultsContainer(
+                                      lastRaceResults, false),
                                 )
                               ],
                             )
@@ -217,7 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: const Icon(Icons.flag, color: secondary),
         title: Text(
           '${fastestLapData['driver_name']}',
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
           '${fastestLapData['team_name']}',
@@ -310,7 +316,8 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: _buildPositionContainer(position.toString()),
         title: Text(
           '${driverData['driver_name']}',
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
           '${driverData['team_name']}',
@@ -378,7 +385,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RacesDetailScreen(race: lastRaceInfo!),
+                                builder: (context) =>
+                                    RacesDetailScreen(race: lastRaceInfo!),
                               ),
                             );
                           }
@@ -405,7 +413,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RacesDetailScreen(race: lastRaceInfo!),
+                                builder: (context) =>
+                                    RacesDetailScreen(race: lastRaceInfo!),
                               ),
                             );
                           }
@@ -504,7 +513,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: Text(
-                      'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
+                      'FORMULA 1 ${upcomingRaceInfo['race_name']}'
+                          .toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -545,7 +555,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildTimeColumn(
-                        remainingTime.inDays.toString().padLeft(2, '0'), 'DAYS'),
+                        remainingTime.inDays.toString().padLeft(2, '0'),
+                        'DAYS'),
                     _buildTimeColumn(
                         remainingTime.inHours
                             .remainder(24)
@@ -586,7 +597,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const PredictPodiumScreen(),
+                                builder: (context) =>
+                                    const PredictPodiumScreen(),
                               ),
                             )
                           : showDialog(
@@ -597,7 +609,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                     },
                     child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: isMobile ? 0 : 5.0),
+                      padding:
+                          EdgeInsets.symmetric(vertical: isMobile ? 0 : 5.0),
                       child: const Text(
                         'PLAY',
                         style: TextStyle(

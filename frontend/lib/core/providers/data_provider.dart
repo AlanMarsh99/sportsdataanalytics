@@ -13,6 +13,8 @@ class DataProvider extends ChangeNotifier {
   APIService apiService = APIService();
   bool firstTime = true;
   Race? _lastRaceInfo;
+  List<dynamic>? _driversStandings;
+  List<dynamic>? _constructorsStandings;
 
   Map<String, dynamic>? get upcomingRaceInfo => _upcomingRaceInfo;
   Map<String, dynamic>? get lastRaceResults => _lastRaceResults;
@@ -22,7 +24,9 @@ class DataProvider extends ChangeNotifier {
   List<dynamic>? get teamsSeason => _teamsSeason;
   List<dynamic>? get racesSeason => _racesSeason;
   Race? get lastRaceInfo => _lastRaceInfo;
-
+  List<dynamic>? get driversStandings => _driversStandings;
+  List<dynamic>? get constructorsStandings =>
+      _constructorsStandings;
 
   DataProvider() {
     if (firstTime) {
@@ -46,18 +50,22 @@ class DataProvider extends ChangeNotifier {
       final results = await Future.wait([
         apiService.getUpcomingRace(),
         apiService.getLastRaceResults(),
+        apiService.getDriverStandings(DateTime.now().year),
+        apiService.getConstructorStandings(DateTime.now().year),
       ]);
 
       _upcomingRaceInfo = results[0];
       _lastRaceResults = results[1];
+      _driversStandings = results[2]['driver_standings'];
+      _constructorsStandings = results[3]['constructors_standings'];
 
       if (_lastRaceResults != null) {
         int lastRaceYear = int.parse(_lastRaceResults!['year']);
         int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
 
-        Map<String, dynamic> raceInfo = await apiService.getRaceInfo(lastRaceYear, lastRaceRound);
+        Map<String, dynamic> raceInfo =
+            await apiService.getRaceInfo(lastRaceYear, lastRaceRound);
         _lastRaceInfo = Race.fromJson(raceInfo);
-        
       }
 
       notifyListeners();

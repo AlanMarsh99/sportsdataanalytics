@@ -51,6 +51,50 @@ class APIService {
     }
   }
 
+  // Fetch the drivers' standings for the current season
+  Future<Map<String, dynamic>> getDriverStandings(int year) async {
+    final url = Uri.parse('$baseUrl/drivers/$year/standings/');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return json.decode(response.body);
+      } else {
+        print('Failed to load drivers standings');
+        print('Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to load driver standings');
+      }
+    } catch (e) {
+      print('Exception caught: $e');
+      rethrow;
+    }
+  }
+
+  // Fetch the constructors' standings for the current season
+  Future<Map<String, dynamic>> getConstructorStandings(int year) async {
+    final url = Uri.parse('$baseUrl/constructors/$year/standings/');
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return json.decode(response.body);
+      } else {
+        print('Failed to load constructors standings');
+        print('Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to load constructor standings');
+      }
+    } catch (e) {
+      print('Exception caught: $e');
+      rethrow;
+    }
+  }
+
   // RACES SCREENS
 
   // Fetch all races in a given year
@@ -76,8 +120,7 @@ class APIService {
   // Fetch race information
   Future<Map<String, dynamic>> getRaceInfo(int year, int round) async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/race/$year/$round/'));
+      final response = await http.get(Uri.parse('$baseUrl/race/$year/$round/'));
 
       if (response.statusCode == 200) {
         print('Response status: ${response.statusCode}');
