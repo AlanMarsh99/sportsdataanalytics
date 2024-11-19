@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Text(
                               'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
                               style:
-                                  TextStyle(fontSize: 14, color: Colors.white),
+                                  TextStyle(fontSize: 16, color: Colors.white),
                             ),
                           ),
                           const SizedBox(width: 20),
@@ -384,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Map<String, dynamic> lastRaceResults, bool isMobile) {
     return Container(
       width: double.infinity,
-      height: isMobile ? 480 : 480,
+      height: isMobile ? 480 : 482,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primary,
@@ -507,12 +507,13 @@ class _HomeScreenState extends State<HomeScreen> {
     String formattedDate = DateFormat('EEEE MMMM d').format(raceDate);
     return Container(
       width: double.infinity,
-      height: isMobile ? 350 : 480,
+      height: isMobile ? 350 : 482,
       decoration: BoxDecoration(
         color: primary,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Stack(
+        alignment: AlignmentDirectional.center,
         children: [
           // Background Image
           ClipRRect(
@@ -553,10 +554,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       'FORMULA 1 ${upcomingRaceInfo['race_name']}'
                           .toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: isMobile ? 14 : 18,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -565,10 +566,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
                 Text(
                   '$formattedDate at $hour',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: isMobile ? 14 : 16,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -577,14 +578,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
+                  child: Text(
                     'PREDICTIONS CLOSE IN:',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 12,
+                      fontSize: isMobile ? 12 : 14,
                     ),
                   ),
                 ),
@@ -594,25 +595,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _buildTimeColumn(
                         remainingTime.inDays.toString().padLeft(2, '0'),
-                        'DAYS'),
+                        'DAYS', isMobile),
                     _buildTimeColumn(
                         remainingTime.inHours
                             .remainder(24)
                             .toString()
                             .padLeft(2, '0'),
-                        'HRS'),
+                        'HRS', isMobile),
                     _buildTimeColumn(
                         remainingTime.inMinutes
                             .remainder(60)
                             .toString()
                             .padLeft(2, '0'),
-                        'MINS'),
+                        'MINS', isMobile),
                     _buildTimeColumn(
                         remainingTime.inSeconds
                             .remainder(60)
                             .toString()
                             .padLeft(2, '0'),
-                        'SECS'),
+                        'SECS', isMobile),
                   ],
                 ),
                 SizedBox(height: isMobile ? 25 : 35),
@@ -668,22 +669,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTimeColumn(String timeValue, String label) {
+  Widget _buildTimeColumn(String timeValue, String label, bool isMobile) {
     return Column(
       children: [
         Text(
           timeValue,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: isMobile ? 24 : 28,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: Color.fromARGB(213, 255, 255, 255),
-            fontSize: 12,
+            fontSize: isMobile ? 12 : 16,
           ),
         ),
       ],
