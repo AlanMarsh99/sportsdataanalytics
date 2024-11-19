@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
     Key? key,
   }) : super(key: key);
 
+  @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
@@ -34,7 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    timer.cancel();
+    if (timer.isActive) {
+      timer.cancel();
+    }
     super.dispose();
   }
 
@@ -86,113 +89,108 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       child: Scaffold(
+        backgroundColor: Colors.transparent, // Make scaffold background transparent
         body: Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: SingleChildScrollView(
-              child: Responsive.isMobile(context)
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'HOME',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Flexible(
-                              child: Text(
-                                'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white),
-                              ),
+            child: Responsive.isMobile(context)
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'HOME',
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Flexible(
+                            child: Text(
+                              'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                              style: TextStyle(fontSize: 14, color: Colors.white),
                             ),
-                            const SizedBox(width: 8),
-                            Image.asset('assets/logo/formula-1-logo.png',
-                                width: 50, fit: BoxFit.cover),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        upcomingRaceInfo != null && lastRaceResults != null
-                            ? Column(
-                                children: [
-                                  _countdownContainer(upcomingRaceInfo, true),
-                                  const SizedBox(height: 16),
-                                  _lastRaceResultsContainer(
-                                      lastRaceResults, true)
-                                ],
-                              )
-                            : Container(
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.8,
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
+                          ),
+                          const SizedBox(width: 8),
+                          Image.asset('assets/logo/formula-1-logo.png',
+                              width: 50, fit: BoxFit.cover),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      upcomingRaceInfo != null && lastRaceResults != null
+                          ? Column(
+                              children: [
+                                _countdownContainer(upcomingRaceInfo, true),
+                                const SizedBox(height: 16),
+                                _lastRaceResultsContainer(lastRaceResults, true)
+                              ],
+                            )
+                          : SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height * 0.8,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
                                 ),
                               ),
-                        const SizedBox(height: 16),
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'HOME',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Flexible(
-                              child: Text(
-                                'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white),
-                              ),
                             ),
-                            const SizedBox(width: 20),
-                            Image.asset('assets/logo/formula-1-logo.png',
-                                width: 50, fit: BoxFit.cover),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        upcomingRaceInfo != null && lastRaceResults != null
-                            ? Row(
-                                children: [
-                                  Flexible(
-                                    child: _countdownContainer(
-                                        upcomingRaceInfo, false),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Flexible(
-                                    child: _lastRaceResultsContainer(
-                                        lastRaceResults, false),
-                                  )
-                                ],
-                              )
-                            : Container(
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.8,
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
+                      const SizedBox(height: 16),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'HOME',
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Flexible(
+                            child: Text(
+                              'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                              style: TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Image.asset('assets/logo/formula-1-logo.png',
+                              width: 50, fit: BoxFit.cover),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      upcomingRaceInfo != null && lastRaceResults != null
+                          ? Row(
+                              children: [
+                                Flexible(
+                                  child: _countdownContainer(upcomingRaceInfo, false),
+                                ),
+                                const SizedBox(width: 16),
+                                Flexible(
+                                  child: _lastRaceResultsContainer(lastRaceResults, false),
+                                )
+                              ],
+                            )
+                          : SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height * 0.8,
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
                                 ),
                               ),
-                        const SizedBox(height: 16),
-                      ],
-                    )),
+                            ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
@@ -219,8 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: const Icon(Icons.flag, color: secondary),
         title: Text(
           '${fastestLapData['driver_name']}',
-          style:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
           '${fastestLapData['team_name']}',
@@ -313,8 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
         leading: _buildPositionContainer(position.toString()),
         title: Text(
           '${driverData['driver_name']}',
-          style:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
           '${driverData['team_name']}',
@@ -344,7 +340,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _lastRaceResultsContainer(
       Map<String, dynamic> lastRaceResults, bool isMobile) {
     return Container(
-      width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
+      width: double.infinity,
       height: isMobile ? 480 : 480,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -382,8 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    RacesDetailScreen(race: lastRaceInfo!),
+                                builder: (context) => RacesDetailScreen(race: lastRaceInfo!),
                               ),
                             );
                           }
@@ -410,8 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    RacesDetailScreen(race: lastRaceInfo!),
+                                builder: (context) => RacesDetailScreen(race: lastRaceInfo!),
                               ),
                             );
                           }
@@ -465,200 +459,183 @@ class _HomeScreenState extends State<HomeScreen> {
 
     String formattedDate = DateFormat('EEEE MMMM d').format(raceDate);
     return Container(
-      width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
+      width: double.infinity,
       height: isMobile ? 350 : 480,
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primary,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              //color: secondary,
-              border: Border.all(
-                color: secondary,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Text(
-                'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
-              ),
+          // Background Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.asset(
+              'assets/images/f1car.jpg',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
             ),
           ),
-          const SizedBox(height: 20),
-          Text(
-            '$formattedDate at $hour',
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: isMobile ? 25 : 40),
+          // Semi-transparent overlay to make text readable
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'PREDICTIONS CLOSE IN:',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-              ),
+              color: Colors.black.withOpacity(0.5),
             ),
           ),
-          SizedBox(height: isMobile ? 18 : 25),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    remainingTime.inDays.toString().padLeft(2, '0'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+          // Content overlaid on top of the image
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: secondary,
+                      width: 2,
                     ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const Text(
-                    'DAYS',
-                    style: TextStyle(
-                      color: Color.fromARGB(213, 255, 255, 255),
-                      fontSize: 12,
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Text(
+                      'FORMULA 1 ${upcomingRaceInfo['race_name']}'.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    remainingTime.inHours
-                        .remainder(24)
-                        .toString()
-                        .padLeft(2, '0'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Text(
-                    'HRS',
-                    style: TextStyle(
-                      color: Color.fromARGB(213, 255, 255, 255),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    remainingTime.inMinutes
-                        .remainder(60)
-                        .toString()
-                        .padLeft(2, '0'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Text(
-                    'MINS',
-                    style: TextStyle(
-                      color: Color.fromARGB(213, 255, 255, 255),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    remainingTime.inSeconds
-                        .remainder(60)
-                        .toString()
-                        .padLeft(2, '0'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Text(
-                    'SECS',
-                    style: TextStyle(
-                      color: Color.fromARGB(213, 255, 255, 255),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: isMobile ? 25 : 35),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            width: 270,
-            child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(secondary),
-                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(35.0),
                   ),
                 ),
-              ),
-              onPressed: () {
-                Provider.of<AuthService>(context, listen: false).status ==
-                        Status.Authenticated
-                    ? Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PredictPodiumScreen(),
-                        ),
-                      )
-                    : showDialog(
-                        context: context,
-                        builder: (context) {
-                          return LogInDialog();
-                        },
-                      );
-              },
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: isMobile ? 0 : 5.0),
-                child: const Text(
-                  'PLAY',
-                  style: TextStyle(
+                const SizedBox(height: 20),
+                Text(
+                  '$formattedDate at $hour',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: isMobile ? 25 : 40),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'PREDICTIONS CLOSE IN:',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-              ),
+                SizedBox(height: isMobile ? 18 : 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildTimeColumn(
+                        remainingTime.inDays.toString().padLeft(2, '0'), 'DAYS'),
+                    _buildTimeColumn(
+                        remainingTime.inHours
+                            .remainder(24)
+                            .toString()
+                            .padLeft(2, '0'),
+                        'HRS'),
+                    _buildTimeColumn(
+                        remainingTime.inMinutes
+                            .remainder(60)
+                            .toString()
+                            .padLeft(2, '0'),
+                        'MINS'),
+                    _buildTimeColumn(
+                        remainingTime.inSeconds
+                            .remainder(60)
+                            .toString()
+                            .padLeft(2, '0'),
+                        'SECS'),
+                  ],
+                ),
+                SizedBox(height: isMobile ? 25 : 35),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  width: 270,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(secondary),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(35.0),
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      Provider.of<AuthService>(context, listen: false).status ==
+                              Status.Authenticated
+                          ? Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PredictPodiumScreen(),
+                              ),
+                            )
+                          : showDialog(
+                              context: context,
+                              builder: (context) {
+                                return LogInDialog();
+                              },
+                            );
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: isMobile ? 0 : 5.0),
+                      child: const Text(
+                        'PLAY',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTimeColumn(String timeValue, String label) {
+    return Column(
+      children: [
+        Text(
+          timeValue,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color.fromARGB(213, 255, 255, 255),
+            fontSize: 12,
+          ),
+        ),
+      ],
     );
   }
 }
