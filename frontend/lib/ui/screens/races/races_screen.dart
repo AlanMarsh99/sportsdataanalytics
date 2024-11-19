@@ -78,9 +78,7 @@ class _RacesScreenState extends State<RacesScreen> {
               ),
               const SizedBox(height: 15),
               Expanded(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: seasonChanged
+                child: seasonChanged
                       ? FutureBuilder<void>(
                           future: _racesSeasonFuture,
                           builder: (context, snapshot) {
@@ -111,7 +109,7 @@ class _RacesScreenState extends State<RacesScreen> {
                               ),
                             )
                           : RacesSeasonTable(races: racesSeason!),
-                ),
+                
               ),
             ],
           ),
