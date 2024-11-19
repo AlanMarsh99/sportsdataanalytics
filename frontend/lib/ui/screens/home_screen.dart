@@ -7,6 +7,7 @@ import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
+import 'package:frontend/ui/screens/teams/teams_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:intl/intl.dart';
@@ -162,6 +163,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
                       _driversStandingsContainer(true),
                       const SizedBox(height: 16),
+                      _constructorsStandingsContainer(true),
+                      const SizedBox(height: 16),
                     ],
                   )
                 : Column(
@@ -215,6 +218,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                       const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: _driversStandingsContainer(false),
+                          ),
+                          const SizedBox(width: 16),
+                          Flexible(
+                            child: _constructorsStandingsContainer(false),
+                          ),
+                        ],
+                      )
                     ],
                   ),
           ),
@@ -384,9 +398,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "LAST RACE RESULTS",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: isMobile ? 14 : 18,
+                      fontWeight: FontWeight.bold),
                 ),
                 MouseRegion(
                   onEnter: (_) => setState(() {
@@ -420,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text(
                           "View full results",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: isMobile ? 12 : 14,
                             fontWeight: FontWeight.bold,
                             color: buttonColor,
                           ),
@@ -692,9 +708,10 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               "DRIVERS' STANDINGS $currentYear",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: isMobile ? 14 : 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             driversStandings != null
                 ? Expanded(
                     child: ListView.builder(
@@ -731,7 +748,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 8, horizontal: 16),
                             decoration: BoxDecoration(
-                              color: positionColor,
+                              gradient: LinearGradient(
+                                colors: [
+                                  positionColor,
+                                  Colors.black
+                                ], // From blue to black
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -754,10 +778,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     const SizedBox(width: 20),
                                     Container(
-                                      width: 50,
+                                      width: isMobile ? 50 : 60,
                                       child: Image.asset(
                                         teamBadgePath!,
-                                        height: 20,
+                                        height: isMobile ? 20 : 30,
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -782,8 +806,146 @@ class _HomeScreenState extends State<HomeScreen> {
                                 // Points
                                 Text(
                                   points.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 16,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 16 : 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _constructorsStandingsContainer(bool isMobile) {
+    int currentYear = DateTime.now().year;
+    return Container(
+      width: double.infinity,
+      height: isMobile ? 450 : 550,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "CONSTRUCTORS' STANDINGS $currentYear",
+              style: TextStyle(
+                  fontSize: isMobile ? 14 : 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 15),
+            constructorsStandings != null
+                ? Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      itemCount: constructorsStandings!.length,
+                      itemBuilder: (context, index) {
+                        final constructor = constructorsStandings![index];
+                        final teamBadgePath =
+                            getBadgePath(constructor['constructor_name']);
+                        final positionColor =
+                            getTeamColour(constructor['constructor_name'])
+                                .withOpacity(0.5); // Adjusted background color
+                        final points = constructor['points'];
+                        final constructorName =
+                            constructor['constructor_name'].toUpperCase();
+
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TeamsDetailScreen(
+                                    teamId: constructor['constructor_id'],
+                                    teamName: constructor['constructor_name']),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 4,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 16),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  positionColor,
+                                  Colors.black
+                                ], // From blue to black
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Position and Logo
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 25,
+                                      child: Text(
+                                        constructor['position'],
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    Container(
+                                      width: isMobile ? 50 : 60,
+                                      child: Image.asset(
+                                        teamBadgePath!,
+                                        height: isMobile ? 20 : 30,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // Driver Name
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: Text(
+                                      constructorName,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                                // Points
+                                Text(
+                                  points.toString(),
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 16 : 20,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
