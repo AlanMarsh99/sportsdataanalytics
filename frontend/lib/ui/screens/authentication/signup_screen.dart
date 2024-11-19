@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
-import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
