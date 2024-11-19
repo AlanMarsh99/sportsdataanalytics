@@ -40,6 +40,7 @@ dependencies:
   firebase_auth: ^5.3.2
   cloud_firestore: ^5.4.5
   flutter_phoenix: ^1.1.1
+  fl_chart: ^0.69.0
 
 
 
@@ -76,7 +77,7 @@ flutter:
     - assets/teams/logos/
     - assets/teams/badges/
     - assets/drivers/
-
+  
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
