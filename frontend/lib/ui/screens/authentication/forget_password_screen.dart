@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  bool isMobile = false;
 
   @override
   void dispose() {
@@ -22,6 +24,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    isMobile = Responsive.isMobile(context);
     return Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -38,20 +41,37 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
             child: Column(
               children: [
-/*Padding(
-                                  padding: const EdgeInsets.only(bottom: 40.0),
-                                  child: Image.asset(
-                                      'assets/devalirian_logo.png',
-                                      fit: BoxFit.cover,
-                                      scale: 14)),*/
-                const Text(
-                  'Forgot password?',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'OpenSans',
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Image.asset('assets/logo/logo-detail.png',
+                    width: isMobile ? 150 : 200, fit: BoxFit.cover),
+                const SizedBox(
+                  height: 30,
+                ),
+                Row(
+                  mainAxisAlignment: isMobile
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 30.0,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Forgot password?',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'OpenSans',
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 30.0),
                 _buildEmailTF(),
@@ -77,7 +97,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        const Text(
           'Email',
           style: Globals.kLabelStyle,
         ),
@@ -86,16 +106,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
+          width: isMobile ? double.infinity : 500,
           child: TextField(
             controller: _emailController,
+            cursorColor: Colors.white,
             style: const TextStyle(
               color: Colors.white,
               fontFamily: 'OpenSans',
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.only(top: 14.0),
-              prefixIcon: const Icon(
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
                 Icons.email,
                 color: Colors.white,
               ),
@@ -111,7 +133,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildSendButton(/*AuthService auth*/) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25.0),
-      width: double.infinity,
+      width: isMobile ? double.infinity : 500,
       child: ElevatedButton(
         style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all<Color>(secondary),

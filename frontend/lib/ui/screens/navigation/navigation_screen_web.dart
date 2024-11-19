@@ -66,7 +66,7 @@ class _NavigationScreenWebState extends State<NavigationScreenWeb>
                     'Log in',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
