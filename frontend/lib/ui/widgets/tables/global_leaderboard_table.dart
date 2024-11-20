@@ -59,10 +59,8 @@ class GlobalLeaderboardTable extends StatelessWidget {
                       DataCell(Row(
                         children: [
                           Image.asset(
-                            //user.image,
-                            'assets/images/placeholder.png',
+                            'assets/avatars/${users[index].avatar}.png',
                             width: 40,
-                            height: 40,
                           ),
                           const SizedBox(width: 5),
                           Text(
