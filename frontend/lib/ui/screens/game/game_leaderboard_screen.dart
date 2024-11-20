@@ -83,17 +83,20 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
                     'Error loading leaderboard.',
                     style: TextStyle(color: Colors.white),
                   );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  // Handle the case when no users are found
-                  return const Text(
-                    'No leaderboard data available.',
-                    style: TextStyle(color: Colors.white),
-                  );
-                } else {
-                  // Render the leaderboard container with the fetched users
-                  List<UserApp> users = snapshot.data!;
-                  return _leaderboardContainer(users, isMobile);
+                } else if (snapshot.hasData) {
+                  if (snapshot.data!.isEmpty) {
+                    // Show a message if there are no users
+                    return const Text(
+                      'No users found.',
+                      style: TextStyle(color: Colors.white),
+                    );
+                  } else {
+                    // Render the leaderboard container with the fetched users
+                    List<UserApp> users = snapshot.data!;
+                    return _leaderboardContainer(users, isMobile);
+                  }
                 }
+                return Container();
               },
             ),
           ),
