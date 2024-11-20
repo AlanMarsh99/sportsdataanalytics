@@ -47,14 +47,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBDgqo_vRppRPp9ZEjcM4OkNSWdyDOWdTQ',
-    appId: '1:325042115318:web:a7aea04e88472813f2d2d7',
-    messagingSenderId: '325042115318',
-    projectId: 'racevision-tud',
-    authDomain: 'racevision-tud.firebaseapp.com',
-    storageBucket: 'racevision-tud.firebasestorage.app',
-    measurementId: 'G-D623N10LJL',
-  );
+      apiKey: "AIzaSyBDgqo_vRppRPp9ZEjcM4OkNSWdyDOWdTQ",
+      authDomain: "racevision-tud.firebaseapp.com",
+      projectId: "racevision-tud",
+      storageBucket: "racevision-tud.firebasestorage.app",
+      messagingSenderId: "325042115318",
+      appId: "1:325042115318:web:6aeb8acb12e88d61f2d2d7",
+      measurementId: "G-S1EWVFBNPY");
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAA9grj2Zl47zDqkrXyBq9SG2Gq-04qkCA',
