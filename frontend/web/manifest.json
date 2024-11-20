@@ -1,11 +1,11 @@
 {
-    "name": "frontend",
-    "short_name": "frontend",
+    "name": "RaceVision",
+    "short_name": "RaceVision",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "F1 data analytics and predictions platform.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
