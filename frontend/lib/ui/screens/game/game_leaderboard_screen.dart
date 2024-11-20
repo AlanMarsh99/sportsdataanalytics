@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user.dart';
+import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/global_leaderboard_table.dart';
 import 'package:intl/intl.dart';
@@ -14,193 +16,13 @@ class GameLeaderboardScreen extends StatefulWidget {
 }
 
 class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
-  List<User> _users = [
-    User(
-      id: 1,
-      username: 'brendan',
-      totalPoints: 523,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'alanmarsh',
-      totalPoints: 342,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'davidst',
-      totalPoints: 260,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'alice',
-      totalPoints: 41,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'anne',
-      totalPoints: 69,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'alex',
-      totalPoints: 164,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'user123',
-      totalPoints: 186,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'peter',
-      totalPoints: 215,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'caroline',
-      totalPoints: 132,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'sergio',
-      totalPoints: 153,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'paul',
-      totalPoints: 190,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'ferrarifan',
-      totalPoints: 205,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'andrea',
-      totalPoints: 305,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'damian',
-      totalPoints: 285,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'sarah',
-      totalPoints: 64,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'fidel',
-      totalPoints: 240,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'alonso',
-      totalPoints: 84,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-    User(
-      id: 1,
-      username: 'stifnes',
-      totalPoints: 220,
-      avatarPicture: 'assets/images/placeholder.png',
-      numPredictions: 20,
-      globalPosition: 12,
-      leaguesFinished: 6,
-      leaguesWon: 2,
-    ),
-  ];
+  List<User> _users = [];
+  late Future<List<UserApp>> _fetchUsersFuture;
 
   @override
   void initState() {
     super.initState();
-    _users.sort((a, b) => b.totalPoints.compareTo(a.totalPoints));
+    _fetchUsersFuture = _fetchUsers();
   }
 
   @override
@@ -208,12 +30,33 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
     super.dispose();
   }
 
+  Future<List<UserApp>> _fetchUsers() async {
+    try {
+      final querySnapshot =
+          await FirebaseFirestore.instance.collection('users').get();
+
+      // Map Firestore documents to the User model
+      final users = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return UserApp.fromMap(data);
+      }).toList();
+
+      // Sort users by total points (descending order)
+      users.sort((a, b) => b.totalPoints.compareTo(a.totalPoints));
+
+      return users;
+    } catch (e) {
+      print('Error fetching users: $e');
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const  Padding(
+        const Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: Text(
             'GAME',
@@ -224,14 +67,40 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Center(
-            child: _leaderboardContainer(),
+            child: FutureBuilder<List<UserApp>>(
+              future: _fetchUsersFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Show a loading indicator while waiting for data
+                  return const CircularProgressIndicator(
+                    color: Colors.white,
+                  );
+                } else if (snapshot.hasError) {
+                  // Show an error message if something goes wrong
+                  return const Text(
+                    'Error loading leaderboard.',
+                    style: TextStyle(color: Colors.white),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  // Handle the case when no users are found
+                  return const Text(
+                    'No leaderboard data available.',
+                    style: TextStyle(color: Colors.white),
+                  );
+                } else {
+                  // Render the leaderboard container with the fetched users
+                  List<UserApp> users = snapshot.data!;
+                  return _leaderboardContainer(users);
+                }
+              },
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _leaderboardContainer() {
+  Widget _leaderboardContainer(List<UserApp> users) {
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
       height: MediaQuery.of(context).size.height * 0.61,
@@ -271,7 +140,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
             child: Align(
               alignment: Alignment.topCenter,
               child: GlobalLeaderboardTable(
-                users: _users,
+                users: users,
               ),
             ),
           )

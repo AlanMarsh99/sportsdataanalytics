@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/ui/responsive.dart';
+import 'package:frontend/ui/screens/authentication/login_screen.dart';
+import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:provider/provider.dart';
@@ -25,19 +28,19 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
   }
 
   UserApp userInfo = UserApp(
-    id: '1',
-    email: 'brendan@test.com',
-    username: 'brendan',
-    totalPoints: 523,
-    avatar: 'assets/images/placeholder.png',
-    level: 1,
-    leaguesWon: 2,
-    leaguesFinished: 5,
-    numPredictions: 15
-  );
+      id: '1',
+      email: 'brendan@test.com',
+      username: 'brendan',
+      totalPoints: 523,
+      avatar: 'assets/images/placeholder.png',
+      level: 1,
+      leaguesWon: 2,
+      leaguesFinished: 5,
+      numPredictions: 15);
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -49,119 +52,238 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                 fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0, left: 16.0, right: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: 330,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 70,
-                            child: Center(
-                              child:
-                                  Image.asset('assets/images/placeholder.png'),
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          TextButton(
-                            onPressed: () {
-                              Provider.of<AuthService>(context, listen: false)
-                                          .status ==
-                                      Status.Authenticated
-                                  ? showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return LogInDialog();
-                                      },
-                                    )
-                                  /*Navigator.push(
+        Consumer<AuthService>(
+          builder: (context, auth, child) {
+            if (auth.status == Status.Authenticated && auth.userApp != null) {
+              userInfo = auth.userApp!;
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        bottom: 16.0, left: 16.0, right: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 330,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.white,
+                                      radius: 70,
+                                      child: Center(
+                                        child: Image.asset(
+                                            'assets/avatars/${userInfo.avatar}.png'),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    TextButton(
+                                      onPressed: () {
+                                        /*Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const PredictPodiumScreen(),
                         ),
                       )*/
-                                  : showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return LogInDialog();
                                       },
-                                    );
-                            },
-                            child: Text(
-                              'Change avatar',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                                      child: const Text(
+                                        'Change avatar',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              _buildStatCard(1, null, 'GLOBAL POSITION', false),
+                            ],
                           ),
+                        ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Container(
+                          height: 330,
+                          child: Column(
+                            children: [
+                              _buildStatCard(userInfo.totalPoints, null,
+                                  'TOTAL POINTS', false),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              _buildStatCard(
+                                  userInfo.leaguesWon,
+                                  userInfo.leaguesFinished,
+                                  'LEAGUE WINS',
+                                  true),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              _buildStatCard(userInfo.numPredictions, null,
+                                  'PREDICTIONS', false),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  /*const SizedBox(
+                    height: 10,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'BADGES',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Divider(
+                          color: Colors.white,
+                          thickness: 1,
+                        ),
+                      ],
+                    ),
+                  ),*/
+                ],
+              );
+            } else {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      top: isMobile
+                          ? MediaQuery.of(context).size.height * 0.2
+                          : MediaQuery.of(context).size.height * 0.2,
+                      left: 16.0,
+                      right: 16.0),
+                  child: Container(
+                    width: isMobile
+                        ? double.infinity
+                        : MediaQuery.of(context).size.width * 0.7,
+                    height: isMobile ? 180 : 200,
+                    decoration: BoxDecoration(
+                      color: primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Text(
+                            "Log in or sign up to make predictions and compete with your friends!",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: isMobile ? 14 : 18),
+                          ),
+                          SizedBox(
+                            height: isMobile ? 30 : 50,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: isMobile ? 100 : 200,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStateProperty.all<Color>(
+                                            secondary),
+                                    shape: WidgetStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(35.0),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 5.0),
+                                    child: Text(
+                                      'LOG IN',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: isMobile ? 20 : 50),
+                              Container(
+                                width: isMobile ? 100 : 200,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStateProperty.all<Color>(
+                                            secondary),
+                                    shape: WidgetStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(35.0),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SignUpScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 5.0),
+                                    child: Text(
+                                      'SIGN UP',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     ),
-                    _buildStatCard(1, null,
-                        'GLOBAL POSITION', false),
-                  ],
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 15,
-              ),
-              Container(
-                height: 330,
-                child: Column(
-                  children: [
-                    _buildStatCard(
-                        userInfo.totalPoints, null, 'TOTAL POINTS', false),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    _buildStatCard(userInfo.leaguesWon,
-                        0, 'LEAGUE WINS', true),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    _buildStatCard(
-                        userInfo.numPredictions, null, 'PREDICTIONS', false),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'BADGES',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-              ),
-              const SizedBox(height: 5),
-              Divider(
-                color: Colors.white,
-                thickness: 1,
-              ),
-            ],
-          ),
+              );
+            }
+          },
         ),
       ],
     );
@@ -174,9 +296,15 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
     bool hasPercentage,
   ) {
     int percentage = 0;
-    if (hasPercentage) {
-      percentage = (stat * 100 / total!).truncate();
+    try {
+      if (hasPercentage) {
+        percentage = (stat * 100 / total!).truncate();
+      }
+    } catch (e) {
+      percentage = -1;
+      print(e);
     }
+
     return Container(
       width: 155,
       height: 100,
@@ -214,7 +342,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                 child: const SizedBox(width: 10),
               ),
               Visibility(
-                visible: hasPercentage,
+                visible: hasPercentage && percentage != -1,
                 child: Text(
                   '($percentage %)',
                   style: const TextStyle(

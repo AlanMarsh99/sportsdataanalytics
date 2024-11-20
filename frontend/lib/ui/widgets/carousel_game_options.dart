@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/game_leaderboard_screen.dart';
 import 'package:frontend/ui/screens/game/game_leagues_screen.dart';
 import 'package:frontend/ui/screens/game/game_myStats_screen.dart';
@@ -117,8 +118,22 @@ class _F1CarouselState extends State<F1Carousel> {
                       padding: const EdgeInsets.only(top: 10.0),
                       child: CarouselSlider(
                         carouselController: carouselController,
-                        options: CarouselOptions(
+                        options: Responsive.isMobile(context) ? CarouselOptions(
                           viewportFraction: 0.4,
+                          height: 45.0,
+                          enableInfiniteScroll: true,
+                          initialPage: _currentIndex,
+                          enlargeCenterPage: true,
+                          scrollDirection: Axis.horizontal,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _currentIndex = index;
+                              _pageController.jumpToPage(index);
+                            });
+                          },
+                        ) : 
+                        CarouselOptions(
+                          viewportFraction: 0.2,
                           height: 45.0,
                           enableInfiniteScroll: true,
                           initialPage: _currentIndex,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user.dart';
+import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/ui/theme.dart';
 
 class GlobalLeaderboardTable extends StatelessWidget {
   const GlobalLeaderboardTable({Key? key, required this.users})
       : super(key: key);
 
-  final List<User> users;
+  final List<UserApp> users;
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +59,8 @@ class GlobalLeaderboardTable extends StatelessWidget {
                       DataCell(Row(
                         children: [
                           Image.asset(
-                            //user.image,
-                            'assets/images/placeholder.png',
+                            'assets/avatars/${users[index].avatar}.png',
                             width: 40,
-                            height: 40,
                           ),
                           const SizedBox(width: 5),
                           Text(

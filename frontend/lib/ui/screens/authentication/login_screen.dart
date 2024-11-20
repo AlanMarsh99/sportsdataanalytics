@@ -320,10 +320,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (auth.status == Status.Authenticated) {
-      await Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const NavigationScreen()),
-      );
+      Navigator.pop(context);
     }
 
     if (auth.status == Status.Unauthenticated) {
