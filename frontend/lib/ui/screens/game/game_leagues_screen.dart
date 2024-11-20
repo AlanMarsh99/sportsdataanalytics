@@ -221,8 +221,9 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: isMobile ? 14 : 16,
+                              fontSize: isMobile ? 13 : 16,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
@@ -270,8 +271,9 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: isMobile ? 14 : 16,
+                              fontSize: isMobile ? 13 : 16,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
