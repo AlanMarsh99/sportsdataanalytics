@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/carousel_game_options.dart';
 
@@ -13,6 +14,7 @@ class GameFirstScreen extends StatefulWidget {
 class _GameFirstScreenState extends State<GameFirstScreen> {
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -36,11 +38,11 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
                       color: Colors.white),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: isMobile ? 10 : 16),
               //Image
               Container(
                 width: double.infinity,
-                height: 220,
+                height: isMobile ? 220 : 500,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/images/f1car.jpg'),
@@ -69,7 +71,7 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
                   style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: isMobile ? 15 : 30),
               Align(
                 alignment: Alignment.center,
                 child: _buildTutorialButton(),
