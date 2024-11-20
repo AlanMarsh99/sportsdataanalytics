@@ -119,7 +119,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     return Container(
       width: double.infinity,
       height: isMobile
-          ? MediaQuery.of(context).size.height * 0.5
+          ? MediaQuery.of(context).size.height * 0.6
           : MediaQuery.of(context).size.height * 0.6,
       decoration: BoxDecoration(
         color: primary,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/ranking_league_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
@@ -40,6 +41,7 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
       child: Column(
@@ -53,14 +55,14 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
           Expanded(
               child: Padding(
             padding: const EdgeInsets.only(top: 16.0),
-            child: _leaguesContainer(),
+            child: _leaguesContainer(isMobile),
           )),
         ],
       ),
     );
   }
 
-  Widget _leaguesContainer() {
+  Widget _leaguesContainer(bool isMobile) {
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
 
@@ -158,7 +160,7 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                     color: Colors.black,
                                   ),
                                 ),
-                                SizedBox(width: 30),
+                                const SizedBox(width: 30),
                                 const Icon(
                                   Icons.chevron_right,
                                   color: secondary,
@@ -177,13 +179,16 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
-                      width: 150,
+                      width: isMobile ? 150 : 200,
                       child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: secondary,
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStateProperty.all<Color>(secondary),
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(35.0),
+                            ),
                           ),
                         ),
                         onPressed: () {
@@ -209,23 +214,30 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                   },
                                 );
                         },
-                        child: const Text(
-                          'CREATE LEAGUE',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.0),
+                          child: Text(
+                            'CREATE LEAGUE',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: isMobile ? 14 : 16,
+                            ),
                           ),
                         ),
                       ),
                     ),
                     Container(
-                      width: 150,
+                      width: isMobile ? 150 : 200,
                       child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: secondary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStateProperty.all<Color>(secondary),
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(35.0),
+                            ),
                           ),
                         ),
                         onPressed: () {
@@ -251,11 +263,15 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                   },
                                 );
                         },
-                        child: const Text(
-                          'JOIN LEAGUE',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.0),
+                          child: Text(
+                            'JOIN LEAGUE',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: isMobile ? 14 : 16,
+                            ),
                           ),
                         ),
                       ),

@@ -215,7 +215,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                                 "Log in or sign up to make predictions and compete with your friends!",
                                 style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: isMobile ? 14 : 18),
+                                    fontSize: isMobile ? 16 : 18),
                               ),
                               SizedBox(
                                 height: isMobile ? 30 : 50,
@@ -224,7 +224,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                    width: isMobile ? 100 : MediaQuery.of(context).size.width * 0.15,
+                                    width: isMobile ? 110 : MediaQuery.of(context).size.width * 0.15,
                                     child: ElevatedButton(
                                       style: ButtonStyle(
                                         backgroundColor:
@@ -262,7 +262,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                                   ),
                                   SizedBox(width: isMobile ? 20 : 50),
                                   Container(
-                                    width: isMobile ? 100 : MediaQuery.of(context).size.width * 0.15,
+                                    width: isMobile ? 110 : MediaQuery.of(context).size.width * 0.15,
                                     child: ElevatedButton(
                                       style: ButtonStyle(
                                         backgroundColor:
