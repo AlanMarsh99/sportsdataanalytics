@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/core/shared/validators.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/theme.dart';
@@ -36,89 +37,90 @@ class _SignUpScreenState extends State<SignUpScreen> {
     isMobile = Responsive.isMobile(context);
 
     return Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [darkGradient, lightGradient],
-          ),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [darkGradient, lightGradient],
         ),
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: 40, vertical: isMobile ? 40 : 80),
-            child: Consumer<AuthService>(
-              builder: (context, auth, child) {
-                return Form(
-                  key: _formKey,
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Image.asset('assets/logo/logo-detail.png',
-                              width: isMobile ? 150 : 200, fit: BoxFit.cover),
-                          const SizedBox(
-                            height: 30,
-                          ),
-                          Row(
-                            mainAxisAlignment: isMobile
-                                ? MainAxisAlignment.start
-                                : MainAxisAlignment.center,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.arrow_back,
-                                  color: Colors.white,
-                                  size: 30.0,
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
+      ),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: 40, vertical: isMobile ? 40 : 80),
+          child: Consumer<AuthService>(
+            builder: (context, auth, child) {
+              return Form(
+                key: _formKey,
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Image.asset('assets/logo/logo-detail.png',
+                            width: isMobile ? 150 : 200, fit: BoxFit.cover),
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        Row(
+                          mainAxisAlignment: isMobile
+                              ? MainAxisAlignment.start
+                              : MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 30.0,
                               ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Create an account',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'OpenSans',
-                                  fontSize: 30.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            const SizedBox(width: 10),
+                            const Text(
+                              'Create an account',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'OpenSans',
+                                fontSize: 30.0,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 30),
-                          _buildEmailTF(),
-                          const SizedBox(
-                            height: 30.0,
-                          ),
-                          _buildUsernameTF(),
-                          const SizedBox(
-                            height: 30.0,
-                          ),
-                          _buildPasswordTF(),
-                          const SizedBox(
-                            height: 30.0,
-                          ),
-                          _buildRepeatPasswordTF(),
-                          SizedBox(
-                            height: isMobile ? 25 : 50,
-                          ),
-                          auth.status == Status.Authenticating
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : _buildSignUpButton(auth),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                        _buildEmailTF(),
+                        const SizedBox(
+                          height: 30.0,
+                        ),
+                        _buildUsernameTF(),
+                        const SizedBox(
+                          height: 30.0,
+                        ),
+                        _buildPasswordTF(),
+                        const SizedBox(
+                          height: 30.0,
+                        ),
+                        _buildRepeatPasswordTF(),
+                        SizedBox(
+                          height: isMobile ? 25 : 50,
+                        ),
+                        auth.status == Status.Authenticating
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : _buildSignUpButton(auth),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildEmailTF() {
@@ -153,11 +155,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               hintStyle: Globals.kHintTextStyle,
             ),
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter an email';
-              }
-              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-              if (!emailRegex.hasMatch(value)) {
+              if (!Validators.validateEmail(value!)) {
                 return 'Please enter a valid email';
               }
               return null;
@@ -202,6 +200,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a username';
+              }
+              if (!Validators.validateName(value)) {
+                return 'Invalid username. Length min. 4, max. 12 characters';
               }
               return null;
             },
@@ -263,8 +264,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               if (value.length < 6) {
                 return 'Password must be at least 6 characters long';
               }
-              if (!RegExp(r'[A-Za-z]').hasMatch(value) ||
-                  !RegExp(r'[0-9]').hasMatch(value)) {
+              if (!Validators.isAlphanumeric(value)) {
                 return 'Password must contain both letters and numbers';
               }
               return null;

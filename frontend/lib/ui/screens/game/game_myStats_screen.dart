@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/user.dart';
+import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
@@ -24,15 +24,16 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
     super.dispose();
   }
 
-  User userInfo = User(
-    id: 1,
+  UserApp userInfo = UserApp(
+    id: '1',
+    email: 'brendan@test.com',
     username: 'brendan',
     totalPoints: 523,
-    avatarPicture: 'assets/images/placeholder.png',
-    numPredictions: 20,
-    globalPosition: 12,
-    leaguesFinished: 6,
+    avatar: 'assets/images/placeholder.png',
+    level: 1,
     leaguesWon: 2,
+    leaguesFinished: 5,
+    numPredictions: 15
   );
 
   @override
@@ -107,7 +108,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                         ],
                       ),
                     ),
-                    _buildStatCard(userInfo.globalPosition, null,
+                    _buildStatCard(1, null,
                         'GLOBAL POSITION', false),
                   ],
                 ),
@@ -125,7 +126,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                       height: 15,
                     ),
                     _buildStatCard(userInfo.leaguesWon,
-                        userInfo.leaguesFinished, 'LEAGUE WINS', true),
+                        0, 'LEAGUE WINS', true),
                     SizedBox(
                       height: 15,
                     ),

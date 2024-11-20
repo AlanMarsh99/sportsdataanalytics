@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/core/shared/validators.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/authentication/forgot_password_screen.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
@@ -31,21 +32,23 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     isMobile = Responsive.isMobile(context);
     return Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [darkGradient, lightGradient],
-          ),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [darkGradient, lightGradient],
         ),
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: 40, vertical: isMobile ? 40 : 80),
-            child: Consumer<AuthService>(
-              builder: (context, auth, child) {
-                return SingleChildScrollView(
+      ),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: 40, vertical: isMobile ? 40 : 80),
+          child: Consumer<AuthService>(
+            builder: (context, auth, child) {
+              return Form(
+                key: _formKey,
+                child: SingleChildScrollView(
                   child: Column(
                     children: [
                       Image.asset('assets/logo/logo-detail.png',
@@ -66,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.pop(context);
                             },
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           const Text(
                             'Welcome back',
                             style: TextStyle(
@@ -101,8 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white,
                             )
                           : _buildLogInButton(auth),
-                      //const Spacer(),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Row(
@@ -139,11 +141,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       )
                     ],
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildEmailTF() {
@@ -160,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
           width: isMobile ? double.infinity : 500,
-          child: TextField(
+          child: TextFormField(
             controller: _emailController,
             cursorColor: Colors.white,
             style: const TextStyle(
@@ -177,6 +181,12 @@ class _LoginScreenState extends State<LoginScreen> {
               hintText: 'Enter your email',
               hintStyle: Globals.kHintTextStyle,
             ),
+            validator: (value) {
+              if (!Validators.validateEmail(value!)) {
+                return 'Please enter a valid email';
+              }
+              return null;
+            },
           ),
         ),
       ],
@@ -223,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
             alignment: Alignment.centerLeft,
             decoration: Globals.kBoxDecorationStyle,
             height: 60.0,
-            child: TextField(
+            child: TextFormField(
               controller: _passwordController,
               cursorColor: Colors.white,
               obscureText: !_passwordVisible,
@@ -254,6 +264,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 hintText: 'Enter your password',
                 hintStyle: Globals.kHintTextStyle,
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a password';
+                }
+                return null;
+              },
             ),
           ),
         ],
@@ -289,7 +305,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         onPressed: () async {
-          signIn(auth);
+          if (_formKey.currentState!.validate()) {
+            signIn(auth);
+          }
         },
       ),
     );
