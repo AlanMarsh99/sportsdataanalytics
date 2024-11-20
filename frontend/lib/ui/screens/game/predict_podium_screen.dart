@@ -290,7 +290,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PredictWinnerScreen(),
+                      builder: (context) => const PredictWinnerScreen(),
                     ),
                   );
                 },
@@ -326,25 +326,25 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
             Container(
               width: MediaQuery.of(context).size.width * 0.25,
               height: 75,
-              padding: EdgeInsets.all(4),
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: driver == null ? Colors.transparent : Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.white),
               ),
               child: driver == null
-                  ? Center(
+                  ? const Center(
                       child: Text(
                         "Make your prediction",
                         style:
-                            const TextStyle(color: Colors.white, fontSize: 12),
+                            TextStyle(color: Colors.white, fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
                     )
                   : Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           driver.name,
                           style: const TextStyle(

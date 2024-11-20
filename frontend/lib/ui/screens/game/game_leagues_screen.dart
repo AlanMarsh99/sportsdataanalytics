@@ -63,179 +63,207 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
   Widget _leaguesContainer() {
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
-      padding: const EdgeInsets.all(16),
+
       decoration: BoxDecoration(
         color: primary,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
+        alignment: AlignmentDirectional.center,
         children: [
-          const SizedBox(height: 10),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "LEAGUE NAME",
-                style: TextStyle(
-                  color: Colors.white54,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(right: 48),
-                child: Text(
-                  "MEMBERS",
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+          // Background Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.asset(
+              'assets/images/image2_f1.jpg',
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
           ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: leagues.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RankingLeagueScreen(
-                          leagueId: leagues[index]["leagueId"].toString(),
-                          leagueName: leagues[index]["name"],
-                        ),
+          // Semi-transparent overlay to make text readable
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.black.withOpacity(0.5),
+            ),
+          ),
+          // Content overlaid on top of the image
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 10),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "LEAGUE NAME",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
-                    );
-                  },
-                  child: Card(
-                    color: Colors.white,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: ListTile(
-                      title: Text(
-                        leagues[index]["name"],
-                        style: const TextStyle(
-                          color: Colors.black,
+                    Padding(
+                      padding: EdgeInsets.only(right: 48),
+                      child: Text(
+                        "MEMBERS",
+                        style: TextStyle(
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            leagues[index]["members"].toString(),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: leagues.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RankingLeagueScreen(
+                                leagueId: leagues[index]["leagueId"].toString(),
+                                leagueName: leagues[index]["name"],
+                              ),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          color: Colors.white,
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListTile(
+                            title: Text(
+                              leagues[index]["name"],
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  leagues[index]["members"].toString(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(width: 30),
+                                const Icon(
+                                  Icons.chevron_right,
+                                  color: secondary,
+                                  size: 28,
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(width: 30),
-                          const Icon(
-                            Icons.chevron_right,
-                            color: secondary,
-                            size: 28,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      width: 150,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: secondary,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ],
+                        ),
+                        onPressed: () {
+                          Provider.of<AuthService>(context, listen: false)
+                                      .status ==
+                                  Status.Authenticated
+                              ? showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return LogInDialog();
+                                  },
+                                )
+                              /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PredictPodiumScreen(),
+                        ),
+                      )*/
+                              : showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return LogInDialog();
+                                  },
+                                );
+                        },
+                        child: const Text(
+                          'CREATE LEAGUE',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                    Container(
+                      width: 150,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: secondary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          Provider.of<AuthService>(context, listen: false)
+                                      .status ==
+                                  Status.Authenticated
+                              ? showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return LogInDialog();
+                                  },
+                                )
+                              /*Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PredictPodiumScreen(),
+                        ),
+                      )*/
+                              : showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return LogInDialog();
+                                  },
+                                );
+                        },
+                        child: const Text(
+                          'JOIN LEAGUE',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                width: 150,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: secondary,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    Provider.of<AuthService>(context, listen: false).status ==
-                            Status.Authenticated
-                        ? showDialog(
-                            context: context,
-                            builder: (context) {
-                              return LogInDialog();
-                            },
-                          )
-                        /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PredictPodiumScreen(),
-                        ),
-                      )*/
-                        : showDialog(
-                            context: context,
-                            builder: (context) {
-                              return LogInDialog();
-                            },
-                          );
-                  },
-                  child: const Text(
-                    'CREATE LEAGUE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                width: 150,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: secondary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    Provider.of<AuthService>(context, listen: false).status ==
-                            Status.Authenticated
-                        ? showDialog(
-                            context: context,
-                            builder: (context) {
-                              return LogInDialog();
-                            },
-                          )
-                        /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PredictPodiumScreen(),
-                        ),
-                      )*/
-                        : showDialog(
-                            context: context,
-                            builder: (context) {
-                              return LogInDialog();
-                            },
-                          );
-                  },
-                  child: const Text(
-                    'JOIN LEAGUE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              )
-            ],
           ),
         ],
       ),

@@ -384,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Map<String, dynamic> lastRaceResults, bool isMobile) {
     return Container(
       width: double.infinity,
-      height: isMobile ? 480 : 482,
+      height: isMobile ? 520 : 487,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primary,
@@ -395,80 +395,80 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "LAST RACE RESULTS",
-                  style: TextStyle(
-                      fontSize: isMobile ? 14 : 18,
-                      fontWeight: FontWeight.bold),
-                ),
-                MouseRegion(
-                  onEnter: (_) => setState(() {
-                    buttonColor = Colors.redAccent;
-                  }),
-                  onExit: (_) => setState(() {
-                    buttonColor = Colors.white;
-                  }),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment:
-                        CrossAxisAlignment.center, // Ensures vertical alignment
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          if (lastRaceInfo != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    RacesDetailScreen(race: lastRaceInfo!),
-                              ),
-                            );
-                          }
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: const Size(0, 0),
-                        ),
-                        child: Text(
-                          "View full results",
-                          style: TextStyle(
-                            fontSize: isMobile ? 12 : 14,
-                            fontWeight: FontWeight.bold,
-                            color: buttonColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () {
-                          if (lastRaceInfo != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    RacesDetailScreen(race: lastRaceInfo!),
-                              ),
-                            );
-                          }
-                        },
-                        icon: Icon(
-                          Icons.arrow_forward_ios,
-                          color: buttonColor,
-                          size: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "LAST RACE RESULTS",
+                style: TextStyle(
+                    fontSize: isMobile ? 14 : 18, fontWeight: FontWeight.bold),
+              ),
             ),
-            const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.centerRight,
+              child: MouseRegion(
+                onEnter: (_) => setState(() {
+                  buttonColor = Colors.redAccent;
+                }),
+                onExit: (_) => setState(() {
+                  buttonColor = Colors.white;
+                }),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.center, // Ensures vertical alignment
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        if (lastRaceInfo != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  RacesDetailScreen(race: lastRaceInfo!),
+                            ),
+                          );
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 0),
+                      ),
+                      child: Text(
+                        "View full results",
+                        style: TextStyle(
+                          fontSize: isMobile ? 12 : 14,
+                          fontWeight: FontWeight.bold,
+                          color: buttonColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
+                        if (lastRaceInfo != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  RacesDetailScreen(race: lastRaceInfo!),
+                            ),
+                          );
+                        }
+                      },
+                      icon: Icon(
+                        Icons.arrow_forward_ios,
+                        color: buttonColor,
+                        size: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -507,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String formattedDate = DateFormat('EEEE MMMM d').format(raceDate);
     return Container(
       width: double.infinity,
-      height: isMobile ? 350 : 482,
+      height: isMobile ? 350 : 487,
       decoration: BoxDecoration(
         color: primary,
         borderRadius: BorderRadius.circular(20),
@@ -543,6 +543,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   decoration: BoxDecoration(
+                    color: primary.withAlpha(100),
                     border: Border.all(
                       color: secondary,
                       width: 2,
@@ -595,25 +596,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     _buildTimeColumn(
                         remainingTime.inDays.toString().padLeft(2, '0'),
-                        'DAYS', isMobile),
+                        'DAYS',
+                        isMobile),
                     _buildTimeColumn(
                         remainingTime.inHours
                             .remainder(24)
                             .toString()
                             .padLeft(2, '0'),
-                        'HRS', isMobile),
+                        'HRS',
+                        isMobile),
                     _buildTimeColumn(
                         remainingTime.inMinutes
                             .remainder(60)
                             .toString()
                             .padLeft(2, '0'),
-                        'MINS', isMobile),
+                        'MINS',
+                        isMobile),
                     _buildTimeColumn(
                         remainingTime.inSeconds
                             .remainder(60)
                             .toString()
                             .padLeft(2, '0'),
-                        'SECS', isMobile),
+                        'SECS',
+                        isMobile),
                   ],
                 ),
                 SizedBox(height: isMobile ? 25 : 35),
@@ -683,7 +688,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Color.fromARGB(213, 255, 255, 255),
+            color: const Color.fromARGB(213, 255, 255, 255),
             fontSize: isMobile ? 12 : 16,
           ),
         ),
@@ -820,9 +825,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   )
-                : const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
+                : Container(
+                    height: 250,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
           ],
@@ -958,9 +966,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   )
-                : const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
+                : Container(
+                    height: 250,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
           ],

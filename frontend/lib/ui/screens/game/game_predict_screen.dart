@@ -132,7 +132,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Image.asset(
-              'assets/images/f1car.jpg',
+              'assets/images/image4_f1.jpg',
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
@@ -156,7 +156,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     decoration: BoxDecoration(
-                      //color: secondary,
+                    color: primary.withAlpha(100),
                       border: Border.all(
                         color: secondary,
                         width: 2,
