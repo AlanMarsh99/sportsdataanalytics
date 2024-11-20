@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/core/shared/validators.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
@@ -38,60 +40,55 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
             child: Consumer<AuthService>(
               builder: (context, auth, child) {
-                return Column(
-                  children: [
-                    Image.asset('assets/logo/logo-detail.png',
-                        width: isMobile ? 150 : 200, fit: BoxFit.cover),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                    Row(
-                      mainAxisAlignment: isMobile
-                          ? MainAxisAlignment.start
-                          : MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 30.0,
+                return Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Image.asset('assets/logo/logo-detail.png',
+                          width: isMobile ? 150 : 200, fit: BoxFit.cover),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Row(
+                        mainAxisAlignment: isMobile
+                            ? MainAxisAlignment.start
+                            : MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 30.0,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                           ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'Forgot password?',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'OpenSans',
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Forgot password?',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'OpenSans',
+                              fontSize: 30.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30.0),
-                    _buildEmailTF(),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    /* auth.status == Status.Authenticating
-                    ? const CircularProgressIndicator(
-                        color: secondary,
-                      )
-                    : */
-                    _buildSendButton(auth),
-                  ],
+                        ],
+                      ),
+                      const SizedBox(height: 30.0),
+                      _buildEmailTF(),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      _buildSendButton(auth),
+                    ],
+                  ),
                 );
               },
             ),
           ),
-        )
-        //}),
-
-        );
+        ));
   }
 
   Widget _buildEmailTF() {
@@ -108,7 +105,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
           width: isMobile ? double.infinity : 500,
-          child: TextField(
+          child: TextFormField(
             controller: _emailController,
             cursorColor: Colors.white,
             style: const TextStyle(
@@ -125,6 +122,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               hintText: 'Enter your email',
               hintStyle: Globals.kHintTextStyle,
             ),
+            validator: (value) {
+              if (!Validators.validateEmail(value!)) {
+                return 'Please enter a valid email';
+              }
+              return null;
+            },
           ),
         ),
       ],
@@ -157,7 +160,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
         onPressed: () async {
-          sendInstructions(auth);
+          if (_formKey.currentState!.validate()) {
+            sendInstructions(auth);
+          }
         },
       ),
     );
