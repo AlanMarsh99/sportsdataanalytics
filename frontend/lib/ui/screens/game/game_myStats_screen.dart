@@ -126,7 +126,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                       height: 15,
                     ),
                     _buildStatCard(userInfo.leaguesWon,
-                        0, 'LEAGUE WINS', true),
+                        userInfo.leaguesFinished, 'LEAGUE WINS', true),
                     SizedBox(
                       height: 15,
                     ),
