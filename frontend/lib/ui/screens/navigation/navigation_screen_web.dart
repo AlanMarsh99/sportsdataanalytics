@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/core/providers/user_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/end_drawer.dart';
 import 'package:provider/provider.dart';
 
 class NavigationScreenWeb extends StatefulWidget {
@@ -49,15 +51,15 @@ class _NavigationScreenWebState extends State<NavigationScreenWeb>
         actions: [
           Consumer<AuthService>(
             builder: (context, auth, child) {
-              if (auth.status == Status.Authenticated) {
+              if (auth.status == Status.Authenticated && auth.userApp != null) {
                 return InkWell(
                   onTap: () {
                     Scaffold.of(context).openEndDrawer();
                   },
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     backgroundColor: Colors.white,
-                    backgroundImage:
-                        AssetImage('assets/images/placeholder.png'),
+                    backgroundImage: AssetImage(
+                        'assets/avatars/${auth.userApp!.avatar}.png'),
                   ),
                 );
               } else {
@@ -124,6 +126,7 @@ class _NavigationScreenWebState extends State<NavigationScreenWeb>
           ),
         ],
       ),
+      endDrawer: const EndDrawer(),
     );
   }
 }

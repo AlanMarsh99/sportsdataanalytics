@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/providers/user_provider.dart';
 import 'package:frontend/core/services/firestore_service.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/widgets/dialogs/warning_error_dialog.dart';
+import 'package:provider/provider.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
@@ -18,7 +20,7 @@ class AuthService extends ChangeNotifier {
         user = newUser;
 
         userApp = await Document<UserApp>(
-          path: 'users/${user.uid}',
+          path: 'users/${user!.uid}',
         ).getData();
       }
       notifyListeners();
@@ -29,8 +31,8 @@ class AuthService extends ChangeNotifier {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   Status _status = Status.Uninitialized;
-  late User user;
-  late UserApp userApp;
+  User? user;
+  UserApp? userApp;
   Status get status => _status;
 
   /// Attempts to sign in Firebase Auth
@@ -77,11 +79,20 @@ class AuthService extends ChangeNotifier {
       // Retrieve the user ID (UID)
       String uid = userCredential.user!.uid;
 
+      UserApp newUser = UserApp(
+        id: uid,
+        username: username,
+        email: email,
+        totalPoints: 0,
+        level: 1,
+        avatar: 'default',
+        numPredictions: 0,
+        leaguesFinished: 0,
+        leaguesWon: 0,
+      );
+
       // Store the user's data in Firestore under a 'users' collection with the UID as the document ID
-      await _firestore.collection('users').doc(uid).set({
-        'username': username,
-        'email': email,
-      });
+      await _firestore.collection('users').doc(uid).set(newUser.toMap());
 
       print("User signed up and data added to Firestore successfully!");
     } on FirebaseAuthException catch (e) {
@@ -153,10 +164,10 @@ class AuthService extends ChangeNotifier {
     bool passwordChanged = false;
 
     var credential = EmailAuthProvider.credential(
-        email: user.email!, password: currentPassword);
+        email: user!.email!, password: currentPassword);
     if (credential != null) {
       if (await reauthenticate(credential)) {
-        await user.updatePassword(newPassword);
+        await user!.updatePassword(newPassword);
         await showDialog(
           context: context,
           builder: (context) {

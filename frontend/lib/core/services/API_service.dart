@@ -15,8 +15,8 @@ class APIService {
           await http.get(Uri.parse('$baseUrl/home/upcoming_race/'));
 
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         // Log the error details if the status is not 200
@@ -37,8 +37,8 @@ class APIService {
       final response =
           await http.get(Uri.parse('$baseUrl/home/last_race_results/'));
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load last race results');
@@ -59,8 +59,8 @@ class APIService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return json.decode(response.body);
       } else {
         print('Failed to load drivers standings');
@@ -81,8 +81,8 @@ class APIService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return json.decode(response.body);
       } else {
         print('Failed to load constructors standings');
@@ -117,8 +117,8 @@ class APIService {
     try {
       final response = await http.get(Uri.parse('$baseUrl/races/$year/'));
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load races for year $year');
@@ -138,8 +138,8 @@ class APIService {
       final response = await http.get(Uri.parse('$baseUrl/race/$year/$round/'));
 
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         // Log the error details if the status is not 200
@@ -160,8 +160,8 @@ class APIService {
       final response =
           await http.get(Uri.parse('$baseUrl/race/$year/$round/results/'));
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load results for race $year round $round');
@@ -181,8 +181,8 @@ class APIService {
       final response =
           await http.get(Uri.parse('$baseUrl/race/$year/$round/pitstops/'));
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load pit stop data');
@@ -203,8 +203,8 @@ class APIService {
     try {
       final response = await http.get(Uri.parse('$baseUrl/drivers/$year/'));
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load drivers for year $year');
@@ -224,8 +224,8 @@ class APIService {
       final response =
           await http.get(Uri.parse('$baseUrl/driver/$driverId/$year/stats/'));
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load stats for driver $driverId');
@@ -247,8 +247,8 @@ class APIService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load race stats for driver $driverId');
@@ -272,8 +272,8 @@ class APIService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load teams for the season $year');
@@ -293,8 +293,8 @@ class APIService {
       final response =
           await http.get(Uri.parse('$baseUrl/team/$teamId/$year/stats/'));
       if (response.statusCode == 200) {
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        //print('Response status: ${response.statusCode}');
+        //print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load team stats for team $teamId');
