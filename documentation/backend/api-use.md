@@ -520,7 +520,6 @@ When you run the Flask development server using the command `python run.py`, you
       "age": 26,
       "nationality": "Dutch",
       "driver_number": "33",
-      "place_of_birth": "Hasselt, Belgium"
     },
     "all_time_stats": {
       "total_races": 150,
