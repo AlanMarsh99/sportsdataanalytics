@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/game_leaderboard_screen.dart';
 import 'package:frontend/ui/screens/game/game_leagues_screen.dart';
@@ -6,38 +7,50 @@ import 'package:frontend/ui/screens/game/game_myStats_screen.dart';
 import 'package:frontend/ui/screens/game/game_predict_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:frontend/ui/widgets/app_bar.dart';
+import 'package:frontend/ui/widgets/drawer.dart';
+import 'package:frontend/ui/widgets/end_drawer.dart';
+import 'package:provider/provider.dart';
 
 class F1Carousel extends StatefulWidget {
   @override
   _F1CarouselState createState() => _F1CarouselState();
 }
 
-class _F1CarouselState extends State<F1Carousel> {
+class _F1CarouselState extends State<F1Carousel> with TickerProviderStateMixin {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentIndex = 0;
   List<String> _tabs = ["Predict", "Leaderboard", "Leagues", "My Stats"];
-
+  late AnimationController _controller;
+  late Animation<double> _myAnimation;
+  bool _flag = true;
+  late List<NavigationRailDestination> _destinations;
   final CarouselSliderController carouselController =
       CarouselSliderController();
-
   double _rotationAngle = 0.0;
   bool _hasChangedScreen = false;
   final double _delta = 0.5;
 
-  void _rotateWheel(double delta) {
-    setState(() {
-      _rotationAngle += delta;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 200),
+    );
+
+    _myAnimation = CurvedAnimation(curve: Curves.linear, parent: _controller);
     // Callback to sincronize UI after everything is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _pageController.jumpToPage(_currentIndex);
       });
+    });
+  }
+
+  void _rotateWheel(double delta) {
+    setState(() {
+      _rotationAngle += delta;
     });
   }
 
@@ -77,6 +90,9 @@ class _F1CarouselState extends State<F1Carousel> {
 
   @override
   Widget build(BuildContext context) {
+    final nav = Provider.of<NavigationProvider>(context);
+    _destinations = nav.destinations;
+    bool isMobile = Responsive.isMobile(context);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -85,97 +101,247 @@ class _F1CarouselState extends State<F1Carousel> {
           colors: [darkGradient, lightGradient],
         ),
       ),
-      child: Scaffold(
-        body: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                },
-                itemCount: _tabs.length,
-                itemBuilder: (context, index) {
-                  return _buildPage(_tabs[index]);
-                },
+      child: isMobile
+          ? Scaffold(
+              appBar: MyAppBar(
+                nav: nav,
+                isMobile: isMobile,
               ),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              alignment: Alignment.center,
-              color: primary,
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 5.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+              drawer: MyDrawer(
+                nav: nav,
+                isMobile: isMobile,
+              ),
+              endDrawer: const EndDrawer(),
+              body: Column(
                 children: [
-                  const Icon(Icons.arrow_back_ios,
-                      color: Colors.white, size: 18),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: CarouselSlider(
-                        carouselController: carouselController,
-                        options: Responsive.isMobile(context) ? CarouselOptions(
-                          viewportFraction: 0.4,
-                          height: 45.0,
-                          enableInfiniteScroll: true,
-                          initialPage: _currentIndex,
-                          enlargeCenterPage: true,
-                          scrollDirection: Axis.horizontal,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                              _pageController.jumpToPage(index);
-                            });
-                          },
-                        ) : 
-                        CarouselOptions(
-                          viewportFraction: 0.2,
-                          height: 45.0,
-                          enableInfiniteScroll: true,
-                          initialPage: _currentIndex,
-                          enlargeCenterPage: true,
-                          scrollDirection: Axis.horizontal,
-                          onPageChanged: (index, reason) {
-                            setState(() {
-                              _currentIndex = index;
-                              _pageController.jumpToPage(index);
-                            });
-                          },
-                        ),
-                        items: _buildCarouselItems(),
-                      ),
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                      itemCount: _tabs.length,
+                      itemBuilder: (context, index) {
+                        return _buildPage(_tabs[index]);
+                      },
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios,
-                      color: Colors.white, size: 18),
+                  const SizedBox(height: 20),
+                  Container(
+                    alignment: Alignment.center,
+                    color: primary,
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.arrow_back_ios,
+                            color: Colors.white, size: 18),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: CarouselSlider(
+                              carouselController: carouselController,
+                              options: Responsive.isMobile(context)
+                                  ? CarouselOptions(
+                                      viewportFraction: 0.4,
+                                      height: 45.0,
+                                      enableInfiniteScroll: true,
+                                      initialPage: _currentIndex,
+                                      enlargeCenterPage: true,
+                                      scrollDirection: Axis.horizontal,
+                                      onPageChanged: (index, reason) {
+                                        setState(() {
+                                          _currentIndex = index;
+                                          _pageController.jumpToPage(index);
+                                        });
+                                      },
+                                    )
+                                  : CarouselOptions(
+                                      viewportFraction: 0.2,
+                                      height: 45.0,
+                                      enableInfiniteScroll: true,
+                                      initialPage: _currentIndex,
+                                      enlargeCenterPage: true,
+                                      scrollDirection: Axis.horizontal,
+                                      onPageChanged: (index, reason) {
+                                        setState(() {
+                                          _currentIndex = index;
+                                          _pageController.jumpToPage(index);
+                                        });
+                                      },
+                                    ),
+                              items: _buildCarouselItems(),
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios,
+                            color: Colors.white, size: 18),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onPanUpdate: (details) {
+                      if (!_hasChangedScreen) {
+                        _handlePanUpdate(details);
+                      }
+                    },
+                    onPanEnd: (_) {
+                      setState(() {
+                        _rotationAngle = 0.0;
+                        _hasChangedScreen = false;
+                      });
+                    },
+                    child: Transform.rotate(
+                      angle: _rotationAngle,
+                      child: Image.asset('assets/images/wheel.png', width: 200),
+                    ),
+                  )
+                ],
+              ),
+            )
+          : Scaffold(
+              appBar: MyAppBar(
+                nav: nav,
+                isMobile: isMobile,
+              ),
+              endDrawer: const EndDrawer(),
+              body: Row(
+                children: [
+                  NavigationRail(
+                    selectedIconTheme: IconThemeData(color: secondary),
+                    unselectedIconTheme:
+                        IconThemeData(color: Colors.white, opacity: 1),
+                    extended: nav.extended,
+                    selectedIndex: nav.selectedIndex,
+                    destinations: _destinations,
+                    onDestinationSelected: (value) {
+                      nav.updateIndex(value);
+                      Navigator.pop(context);
+                    },
+                    leading: IconButton(
+                      icon: AnimatedIcon(
+                        icon: AnimatedIcons.menu_close,
+                        color: Colors.white,
+                        progress: _myAnimation,
+                      ),
+                      onPressed: () {
+                        if (_flag) {
+                          _controller.forward();
+                        } else {
+                          _controller.reverse();
+                        }
+
+                        _flag = !_flag;
+                        if (nav.extended) {
+                          nav.setExtended(false);
+                        } else {
+                          nav.setExtended(true);
+                        }
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: PageView.builder(
+                            controller: _pageController,
+                            onPageChanged: (index) {
+                              setState(() {
+                                _currentIndex = index;
+                              });
+                            },
+                            itemCount: _tabs.length,
+                            itemBuilder: (context, index) {
+                              return _buildPage(_tabs[index]);
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          alignment: Alignment.center,
+                          color: primary,
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.arrow_back_ios,
+                                  color: Colors.white, size: 18),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 10.0),
+                                  child: CarouselSlider(
+                                    carouselController: carouselController,
+                                    options: Responsive.isMobile(context)
+                                        ? CarouselOptions(
+                                            viewportFraction: 0.4,
+                                            height: 45.0,
+                                            enableInfiniteScroll: true,
+                                            initialPage: _currentIndex,
+                                            enlargeCenterPage: true,
+                                            scrollDirection: Axis.horizontal,
+                                            onPageChanged: (index, reason) {
+                                              setState(() {
+                                                _currentIndex = index;
+                                                _pageController
+                                                    .jumpToPage(index);
+                                              });
+                                            },
+                                          )
+                                        : CarouselOptions(
+                                            viewportFraction: 0.2,
+                                            height: 45.0,
+                                            enableInfiniteScroll: true,
+                                            initialPage: _currentIndex,
+                                            enlargeCenterPage: true,
+                                            scrollDirection: Axis.horizontal,
+                                            onPageChanged: (index, reason) {
+                                              setState(() {
+                                                _currentIndex = index;
+                                                _pageController
+                                                    .jumpToPage(index);
+                                              });
+                                            },
+                                          ),
+                                    items: _buildCarouselItems(),
+                                  ),
+                                ),
+                              ),
+                              const Icon(Icons.arrow_forward_ios,
+                                  color: Colors.white, size: 18),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onPanUpdate: (details) {
+                            if (!_hasChangedScreen) {
+                              _handlePanUpdate(details);
+                            }
+                          },
+                          onPanEnd: (_) {
+                            setState(() {
+                              _rotationAngle = 0.0;
+                              _hasChangedScreen = false;
+                            });
+                          },
+                          child: Transform.rotate(
+                            angle: _rotationAngle,
+                            child: Image.asset('assets/images/wheel.png',
+                                width: 200),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onPanUpdate: (details) {
-                if (!_hasChangedScreen) {
-                  _handlePanUpdate(details);
-                }
-              },
-              onPanEnd: (_) {
-                setState(() {
-                  _rotationAngle = 0.0;
-                  _hasChangedScreen = false;
-                });
-              },
-              child: Transform.rotate(
-                angle: _rotationAngle,
-                child: Image.asset('assets/images/wheel.png', width: 200),
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 
