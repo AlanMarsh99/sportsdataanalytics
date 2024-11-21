@@ -2,6 +2,8 @@ import 'package:frontend/core/shared/globals.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/race_positions.dart';
+import '../models/lap_data.dart';
+
 
 class APIService {
   static String baseUrl = 'https://sportsdataanalytics.onrender.com';
@@ -30,6 +32,28 @@ class APIService {
       rethrow;
     }
   }
+
+  Future<LapDataResponse?> fetchDriverLapData(int year, int round, String driverId) async {
+      final url = Uri.parse('$baseUrl/lap_data/$year/$round/$driverId/');
+
+      try {
+        final response = await http.get(url);
+
+        if (response.statusCode == 200) {
+          final jsonData = jsonDecode(response.body);
+          return LapDataResponse.fromJson(jsonData);
+        } else {
+          // Handle non-200 responses
+          print('Failed to load lap data');
+          print('Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+          return null;
+        }
+      } catch (e) {
+        print('Exception caught: $e');
+        return null;
+      }
+    }
 
   // Fetch last race results
   Future<Map<String, dynamic>> getLastRaceResults() async {
