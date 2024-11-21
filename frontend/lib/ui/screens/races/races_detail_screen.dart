@@ -10,6 +10,8 @@ import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
 import 'package:frontend/ui/widgets/tables/race_results_table.dart';
 import 'package:fl_chart/fl_chart.dart'; // Added for charting
 import 'package:frontend/core/models/race_positions.dart'; // Added for race positions
+import 'package:frontend/core/models/pit_stops.dart';
+import 'package:frontend/ui/widgets/tables/pit_stop_table.dart';
 
 class RacesDetailScreen extends StatefulWidget {
   const RacesDetailScreen({Key? key, required this.race}) : super(key: key);
@@ -27,6 +29,10 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
   late Future<RacePositions?> racePositions;
   bool racePositionsError = false;
 
+  // Added for pit stops
+  late Future<PitStopDataResponse?> pitStopData;
+  bool pitStopError = false;
+
   @override
   void initState() {
     super.initState();
@@ -36,12 +42,15 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
       round = int.parse(widget.race.round.split('/').first);
       year = int.parse(widget.race.date.split('-').first);
       raceResults = APIService().getRaceResults(year, round);
-      // Fetch race positions
       racePositions = APIService().fetchRacePositions(year, round);
+      pitStopData = APIService()
+          .getPitStops(year, round)
+          .then((jsonList) => PitStopDataResponse.fromJson(jsonList));
     } catch (e) {
       print(e);
       resultsError = true;
-      racePositionsError = true; // Added
+      racePositionsError = true;
+      pitStopError = true;
     }
   }
 
@@ -242,9 +251,35 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                                         },
                                       ),
                                 Container(),
-                                Container(),
-                              ],
-                            ),
+                                pitStopError
+                                  ? const Text(
+                                      'Error loading pit stops',
+                                      style: TextStyle(color: Colors.white),
+                                    )
+                                  : FutureBuilder<PitStopDataResponse?>(
+                                      future: pitStopData,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return const Text(
+                                            'Error: Failed to load',
+                                            style: TextStyle(color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasData && snapshot.data != null) {
+                                          return PitStopsTable(data: snapshot.data!);
+                                        } else {
+                                          return const Text(
+                                            'No data available',
+                                            style: TextStyle(color: Colors.white),
+                                          );
+                                        }
+                                      },
+                                    ),
+                            ],
+                          ),
                           ),
                         ],
                       )
@@ -490,7 +525,33 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                                                       },
                                                     ),
                                               Container(),
-                                              Container(),
+                                              pitStopError
+                                                ? const Text(
+                                                    'Error loading pit stops',
+                                                    style: TextStyle(color: Colors.white),
+                                                  )
+                                                : FutureBuilder<PitStopDataResponse?>(
+                                                    future: pitStopData,
+                                                    builder: (context, snapshot) {
+                                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                                        return const Center(
+                                                          child: CircularProgressIndicator(color: Colors.white),
+                                                        );
+                                                      } else if (snapshot.hasError) {
+                                                        return const Text(
+                                                          'Error: Failed to load',
+                                                          style: TextStyle(color: Colors.white),
+                                                        );
+                                                      } else if (snapshot.hasData && snapshot.data != null) {
+                                                        return PitStopsTable(data: snapshot.data!);
+                                                      } else {
+                                                        return const Text(
+                                                          'No data available',
+                                                          style: TextStyle(color: Colors.white),
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
                                             ],
                                           ),
                                         ),
