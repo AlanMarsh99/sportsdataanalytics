@@ -127,7 +127,6 @@ class _DriversScreenState extends State<DriversScreen> {
                                 ),
                               ),
                         const SizedBox(height: 16),
-
                         Row(
                           children: [
                             seasonChanged
@@ -536,17 +535,27 @@ class _DriversScreenState extends State<DriversScreen> {
                             _buildYearDropdown()
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: Text(
+                            selectedDriver!,
+                            style: const TextStyle(
+                                fontSize: 21,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                         Center(
                           child: CircleAvatar(
-                            radius: 100,
+                            radius: 120,
                             backgroundColor: Colors.white,
                             backgroundImage: AssetImage(
                               getDriverImagePath(selectedDriver!),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 20),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -643,18 +652,18 @@ class _DriversScreenState extends State<DriversScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 20),
+                            SizedBox(width: 30),
                             Flexible(
                               flex: 3,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  /*const Text(
                                     'SEASONS',
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
-                                  ),
+                                  ),*/
                                   Container(
                                     child: driverChanged ||
                                             widget.driverId != null
