@@ -514,6 +514,14 @@ When you run the Flask development server using the command `python run.py`, you
 
   ```json
   {
+    "general_info": {
+      "full_name": "Max Verstappen",
+      "date_of_birth": "1997-09-30",
+      "age": 26,
+      "nationality": "Dutch",
+      "driver_number": "33",
+      "place_of_birth": "Hasselt, Belgium"
+    },
     "all_time_stats": {
       "total_races": 150,
       "total_wins": 35,

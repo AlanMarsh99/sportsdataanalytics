@@ -372,10 +372,10 @@ def get_race_positions(year, round):
 
     return jsonify(race_positions)
 
-# Get lap-by-lap positions and lap times for a single driver for a specific race - WORKS
+# Get lap-by-lap positions and lap times for a single driver and list of drivers for a specific race - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/driver/<string:driver_id>/lap_data/', methods=['GET'])
 @cache.cached(timeout=0)
-def get_driver_lap_data(year, round, driver_id):
+def get_driver_lap_data_with_drivers(year, round, driver_id):
     # Fetch lap data for the driver
     limit = 1000  # Ensure we retrieve all laps
     laps_url = f"{BASE_ERGAST_URL}/{year}/{round}/drivers/{driver_id}/laps.json?limit={limit}"
@@ -417,14 +417,31 @@ def get_driver_lap_data(year, round, driver_id):
     else:
         driver_name = driver_id  # Fallback to driver ID if name not found
     
+    # Fetch all drivers participating in the race
+    drivers_url = f"{BASE_ERGAST_URL}/{year}/{round}/drivers.json"
+    drivers_response = requests.get(drivers_url)
+    drivers_list = []
+    if drivers_response.status_code == 200:
+        drivers_data = drivers_response.json()['MRData']['DriverTable']['Drivers']
+        for driver in drivers_data:
+            drivers_list.append({
+                "driver_id": driver['driverId'],
+                "driver_name": f"{driver['givenName']} {driver['familyName']}"
+            })
+    else:
+        return jsonify({"error": "Failed to retrieve list of drivers for this race."}), drivers_response.status_code
+    
     # Prepare the final data
-    driver_lap_data = {
-        "driver_id": driver_id,
-        "driver_name": driver_name,
-        "laps": lap_data_list
+    result = {
+        "drivers": drivers_list,
+        "lap_data": {
+            "driver_id": driver_id,
+            "driver_name": driver_name,
+            "laps": lap_data_list
+        }
     }
     
-    return jsonify(driver_lap_data)
+    return jsonify(result)
 
 ## RACE SCREEN VIEWS
 
@@ -875,8 +892,12 @@ def get_driver_stats(driver_id, year):
     # Append current season result to season_results
     season_results.append(current_season_result)
 
+    # Fetch general information about the driver
+    general_info = fetch_driver_general_info(driver_id)
+
     # Combine all stats for JSON response
     return jsonify({
+        "general_info": general_info,  # New section added
         "all_time_stats": all_time_stats,
         "current_season_stats": current_season_stats,
         "season_results": season_results
