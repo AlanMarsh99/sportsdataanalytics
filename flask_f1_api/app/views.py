@@ -792,6 +792,36 @@ def get_driver_stats(driver_id, year):
                 driver_standing = standings_data[0]['DriverStandings'][0]
                 return driver_standing
         return None
+    
+    def fetch_driver_general_info(driver_id):
+        driver_info_url = f"{BASE_ERGAST_URL}/drivers/{driver_id}.json"
+        response = requests.get(driver_info_url)
+        
+        if response.status_code == 200:
+            driver_data = response.json().get('MRData', {}).get('DriverTable', {}).get('Drivers', [])
+            if driver_data:
+                driver = driver_data[0]  # Extract first driver entry
+                full_name = f"{driver.get('givenName', '')} {driver.get('familyName', '')}"
+                date_of_birth = driver.get('dateOfBirth', '')
+                nationality = driver.get('nationality', '')
+                driver_number = driver.get('permanentNumber', 'N/A')
+
+                # Calculate age from date of birth
+                age = None
+                if date_of_birth:
+                    birth_date = datetime.strptime(date_of_birth, "%Y-%m-%d")
+                    today = datetime.today()
+                    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+
+                return {
+                    "full_name": full_name,
+                    "date_of_birth": date_of_birth,
+                    "age": age,
+                    "nationality": nationality,
+                    "driver_number": driver_number,
+                }
+        return {"error": f"Driver {driver_id} info could not be retrieved"}
+
 
     # Career Stats (all-time)
     career_stats_url = f"{BASE_ERGAST_URL}/drivers/{driver_id}/driverStandings.json?limit=1000"
