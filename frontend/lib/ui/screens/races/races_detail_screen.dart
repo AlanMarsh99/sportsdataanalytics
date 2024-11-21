@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/race.dart';
-import 'package:frontend/core/models/result.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/API_service.dart';
-import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
-import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/app_bar.dart';
 import 'package:frontend/ui/widgets/drawer.dart';
-import 'package:frontend/ui/widgets/tables/driver_seasons_table.dart';
 import 'package:frontend/ui/widgets/tables/race_results_table.dart';
 import 'package:fl_chart/fl_chart.dart'; // Added for charting
 import 'package:provider/provider.dart';
@@ -38,7 +34,6 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
   late Animation<double> _myAnimation;
   bool _flag = true;
   late List<NavigationRailDestination> _destinations;
-  //var user = Provider.of<AuthProvider>(context).userCNC4;
 
   // Added for pit stops
   late Future<PitStopDataResponse?> pitStopData;
@@ -99,12 +94,10 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
               ? Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: SingleChildScrollView(
-                      child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 25),
-                        child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             IconButton(
@@ -127,246 +120,195 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                             ),
                           ],
                         ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Flexible(
-                            flex: 2,
-                            fit: FlexFit.tight,
-                            child: _buildSquareCard(
-                              'Round',
-                              widget.race.round,
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Flexible(
+                              flex: 2,
+                              fit: FlexFit.tight,
+                              child: _buildSquareCard(
+                                'Round',
+                                widget.race.round,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Flexible(
-                            flex: 2,
-                            fit: FlexFit.tight,
-                            child: _buildSquareCard(
-                              'Date',
-                              widget.race.date,
-                              //Globals.toDateFormat(widget.race.date),
+                            const SizedBox(width: 16),
+                            Flexible(
+                              flex: 2,
+                              fit: FlexFit.tight,
+                              child: _buildSquareCard(
+                                'Date',
+                                widget.race.date,
+                                //Globals.toDateFormat(widget.race.date),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          // TabBarView for the content of each tab
-                          Container(
-                            height: 500,
-                            child: TabBarView(
-                              children: [
-                                resultsError
-                                    ? const Text('Error loading results')
-                                    : FutureBuilder<List<dynamic>>(
-                                        future: raceResults,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const Center(
-                                              child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                              ),
-                                            );
-                                          } else if (snapshot.hasError) {
-                                            return const Text(
-                                              'Error: Failed to load',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            );
-                                          } else if (snapshot.hasData) {
-                                            List<dynamic> results =
-                                                snapshot.data!;
-                                            return RaceResultsTable(
-                                              data: results,
-                                            );
-                                          }
-                                          return Container();
-                                        }),
-                                // Lap graphs Tab (Updated)
-                                racePositionsError
-                                    ? const Text('Error loading race positions',
-                                        style: TextStyle(color: Colors.white))
-                                    : FutureBuilder<RacePositions?>(
-                                        future: racePositions,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const Center(
-                                              child: CircularProgressIndicator(
-                                                  color: Colors.white),
-                                            );
-                                          } else if (snapshot.hasError) {
-                                            return const Text(
-                                                'Error: Failed to load',
-                                                style: TextStyle(
-                                                    color: Colors.white));
-                                          } else if (snapshot.hasData &&
-                                              snapshot.data != null) {
-                                            return LapGraphWidget(
-                                                racePositions: snapshot.data!);
-                                          } else {
-                                            return const Text(
-                                                'No data available',
-                                                style: TextStyle(
-                                                    color: Colors.white));
-                                          }
-                                        },
-                                      ),
-                                Container(),
-                                pitStopError
-                                    ? const Text(
-                                        'Error loading pit stops',
-                                        style: TextStyle(color: Colors.white),
-                                      )
-                                    : FutureBuilder<PitStopDataResponse?>(
-                                        future: pitStopData,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return const Center(
-                                              child: CircularProgressIndicator(
-                                                  color: Colors.white),
-                                            );
-                                          } else if (snapshot.hasError) {
-                                            return const Text(
-                                              'Error: Failed to load',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            );
-                                          } else if (snapshot.hasData &&
-                                              snapshot.data != null) {
-                                            return PitStopsTable(
-                                                data: snapshot.data!);
-                                          } else {
-                                            return const Text(
-                                              'No data available',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            );
-                                          }
-                                        },
-                                      ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Flexible(
-                            flex: 2,
-                            fit: FlexFit.tight,
-                            child: _buildSquareCard(
-                                'Circuit', widget.race.circuitName),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 12),
-                      _buildInfoContainer('Winner', widget.race.winner),
-                      const SizedBox(height: 12),
-                      _buildInfoContainer(
-                          'Winning time', widget.race.winningTime),
-                      const SizedBox(height: 12),
-                      _buildInfoContainer(
-                          'Pole position', widget.race.polePosition),
-                      const SizedBox(height: 12),
-                      _buildInfoContainer(
-                          'Fastest lap', widget.race.fastestLap),
-                      const SizedBox(height: 12),
-                      _buildInfoContainer(
-                          'Fastest lap time', widget.race.fastestLapTime),
-                      const SizedBox(height: 12),
-                      _buildInfoContainer(
-                          'Fastest pitstop', widget.race.fastestPitStopDriver),
-                      const SizedBox(height: 12),
-                      _buildInfoContainer('Fastest pitstop time',
-                          widget.race.fastestPitStopTime),
-                      const SizedBox(height: 12),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        child: const TabBar(
-                          labelColor: redAccent,
-                          unselectedLabelColor: Colors.white,
-                          unselectedLabelStyle: TextStyle(
-                            fontWeight: FontWeight.normal,
-                          ),
-                          labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                          indicatorColor: redAccent,
-                          dividerHeight: 0,
-                          isScrollable: true,
-                          tabs: [
-                            Tab(text: "Results"),
-                            Tab(text: "Lap graphs"),
-                            Tab(text: "Lap times"),
-                            Tab(text: "Pit stops"),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      // TabBarView for the content of each tab
-                      Container(
-                        height: 500,
-                        child: TabBarView(
+                        const SizedBox(height: 12),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            resultsError
-                                ? const Text('Error loading results')
-                                : FutureBuilder<List<dynamic>>(
-                                    future: raceResults,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return const Text(
-                                          'Error: Failed to load',
-                                          style: TextStyle(color: Colors.white),
-                                        );
-                                      } else if (snapshot.hasData) {
-                                        List<dynamic> results = snapshot.data!;
-                                        return RaceResultsTable(
-                                          data: results,
-                                        );
-                                      }
-                                      return Container();
-                                    }),
-                            // Lap graphs Tab (Updated)
-                            racePositionsError
-                                ? const Text('Error loading race positions',
-                                    style: TextStyle(color: Colors.white))
-                                : FutureBuilder<RacePositions?>(
-                                    future: racePositions,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                              color: Colors.white),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return const Text(
+                            Flexible(
+                              flex: 2,
+                              fit: FlexFit.tight,
+                              child: _buildSquareCard(
+                                  'Location', widget.race.location),
+                            ),
+                            const SizedBox(width: 16),
+                            Flexible(
+                              flex: 2,
+                              fit: FlexFit.tight,
+                              child: _buildSquareCard(
+                                  'Circuit', widget.race.circuitName),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+                        _buildInfoContainer('Winner', widget.race.winner),
+                        const SizedBox(height: 12),
+                        _buildInfoContainer(
+                            'Winning time', widget.race.winningTime),
+                        const SizedBox(height: 12),
+                        _buildInfoContainer(
+                            'Pole position', widget.race.polePosition),
+                        const SizedBox(height: 12),
+                        _buildInfoContainer(
+                            'Fastest lap', widget.race.fastestLap),
+                        const SizedBox(height: 12),
+                        _buildInfoContainer(
+                            'Fastest lap time', widget.race.fastestLapTime),
+                        const SizedBox(height: 12),
+                        _buildInfoContainer('Fastest pitstop',
+                            widget.race.fastestPitStopDriver),
+                        const SizedBox(height: 12),
+                        _buildInfoContainer('Fastest pitstop time',
+                            widget.race.fastestPitStopTime),
+                        const SizedBox(height: 12),
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: const TabBar(
+                            tabAlignment: TabAlignment.start,
+                            labelColor: redAccent,
+                            unselectedLabelColor: Colors.white,
+                            unselectedLabelStyle: TextStyle(
+                              fontWeight: FontWeight.normal,
+                            ),
+                            labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                            indicatorColor: redAccent,
+                            dividerHeight: 0,
+                            isScrollable: true,
+                            tabs: [
+                              Tab(text: "Results"),
+                              Tab(text: "Lap graphs"),
+                              Tab(text: "Lap times"),
+                              Tab(text: "Pit stops"),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // TabBarView for the content of each tab
+                        Container(
+                          height: 500,
+                          child: TabBarView(
+                            children: [
+                              resultsError
+                                  ? const Text('Error loading results')
+                                  : FutureBuilder<List<dynamic>>(
+                                      future: raceResults,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return const Text(
                                             'Error: Failed to load',
                                             style:
-                                                TextStyle(color: Colors.white));
-                                      } else if (snapshot.hasData &&
-                                          snapshot.data != null) {
-                                        return LapGraphWidget(
-                                            racePositions: snapshot.data!);
-                                      } else {
-                                        return const Text('No data available',
+                                                TextStyle(color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasData) {
+                                          List<dynamic> results =
+                                              snapshot.data!;
+                                          return RaceResultsTable(
+                                            data: results,
+                                          );
+                                        }
+                                        return Container();
+                                      }),
+                              // Lap graphs Tab (Updated)
+                              racePositionsError
+                                  ? const Text('Error loading race positions',
+                                      style: TextStyle(color: Colors.white))
+                                  : FutureBuilder<RacePositions?>(
+                                      future: racePositions,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                                color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return const Text(
+                                              'Error: Failed to load',
+                                              style: TextStyle(
+                                                  color: Colors.white));
+                                        } else if (snapshot.hasData &&
+                                            snapshot.data != null) {
+                                          return LapGraphWidget(
+                                              racePositions: snapshot.data!);
+                                        } else {
+                                          return const Text('No data available',
+                                              style: TextStyle(
+                                                  color: Colors.white));
+                                        }
+                                      },
+                                    ),
+                              Container(),
+                              pitStopError
+                                  ? const Text(
+                                      'Error loading pit stops',
+                                      style: TextStyle(color: Colors.white),
+                                    )
+                                  : FutureBuilder<PitStopDataResponse?>(
+                                      future: pitStopData,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                                color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return const Text(
+                                            'Error: Failed to load',
                                             style:
-                                                TextStyle(color: Colors.white));
-                                      }
-                                    },
-                                  ),
-                            Container(),
-                            Container(),
-                          ],
+                                                TextStyle(color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasData &&
+                                            snapshot.data != null) {
+                                          return PitStopsTable(
+                                              data: snapshot.data!);
+                                        } else {
+                                          return const Text(
+                                            'No data available',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          );
+                                        }
+                                      },
+                                    ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  )),
+                      ],
+                    ),
+                  ),
                 )
               : Row(
                   children: [
@@ -410,31 +352,28 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 25),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.arrow_back,
-                                        color: Colors.white,
-                                        size: 24.0,
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_back,
+                                      color: Colors.white,
+                                      size: 24.0,
                                     ),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      widget.race.raceName,
-                                      style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                  ],
-                                ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    widget.race.raceName,
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                ],
                               ),
                               Row(
                                 mainAxisAlignment:
