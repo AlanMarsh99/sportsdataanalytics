@@ -270,6 +270,21 @@ When you run the Flask development server using the command `python run.py`, you
 
   ```json
   {
+    "drivers": [
+        {
+            "driver_id": "albon",
+            "driver_name": "Alexander Albon"
+        },
+        {
+            "driver_id": "alonso",
+            "driver_name": "Fernando Alonso"
+        },
+        {
+            "driver_id": "bearman",
+            "driver_name": "Oliver Bearman"
+        },
+        // additional drivers...
+    ],
     "driver_id": "max_verstappen",
     "driver_name": "Max Verstappen",
     "laps": [
