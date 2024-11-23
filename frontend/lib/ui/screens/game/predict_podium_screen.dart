@@ -1,152 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/driver.dart';
+import 'package:frontend/core/models/lap_data.dart';
+import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/ui/screens/game/predict_winner_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
 class PredictPodiumScreen extends StatefulWidget {
   const PredictPodiumScreen({
     Key? key,
+    required this.prediction,
+    required this.drivers,
+    required this.raceName,
   }) : super(key: key);
+
+  final Prediction prediction;
+  final List<DriverInfo> drivers;
+  final String raceName;
 
   _PredictPodiumScreenState createState() => _PredictPodiumScreenState();
 }
 
 class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
-  List<Driver?> selectedDrivers = [null, null, null];
-  List<int> disabledDriverIds = [];
+  List<DriverInfo?> selectedDrivers = [null, null, null];
+  List<String> disabledDriverIds = [];
 
-  List<Driver> drivers = [
-    Driver(
-      id: 1,
-      name: "Max Verstappen",
-      totalWins: 50,
-      totalPodiums: 85,
-      totalChampionships: 2,
-      totalPolePositions: 30,
-      seasonWins: 10,
-      seasonPodiums: 15,
-      seasonChampionships: 1,
-      seasonPolePositions: 8,
-      teamId: "Red Bull Racing",
-    ),
-    Driver(
-      id: 2,
-      name: "Lewis Hamilton",
-      totalWins: 103,
-      totalPodiums: 182,
-      totalChampionships: 7,
-      totalPolePositions: 103,
-      seasonWins: 5,
-      seasonPodiums: 10,
-      seasonChampionships: 0,
-      seasonPolePositions: 4,
-      teamId: "Mercedes",
-    ),
-    Driver(
-      id: 3,
-      name: "Charles Leclerc",
-      totalWins: 5,
-      totalPodiums: 23,
-      totalChampionships: 0,
-      totalPolePositions: 10,
-      seasonWins: 2,
-      seasonPodiums: 5,
-      seasonChampionships: 0,
-      seasonPolePositions: 3,
-      teamId: "Ferrari",
-    ),
-    Driver(
-      id: 4,
-      name: "Lando Norris",
-      totalWins: 0,
-      totalPodiums: 9,
-      totalChampionships: 0,
-      totalPolePositions: 0,
-      seasonWins: 0,
-      seasonPodiums: 4,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "McLaren",
-    ),
-    Driver(
-      id: 5,
-      name: "Sergio Perez",
-      totalWins: 6,
-      totalPodiums: 30,
-      totalChampionships: 0,
-      totalPolePositions: 2,
-      seasonWins: 3,
-      seasonPodiums: 6,
-      seasonChampionships: 0,
-      seasonPolePositions: 1,
-      teamId: "Red Bull Racing",
-    ),
-    Driver(
-      id: 6,
-      name: "Fernando Alonso",
-      totalWins: 32,
-      totalPodiums: 100,
-      totalChampionships: 2,
-      totalPolePositions: 22,
-      seasonWins: 0,
-      seasonPodiums: 6,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "Aston Martin",
-    ),
-    Driver(
-      id: 7,
-      name: "Carlos Sainz",
-      totalWins: 2,
-      totalPodiums: 15,
-      totalChampionships: 0,
-      totalPolePositions: 2,
-      seasonWins: 1,
-      seasonPodiums: 3,
-      seasonChampionships: 0,
-      seasonPolePositions: 1,
-      teamId: "Ferrari",
-    ),
-    Driver(
-      id: 8,
-      name: "George Russell",
-      totalWins: 1,
-      totalPodiums: 10,
-      totalChampionships: 0,
-      totalPolePositions: 1,
-      seasonWins: 0,
-      seasonPodiums: 2,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "Mercedes",
-    ),
-    Driver(
-      id: 9,
-      name: "Pierre Gasly",
-      totalWins: 1,
-      totalPodiums: 3,
-      totalChampionships: 0,
-      totalPolePositions: 0,
-      seasonWins: 0,
-      seasonPodiums: 1,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "Alpine",
-    ),
-    Driver(
-      id: 10,
-      name: "Esteban Ocon",
-      totalWins: 1,
-      totalPodiums: 2,
-      totalChampionships: 0,
-      totalPolePositions: 0,
-      seasonWins: 0,
-      seasonPodiums: 1,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "Alpine",
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -219,12 +96,12 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Padding(
-                padding: EdgeInsets.all(5),
+            child: Padding(
+                padding: const EdgeInsets.all(5),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       '1 of 3',
                       style: TextStyle(
                         color: Colors.white,
@@ -233,8 +110,8 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      'Predict your podium for the United States Grand Prix',
-                      style: TextStyle(
+                      'Predict your podium for the ${widget.raceName}',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -263,10 +140,10 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
           const SizedBox(height: 15),
           Expanded(
             child: ListView.builder(
-              itemCount: drivers.length,
+              itemCount: widget.drivers.length,
               itemBuilder: (context, index) {
-                Driver driver = drivers[index];
-                bool isDisabled = disabledDriverIds.contains(driver.id);
+                DriverInfo driver = widget.drivers[index];
+                bool isDisabled = disabledDriverIds.contains(driver.driverId);
                 return _buildDriverTile(driver, isDisabled);
               },
             ),
@@ -287,10 +164,16 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                   ),
                 ),
                 onPressed: () {
+                  Prediction newPrediction = widget.prediction;
+                  newPrediction.podiumIds = selectedDrivers
+                      .map((driver) => driver!.driverId)
+                      .toList();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PredictWinnerScreen(),
+                      builder: (context) => PredictWinnerScreen(prediction: newPrediction,
+                                drivers: widget.drivers,
+                                raceName: widget.raceName,),
                     ),
                   );
                 },
@@ -312,15 +195,15 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
 
   // Podium Container (1st, 2nd, 3rd positions)
   Widget _buildPodiumContainer(int index) {
-    return DragTarget<Driver>(
+    return DragTarget<DriverInfo>(
       onAcceptWithDetails: (driver) {
         setState(() {
           selectedDrivers[index] = driver.data;
-          disabledDriverIds.add(driver.data.id);
+          disabledDriverIds.add(driver.data.driverId);
         });
       },
       builder: (context, candidateData, rejectedData) {
-        Driver? driver = selectedDrivers[index];
+        DriverInfo? driver = selectedDrivers[index];
         return Stack(
           children: [
             Container(
@@ -346,7 +229,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                       children: [
                         const SizedBox(height: 4),
                         Text(
-                          driver.name,
+                          driver.driverName,
                           style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -354,7 +237,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          driver.teamId,
+                          driver.teamName!,
                           style:
                               TextStyle(color: Colors.grey[700], fontSize: 12),
                           textAlign: TextAlign.center,
@@ -370,7 +253,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                   onPressed: () {
                     setState(() {
                       selectedDrivers[index] = null;
-                      disabledDriverIds.remove(driver.id);
+                      disabledDriverIds.remove(driver.driverId);
                     });
                   },
                   icon: const Icon(
@@ -387,8 +270,8 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
   }
 
   // Driver List Tile
-  Widget _buildDriverTile(Driver driver, bool isDisabled) {
-    return LongPressDraggable<Driver>(
+  Widget _buildDriverTile(DriverInfo driver, bool isDisabled) {
+    return LongPressDraggable<DriverInfo>(
       data: driver,
       feedback: Material(
         color: Colors.transparent,
@@ -401,7 +284,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
   }
 
   // Driver Card (UI component for each driver)
-  Widget _buildDriverCard(Driver driver, bool isDisabled) {
+  Widget _buildDriverCard(DriverInfo driver, bool isDisabled) {
     return Opacity(
       opacity: isDisabled ? 0.5 : 1.0,
       child: Card(
@@ -415,19 +298,19 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                     -1) {
                   selectedDrivers[selectedDrivers
                       .indexWhere((element) => element == null)] = driver;
-                  disabledDriverIds.add(driver.id);
+                  disabledDriverIds.add(driver.driverId);
                 }
               });
             }
           },
           leading: const Icon(Icons.flag, color: secondary),
           title: Text(
-            driver.name,
+            driver.driverName,
             style: const TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
-            driver.teamId,
+            driver.teamName!,
             style: TextStyle(color: Colors.grey[600]),
           ),
         ),

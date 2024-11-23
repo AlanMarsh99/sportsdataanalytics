@@ -17,13 +17,15 @@ class LapDataResponse {
 class DriverInfo {
   final String driverId;
   final String driverName;
+  final String? teamName;
 
-  DriverInfo({required this.driverId, required this.driverName});
+  DriverInfo({required this.driverId, required this.driverName, this.teamName});
 
   factory DriverInfo.fromJson(Map<String, dynamic> json) {
     return DriverInfo(
       driverId: json['driver_id'],
       driverName: json['driver_name'],
+      teamName: json['team_name'],
     );
   }
 }

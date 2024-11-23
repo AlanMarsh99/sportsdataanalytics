@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/lap_data.dart';
+import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
@@ -636,21 +638,42 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     onPressed: () {
-                      Provider.of<AuthService>(context, listen: false).status ==
-                              Status.Authenticated
-                          ? Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const PredictPodiumScreen(),
+                     if (Provider.of<AuthService>(context, listen: false)
+                                .status ==
+                            Status.Authenticated) {
+                          Prediction newPrediction = Prediction(
+                            userId:
+                                Provider.of<AuthService>(context, listen: false)
+                                    .user!
+                                    .uid,
+                            round: upcomingRaceInfo!['round'],
+                            year: upcomingRaceInfo['year'],
+                          );
+                          
+                          List<DriverInfo> drivers =
+                              (upcomingRaceInfo['drivers'] as List)
+                                  .map((driverJson) =>
+                                      DriverInfo.fromJson(driverJson))
+                                  .toList();
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PredictPodiumScreen(
+                                prediction: newPrediction,
+                                drivers: drivers,
+                                raceName: upcomingRaceInfo['race_name'],
                               ),
-                            )
-                          : showDialog(
-                              context: context,
-                              builder: (context) {
-                                return LogInDialog();
-                              },
-                            );
+                            ),
+                          );
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return LogInDialog();
+                            },
+                          );
+                        }
                     },
                     child: Padding(
                       padding:

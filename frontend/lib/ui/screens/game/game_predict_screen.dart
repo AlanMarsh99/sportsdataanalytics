@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/lap_data.dart';
+import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/responsive.dart';
@@ -86,7 +88,9 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: Center(
-            child: _countdownContainer(isMobile),
+            child: upcomingRaceInfo == null
+                ? CircularProgressIndicator()
+                : _countdownContainer(upcomingRaceInfo, isMobile),
           ),
         ),
       ],
@@ -115,7 +119,8 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     );
   }
 
-  Widget _countdownContainer(bool isMobile) {
+  Widget _countdownContainer(
+      Map<String, dynamic> upcomingRaceInfo, bool isMobile) {
     return Container(
       width: double.infinity,
       height: isMobile
@@ -156,7 +161,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     decoration: BoxDecoration(
-                    color: primary.withAlpha(100),
+                      color: primary.withAlpha(100),
                       border: Border.all(
                         color: secondary,
                         width: 2,
@@ -166,7 +171,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                     child: Padding(
                       padding: EdgeInsets.all(5),
                       child: Text(
-                        'FORMULA 1 PIRELLI UNITED STATES GRAND PRIX 2024',
+                        'FORMULA 1 ${upcomingRaceInfo['race_name']}',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -249,22 +254,42 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                         ),
                       ),
                       onPressed: () {
-                        Provider.of<AuthService>(context, listen: false)
-                                    .status ==
-                                Status.Authenticated
-                            ? Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const PredictPodiumScreen(),
-                                ),
-                              )
-                            : showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return LogInDialog();
-                                },
-                              );
+                        if (Provider.of<AuthService>(context, listen: false)
+                                .status ==
+                            Status.Authenticated) {
+                          Prediction newPrediction = Prediction(
+                            userId:
+                                Provider.of<AuthService>(context, listen: false)
+                                    .user!
+                                    .uid,
+                            round: upcomingRaceInfo!['round'],
+                            year: upcomingRaceInfo['year'],
+                          );
+
+                          List<DriverInfo> drivers =
+                              (upcomingRaceInfo['drivers'] as List)
+                                  .map((driverJson) =>
+                                      DriverInfo.fromJson(driverJson))
+                                  .toList();
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PredictPodiumScreen(
+                                prediction: newPrediction,
+                                drivers: drivers,
+                                raceName: upcomingRaceInfo['race_name'],
+                              ),
+                            ),
+                          );
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return LogInDialog();
+                            },
+                          );
+                        }
                       },
                       child: Padding(
                         padding:

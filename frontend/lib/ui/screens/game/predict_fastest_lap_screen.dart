@@ -1,152 +1,30 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/driver.dart';
+import 'package:frontend/core/models/lap_data.dart';
+import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/carousel_game_options.dart';
 
 class PredictFastestLapScreen extends StatefulWidget {
   const PredictFastestLapScreen({
     Key? key,
+    required this.prediction,
+    required this.drivers,
+    required this.raceName,
   }) : super(key: key);
 
-  _PredictFastestLapScreenState createState() => _PredictFastestLapScreenState();
+  final Prediction prediction;
+  final List<DriverInfo> drivers;
+  final String raceName;
+
+  _PredictFastestLapScreenState createState() =>
+      _PredictFastestLapScreenState();
 }
 
 class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
-  Driver? selectedDriver;
-  int disabledDriverId = -1;
-
-  List<Driver> drivers = [
-    Driver(
-      id: 1,
-      name: "Max Verstappen",
-      totalWins: 50,
-      totalPodiums: 85,
-      totalChampionships: 2,
-      totalPolePositions: 30,
-      seasonWins: 10,
-      seasonPodiums: 15,
-      seasonChampionships: 1,
-      seasonPolePositions: 8,
-      teamId: "Red Bull Racing",
-    ),
-    Driver(
-      id: 2,
-      name: "Lewis Hamilton",
-      totalWins: 103,
-      totalPodiums: 182,
-      totalChampionships: 7,
-      totalPolePositions: 103,
-      seasonWins: 5,
-      seasonPodiums: 10,
-      seasonChampionships: 0,
-      seasonPolePositions: 4,
-      teamId: "Mercedes",
-    ),
-    Driver(
-      id: 3,
-      name: "Charles Leclerc",
-      totalWins: 5,
-      totalPodiums: 23,
-      totalChampionships: 0,
-      totalPolePositions: 10,
-      seasonWins: 2,
-      seasonPodiums: 5,
-      seasonChampionships: 0,
-      seasonPolePositions: 3,
-      teamId: "Ferrari",
-    ),
-    Driver(
-      id: 4,
-      name: "Lando Norris",
-      totalWins: 0,
-      totalPodiums: 9,
-      totalChampionships: 0,
-      totalPolePositions: 0,
-      seasonWins: 0,
-      seasonPodiums: 4,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "McLaren",
-    ),
-    Driver(
-      id: 5,
-      name: "Sergio Perez",
-      totalWins: 6,
-      totalPodiums: 30,
-      totalChampionships: 0,
-      totalPolePositions: 2,
-      seasonWins: 3,
-      seasonPodiums: 6,
-      seasonChampionships: 0,
-      seasonPolePositions: 1,
-      teamId: "Red Bull Racing",
-    ),
-    Driver(
-      id: 6,
-      name: "Fernando Alonso",
-      totalWins: 32,
-      totalPodiums: 100,
-      totalChampionships: 2,
-      totalPolePositions: 22,
-      seasonWins: 0,
-      seasonPodiums: 6,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "Aston Martin",
-    ),
-    Driver(
-      id: 7,
-      name: "Carlos Sainz",
-      totalWins: 2,
-      totalPodiums: 15,
-      totalChampionships: 0,
-      totalPolePositions: 2,
-      seasonWins: 1,
-      seasonPodiums: 3,
-      seasonChampionships: 0,
-      seasonPolePositions: 1,
-      teamId: "Ferrari",
-    ),
-    Driver(
-      id: 8,
-      name: "George Russell",
-      totalWins: 1,
-      totalPodiums: 10,
-      totalChampionships: 0,
-      totalPolePositions: 1,
-      seasonWins: 0,
-      seasonPodiums: 2,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "Mercedes",
-    ),
-    Driver(
-      id: 9,
-      name: "Pierre Gasly",
-      totalWins: 1,
-      totalPodiums: 3,
-      totalChampionships: 0,
-      totalPolePositions: 0,
-      seasonWins: 0,
-      seasonPodiums: 1,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "Alpine",
-    ),
-    Driver(
-      id: 10,
-      name: "Esteban Ocon",
-      totalWins: 1,
-      totalPodiums: 2,
-      totalChampionships: 0,
-      totalPolePositions: 0,
-      seasonWins: 0,
-      seasonPodiums: 1,
-      seasonChampionships: 0,
-      seasonPolePositions: 0,
-      teamId: "Alpine",
-    ),
-  ];
+  DriverInfo? selectedDriver;
+  String? disabledDriverId;
 
   @override
   Widget build(BuildContext context) {
@@ -260,10 +138,10 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
           const SizedBox(height: 15),
           Expanded(
             child: ListView.builder(
-              itemCount: drivers.length,
+              itemCount: widget.drivers.length,
               itemBuilder: (context, index) {
-                Driver driver = drivers[index];
-                bool isDisabled = disabledDriverId == driver.id;
+                DriverInfo driver = widget.drivers[index];
+                bool isDisabled = disabledDriverId == driver.driverId;
                 return _buildDriverTile(driver, isDisabled);
               },
             ),
@@ -283,13 +161,30 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                   ),
                 ),
                 onPressed: () {
-                  // Save predictions in the database
-                  Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => F1Carousel(),
-                  ),
-                );
+                  Prediction newPrediction = widget.prediction;
+                  newPrediction.id = FirebaseFirestore.instance
+                      .collection('predictions')
+                      .doc()
+                      .id;
+                  newPrediction.fastestLapId = selectedDriver!.driverId;
+                  newPrediction.timestamp = Timestamp.now();
+
+                  try {
+                    // Save predictions in the database
+                    FirebaseFirestore.instance
+                        .collection('predictions')
+                        .doc(newPrediction.id)
+                        .set(newPrediction.toMap());
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => F1Carousel(),
+                      ),
+                    );
+                  } catch (e) {
+                    print('Error saving prediction');
+                  }
                 },
                 child: const Text(
                   'SAVE PREDICTIONS',
@@ -309,15 +204,15 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
 
   // Winner Container
   Widget _buildPodiumContainer() {
-    return DragTarget<Driver>(
+    return DragTarget<DriverInfo>(
       onAcceptWithDetails: (driver) {
         setState(() {
           selectedDriver = driver.data;
-          disabledDriverId = driver.data.id;
+          disabledDriverId = driver.data.driverId;
         });
       },
       builder: (context, candidateData, rejectedData) {
-        Driver? driver = selectedDriver;
+        DriverInfo? driver = selectedDriver;
         return Stack(
           children: [
             Container(
@@ -343,7 +238,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                       children: [
                         SizedBox(height: 4),
                         Text(
-                          driver.name,
+                          driver.driverName,
                           style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -351,7 +246,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          driver.teamId,
+                          driver.teamName!,
                           style:
                               TextStyle(color: Colors.grey[700], fontSize: 12),
                           textAlign: TextAlign.center,
@@ -367,7 +262,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                   onPressed: () {
                     setState(() {
                       selectedDriver = null;
-                      disabledDriverId = -1;
+                      disabledDriverId = null;
                     });
                   },
                   icon: const Icon(
@@ -384,8 +279,8 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
   }
 
   // Driver List Tile
-  Widget _buildDriverTile(Driver driver, bool isDisabled) {
-    return LongPressDraggable<Driver>(
+  Widget _buildDriverTile(DriverInfo driver, bool isDisabled) {
+    return LongPressDraggable<DriverInfo>(
       data: driver,
       feedback: Material(
         color: Colors.transparent,
@@ -398,7 +293,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
   }
 
   // Driver Card (UI component for each driver)
-  Widget _buildDriverCard(Driver driver, bool isDisabled) {
+  Widget _buildDriverCard(DriverInfo driver, bool isDisabled) {
     return Opacity(
       opacity: isDisabled ? 0.5 : 1.0,
       child: Card(
@@ -410,19 +305,19 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
               setState(() {
                 if (selectedDriver == null) {
                   selectedDriver = driver;
-                  disabledDriverId = driver.id;
+                  disabledDriverId = driver.driverId;
                 }
               });
             }
           },
           leading: const Icon(Icons.flag, color: secondary),
           title: Text(
-            driver.name,
+            driver.driverName,
             style: const TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
-            driver.teamId,
+            driver.teamName!,
             style: TextStyle(color: Colors.grey[600]),
           ),
         ),

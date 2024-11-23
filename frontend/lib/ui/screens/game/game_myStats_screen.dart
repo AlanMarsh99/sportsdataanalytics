@@ -32,6 +32,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
       email: 'brendan@test.com',
       username: 'brendan',
       totalPoints: 523,
+      seasonPoints: 523,
       avatar: 'assets/images/placeholder.png',
       level: 1,
       leaguesWon: 2,
