@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/lap_data.dart';
+import 'package:frontend/ui/responsive.dart';
 
 class LapComparisonTable extends StatelessWidget {
   final LapData driver1LapData;
@@ -11,9 +12,11 @@ class LapComparisonTable extends StatelessWidget {
     required this.driver2LapData,
   }) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     final lapCount = driver1LapData.laps.length;
+    final isMobile = Responsive.isMobile(context);
     return Scrollbar(
       thumbVisibility: true,
       child: SingleChildScrollView(
@@ -30,9 +33,9 @@ class LapComparisonTable extends StatelessWidget {
               child: DataTable(
                 columnSpacing: 16.0,
                 columns: [
-                  DataColumn(
+                   DataColumn(
                     label: Text(
-                      '${driver1LapData.driverName} Position',
+                      'Lap',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -41,7 +44,16 @@ class LapComparisonTable extends StatelessWidget {
                   ),
                   DataColumn(
                     label: Text(
-                      '${driver1LapData.driverName} Lap Time',
+                      '${driver1LapData.driverName.split(' ').last} Position',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      isMobile ? 'Lap Time' : '${driver1LapData.driverName.split(' ').last} Lap Time',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -59,7 +71,7 @@ class LapComparisonTable extends StatelessWidget {
                   ),
                   DataColumn(
                     label: Text(
-                      '${driver2LapData.driverName} Position',
+                       isMobile ? 'Lap Time' : '${driver2LapData.driverName.split(' ').last} Lap Time',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -68,7 +80,7 @@ class LapComparisonTable extends StatelessWidget {
                   ),
                   DataColumn(
                     label: Text(
-                      '${driver2LapData.driverName} Lap Time',
+                      '${driver2LapData.driverName.split(' ').last} Position',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -81,10 +93,17 @@ class LapComparisonTable extends StatelessWidget {
                   (index) {
                     final lap1 = driver1LapData.laps[index];
                     final lap2 = driver2LapData.laps[index];
-                    final timeDiff = _calculateTimeDifference(lap1.lapTime, lap2.lapTime);
+                    final timeDiff =
+                        _calculateTimeDifference(lap1.lapTime, lap2.lapTime);
 
                     return DataRow(
                       cells: [
+                         DataCell(
+                          Text(
+                            (index+1).toString(),
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                        ),
                         DataCell(
                           Text(
                             lap1.position.toString(),
@@ -108,13 +127,13 @@ class LapComparisonTable extends StatelessWidget {
                         ),
                         DataCell(
                           Text(
-                            lap2.position.toString(),
+                            lap2.lapTime,
                             style: const TextStyle(color: Colors.black),
                           ),
                         ),
                         DataCell(
                           Text(
-                            lap2.lapTime,
+                            lap2.position.toString(),
                             style: const TextStyle(color: Colors.black),
                           ),
                         ),
@@ -148,7 +167,8 @@ class LapComparisonTable extends StatelessWidget {
     final wholeSeconds = seconds.truncate();
     final milliseconds = ((seconds - wholeSeconds) * 1000).round();
 
-    return Duration(minutes: minutes, seconds: wholeSeconds, milliseconds: milliseconds);
+    return Duration(
+        minutes: minutes, seconds: wholeSeconds, milliseconds: milliseconds);
   }
 
   Color _getDifferenceColour(String timeDiff) {

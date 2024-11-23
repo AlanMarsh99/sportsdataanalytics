@@ -34,7 +34,7 @@ class APIService {
   }
 
   Future<LapDataResponse?> fetchDriverLapData(int year, int round, String driverId) async {
-      final url = Uri.parse('$baseUrl/lap_data/$year/$round/$driverId/');
+      final url = Uri.parse('$baseUrl/race/$year/$round/driver/$driverId/lap_data');
 
       try {
         final response = await http.get(url);
