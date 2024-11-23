@@ -167,14 +167,19 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                       .doc()
                       .id;
                   newPrediction.fastestLapId = selectedDriver!.driverId;
-                  newPrediction.timestamp = Timestamp.now();
+                  //newPrediction.timestamp = FieldValue.serverTimestamp();
+
+                  Map<String, dynamic> predictionData = newPrediction.toMap();
+
+                  // Add the server timestamp to the map
+                  predictionData['timestamp'] = FieldValue.serverTimestamp();
 
                   try {
                     // Save predictions in the database
                     FirebaseFirestore.instance
                         .collection('predictions')
                         .doc(newPrediction.id)
-                        .set(newPrediction.toMap());
+                        .set(predictionData);
 
                     Navigator.pushReplacement(
                       context,

@@ -4,7 +4,6 @@ import 'dart:convert';
 import '../models/race_positions.dart';
 import '../models/lap_data.dart';
 
-
 class APIService {
   static String baseUrl = 'https://sportsdataanalytics.onrender.com';
 
@@ -17,8 +16,8 @@ class APIService {
           await http.get(Uri.parse('$baseUrl/home/upcoming_race/'));
 
       if (response.statusCode == 200) {
-        //print('Response status: ${response.statusCode}');
-        //print('Response body: ${response.body}');
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         // Log the error details if the status is not 200
@@ -33,27 +32,29 @@ class APIService {
     }
   }
 
-  Future<LapDataResponse?> fetchDriverLapData(int year, int round, String driverId) async {
-      final url = Uri.parse('$baseUrl/race/$year/$round/driver/$driverId/lap_data');
+  Future<LapDataResponse?> fetchDriverLapData(
+      int year, int round, String driverId) async {
+    final url =
+        Uri.parse('$baseUrl/race/$year/$round/driver/$driverId/lap_data');
 
-      try {
-        final response = await http.get(url);
+    try {
+      final response = await http.get(url);
 
-        if (response.statusCode == 200) {
-          final jsonData = jsonDecode(response.body);
-          return LapDataResponse.fromJson(jsonData);
-        } else {
-          // Handle non-200 responses
-          print('Failed to load lap data');
-          print('Status code: ${response.statusCode}');
-          print('Response body: ${response.body}');
-          return null;
-        }
-      } catch (e) {
-        print('Exception caught: $e');
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        return LapDataResponse.fromJson(jsonData);
+      } else {
+        // Handle non-200 responses
+        print('Failed to load lap data');
+        print('Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
         return null;
       }
+    } catch (e) {
+      print('Exception caught: $e');
+      return null;
     }
+  }
 
   // Fetch last race results
   Future<Map<String, dynamic>> getLastRaceResults() async {
@@ -61,8 +62,8 @@ class APIService {
       final response =
           await http.get(Uri.parse('$baseUrl/home/last_race_results/'));
       if (response.statusCode == 200) {
-        //print('Response status: ${response.statusCode}');
-        //print('Response body: ${response.body}');
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
         return jsonDecode(response.body);
       } else {
         print('Failed to load last race results');
@@ -120,18 +121,18 @@ class APIService {
     }
   }
 
-    // Fetch lap by lap race positions
+  // Fetch lap by lap race positions
   Future<RacePositions?> fetchRacePositions(int year, int round) async {
     final url = Uri.parse('$baseUrl/race/$year/$round/positions/');
     final response = await http.get(url);
 
-      if (response.statusCode == 200) {
-        return RacePositions.fromJson(json.decode(response.body));
-      } else {
-        // Handle errors as needed
-        print('Failed to load race positions: ${response.body}');
-        return null;
-      }
+    if (response.statusCode == 200) {
+      return RacePositions.fromJson(json.decode(response.body));
+    } else {
+      // Handle errors as needed
+      print('Failed to load race positions: ${response.body}');
+      return null;
+    }
   }
 
   // RACES SCREENS

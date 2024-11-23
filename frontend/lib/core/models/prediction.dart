@@ -9,6 +9,7 @@ class Prediction {
   List<String>? podiumIds;
   String? fastestLapId;
   Timestamp? timestamp;
+  int? points;
 
 
   Prediction({
@@ -20,6 +21,7 @@ class Prediction {
     this.podiumIds,
     this.fastestLapId,
     this.timestamp,
+    this.points
   });
 
   Map<String, dynamic> toMap() {
@@ -32,6 +34,7 @@ class Prediction {
       'podiumIds': podiumIds,
       'fastestLapId': fastestLapId,
       'timestamp': timestamp,
+      'points': points
     };
   }
 
@@ -45,11 +48,12 @@ class Prediction {
       podiumIds: List<String>.from(map['podiumIds']),
       fastestLapId: map['fastestLapId'],
       timestamp: map['timestamp'],
+      points: map['points']
     );
   }
 
   @override
   String toString() {
-    return 'Prediction(id: $id, userId: $userId, year: $year, round: $round, winnerId: $winnerId, podiumIds: $podiumIds, fastestLapId: $fastestLapId, timestamp: $timestamp)';
+    return 'Prediction(id: $id, userId: $userId, year: $year, round: $round, winnerId: $winnerId, podiumIds: $podiumIds, fastestLapId: $fastestLapId, timestamp: $timestamp, points: $points)';
   }
 }
