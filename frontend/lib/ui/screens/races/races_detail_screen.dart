@@ -13,6 +13,8 @@ import '../../widgets/end_drawer.dart'; // Added for race positions
 import 'package:frontend/core/models/race_positions.dart'; // Added for race positions
 import 'package:frontend/core/models/pit_stops.dart';
 import 'package:frontend/ui/widgets/tables/pit_stop_table.dart';
+import 'package:frontend/ui/widgets/tables/lap_comparison_table.dart';
+import 'package:frontend/core/models/lap_data.dart';
 
 class RacesDetailScreen extends StatefulWidget {
   const RacesDetailScreen({Key? key, required this.race}) : super(key: key);
@@ -26,6 +28,15 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
     with TickerProviderStateMixin {
   late Future<List<dynamic>> raceResults;
   bool resultsError = false;
+
+  // Added for lap comparison
+  Future<LapDataResponse?>? driver1LapDataFuture;
+  Future<LapDataResponse?>? driver2LapDataFuture;
+  String? selectedDriver1Id;
+  String? selectedDriver2Id;
+  List<DriverInfo> driversInRace = [];
+  int year = -1;
+  int round = -1;
 
   // Added for race positions
   late Future<RacePositions?> racePositions;
@@ -48,8 +59,6 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
     );
 
     _myAnimation = CurvedAnimation(curve: Curves.linear, parent: _controller);
-    int round = -1;
-    int year = -1;
     try {
       round = int.parse(widget.race.round.split('/').first);
       year = int.parse(widget.race.date.split('-').first);
@@ -64,6 +73,30 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
       racePositionsError = true;
       pitStopError = true;
     }
+
+    selectedDriver1Id = widget.race.winnerDriverId;
+
+    APIService()
+        .fetchDriverLapData(year, round, selectedDriver1Id!)
+        .then((response) {
+      if (response != null) {
+        setState(() {
+          driversInRace = response.drivers;
+          // Initialize selected drivers
+          if (driversInRace.length >= 2) {
+            selectedDriver1Id = driversInRace[0].driverId;
+            selectedDriver2Id = driversInRace[1].driverId;
+            // Fetch lap data for the selected drivers
+            driver1LapDataFuture = APIService()
+                .fetchDriverLapData(year, round, selectedDriver1Id!);
+            driver2LapDataFuture = APIService()
+                .fetchDriverLapData(year, round, selectedDriver2Id!);
+          }
+        });
+      }
+    }).catchError((error) {
+      print('Error fetching drivers: $error');
+    });
   }
 
   @override
@@ -234,6 +267,14 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                                         } else if (snapshot.hasData) {
                                           List<dynamic> results =
                                               snapshot.data!;
+
+                                          for (var driver in results) {
+                                            DriverInfo driverInfo = DriverInfo(
+                                                driverId: driver['driver_id'],
+                                                driverName: driver['driver']);
+
+                                            driversInRace.add(driverInfo);
+                                          }
                                           return RaceResultsTable(
                                             data: results,
                                           );
@@ -269,7 +310,162 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                                         }
                                       },
                                     ),
-                              Container(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: DropdownButtonFormField<String>(
+                                          dropdownColor: primary,
+                                          value: selectedDriver1Id,
+                                          items: driversInRace.map((driver) {
+                                            return DropdownMenuItem(
+                                              value: driver.driverId,
+                                              child: Text(driver.driverName,
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedDriver1Id = value;
+                                              // Fetch lap data for the new driver
+                                              driver1LapDataFuture =
+                                                  APIService()
+                                                      .fetchDriverLapData(
+                                                          year,
+                                                          round,
+                                                          selectedDriver1Id!);
+                                            });
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Select Driver 1',
+                                            labelStyle:
+                                                TextStyle(color: Colors.white),
+                                            enabledBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white),
+                                            ),
+                                            focusedBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide:
+                                                  BorderSide(color: redAccent),
+                                            ),
+                                          ),
+                                          iconEnabledColor: Colors.red,
+                                          iconDisabledColor: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(width: 16),
+                                      Expanded(
+                                        child: DropdownButtonFormField<String>(
+                                          dropdownColor: primary,
+                                          value: selectedDriver2Id,
+                                          items: driversInRace.map((driver) {
+                                            return DropdownMenuItem(
+                                              value: driver.driverId,
+                                              child: Text(driver.driverName,
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedDriver2Id = value;
+                                              // Fetch lap data for the new driver
+                                              driver2LapDataFuture =
+                                                  APIService()
+                                                      .fetchDriverLapData(
+                                                          year,
+                                                          round,
+                                                          selectedDriver2Id!);
+                                            });
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Select Driver 2',
+                                            labelStyle:
+                                                TextStyle(color: Colors.white),
+                                            enabledBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white),
+                                            ),
+                                            focusedBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide:
+                                                  BorderSide(color: redAccent),
+                                            ),
+                                          ),
+                                          iconEnabledColor: Colors.red,
+                                          iconDisabledColor: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16),
+                                  // Display the comparison table or a loading indicator
+                                  if (driver1LapDataFuture != null &&
+                                      driver2LapDataFuture != null)
+                                    FutureBuilder<List<LapDataResponse?>>(
+                                      future: Future.wait([
+                                        driver1LapDataFuture!,
+                                        driver2LapDataFuture!,
+                                      ]),
+                                      builder: (context,
+                                          AsyncSnapshot<List<LapDataResponse?>>
+                                              snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                                color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return Text(
+                                            'Error loading lap data',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasData) {
+                                          // Get the data from the snapshot
+                                          final List<LapDataResponse?>
+                                              responses = snapshot.data!;
+
+                                          if (responses[0] != null &&
+                                              responses[1] != null) {
+                                            driversInRace =
+                                                responses[0]!.drivers;
+                                            final LapData driver1DataResponse =
+                                                responses[0]!.lapData;
+                                            final LapData driver2DataResponse =
+                                                responses[1]!.lapData;
+
+                                            return Expanded(child: LapComparisonTable(
+                                                driver1LapData:
+                                                    driver1DataResponse,
+                                                driver2LapData:
+                                                    driver2DataResponse),);
+                                          } else {
+                                            return Text(
+                                              'No lap data available',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            );
+                                          }
+                                        } else {
+                                          // This else block handles any other unexpected state
+                                          return Text(
+                                            'No lap data available',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          );
+                                        }
+                                      },
+                                    )
+                                ],
+                              ),
                               pitStopError
                                   ? const Text(
                                       'Error loading pit stops',
@@ -537,6 +733,7 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                                                             List<dynamic>
                                                                 results =
                                                                 snapshot.data!;
+
                                                             return RaceResultsTable(
                                                               data: results,
                                                             );
@@ -589,7 +786,222 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                                                           }
                                                         },
                                                       ),
-                                                Container(),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child:
+                                                              DropdownButtonFormField<
+                                                                  String>(
+                                                            dropdownColor:
+                                                                primary,
+                                                            value:
+                                                                selectedDriver1Id,
+                                                            items: driversInRace
+                                                                .map((driver) {
+                                                              return DropdownMenuItem(
+                                                                value: driver
+                                                                    .driverId,
+                                                                child: Text(
+                                                                    driver
+                                                                        .driverName,
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white)),
+                                                              );
+                                                            }).toList(),
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                selectedDriver1Id =
+                                                                    value;
+                                                                // Fetch lap data for the new driver
+                                                                driver1LapDataFuture =
+                                                                    APIService()
+                                                                        .fetchDriverLapData(
+                                                                            year,
+                                                                            round,
+                                                                            selectedDriver1Id!);
+                                                              });
+                                                            },
+                                                            decoration:
+                                                                InputDecoration(
+                                                              labelText:
+                                                                  'Select Driver 1',
+                                                              labelStyle: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                              enabledBorder:
+                                                                  const UnderlineInputBorder(
+                                                                borderSide: BorderSide(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              focusedBorder:
+                                                                  const UnderlineInputBorder(
+                                                                borderSide:
+                                                                    BorderSide(
+                                                                        color:
+                                                                            redAccent),
+                                                              ),
+                                                            ),
+                                                            iconEnabledColor:
+                                                                Colors.red,
+                                                            iconDisabledColor:
+                                                                Colors.white,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 16),
+                                                        Expanded(
+                                                          child:
+                                                              DropdownButtonFormField<
+                                                                  String>(
+                                                            dropdownColor:
+                                                                primary,
+                                                            value:
+                                                                selectedDriver2Id,
+                                                            items: driversInRace
+                                                                .map((driver) {
+                                                              return DropdownMenuItem(
+                                                                value: driver
+                                                                    .driverId,
+                                                                child: Text(
+                                                                    driver
+                                                                        .driverName,
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white)),
+                                                              );
+                                                            }).toList(),
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                selectedDriver2Id =
+                                                                    value;
+                                                                // Fetch lap data for the new driver
+                                                                driver2LapDataFuture =
+                                                                    APIService()
+                                                                        .fetchDriverLapData(
+                                                                            year,
+                                                                            round,
+                                                                            selectedDriver2Id!);
+                                                              });
+                                                            },
+                                                            decoration:
+                                                                InputDecoration(
+                                                              labelText:
+                                                                  'Select Driver 2',
+                                                              labelStyle: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                              enabledBorder:
+                                                                  const UnderlineInputBorder(
+                                                                borderSide: BorderSide(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              focusedBorder:
+                                                                  const UnderlineInputBorder(
+                                                                borderSide:
+                                                                    BorderSide(
+                                                                        color:
+                                                                            redAccent),
+                                                              ),
+                                                            ),
+                                                            iconEnabledColor:
+                                                                Colors.red,
+                                                            iconDisabledColor:
+                                                                Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(height: 16),
+                                                    // Display the comparison table or a loading indicator
+                                                    if (driver1LapDataFuture !=
+                                                            null &&
+                                                        driver2LapDataFuture !=
+                                                            null)
+                                                      FutureBuilder<
+                                                          List<
+                                                              LapDataResponse?>>(
+                                                        future: Future.wait([
+                                                          driver1LapDataFuture!,
+                                                          driver2LapDataFuture!,
+                                                        ]),
+                                                        builder: (context,
+                                                            AsyncSnapshot<
+                                                                    List<
+                                                                        LapDataResponse?>>
+                                                                snapshot) {
+                                                          if (snapshot
+                                                                  .connectionState ==
+                                                              ConnectionState
+                                                                  .waiting) {
+                                                            return Center(
+                                                              child: CircularProgressIndicator(
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                          } else if (snapshot
+                                                              .hasError) {
+                                                            return Text(
+                                                              'Error loading lap data',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                          } else if (snapshot
+                                                              .hasData) {
+                                                            // Get the data from the snapshot
+                                                            final List<
+                                                                    LapDataResponse?>
+                                                                responses =
+                                                                snapshot.data!;
+
+                                                            if (responses[0] !=
+                                                                    null &&
+                                                                responses[1] !=
+                                                                    null) {
+                                                              driversInRace =
+                                                                  responses[0]!
+                                                                      .drivers;
+                                                              final LapData
+                                                                  driver1DataResponse =
+                                                                  responses[0]!
+                                                                      .lapData;
+                                                              final LapData
+                                                                  driver2DataResponse =
+                                                                  responses[1]!
+                                                                      .lapData;
+
+                                                              return LapComparisonTable(
+                                                                  driver1LapData:
+                                                                      driver1DataResponse,
+                                                                  driver2LapData:
+                                                                      driver2DataResponse);
+                                                            } else {
+                                                              return Text(
+                                                                'No lap data available',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                              );
+                                                            }
+                                                          } else {
+                                                            // This else block handles any other unexpected state
+                                                            return Text(
+                                                              'No lap data available',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            );
+                                                          }
+                                                        },
+                                                      )
+                                                  ],
+                                                ),
                                                 pitStopError
                                                     ? const Text(
                                                         'Error loading pit stops',
