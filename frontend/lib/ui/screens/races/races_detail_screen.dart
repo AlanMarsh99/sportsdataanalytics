@@ -310,7 +310,162 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                                         }
                                       },
                                     ),
-                              Container(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: DropdownButtonFormField<String>(
+                                          dropdownColor: primary,
+                                          value: selectedDriver1Id,
+                                          items: driversInRace.map((driver) {
+                                            return DropdownMenuItem(
+                                              value: driver.driverId,
+                                              child: Text(driver.driverName,
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedDriver1Id = value;
+                                              // Fetch lap data for the new driver
+                                              driver1LapDataFuture =
+                                                  APIService()
+                                                      .fetchDriverLapData(
+                                                          year,
+                                                          round,
+                                                          selectedDriver1Id!);
+                                            });
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Select Driver 1',
+                                            labelStyle:
+                                                TextStyle(color: Colors.white),
+                                            enabledBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white),
+                                            ),
+                                            focusedBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide:
+                                                  BorderSide(color: redAccent),
+                                            ),
+                                          ),
+                                          iconEnabledColor: Colors.red,
+                                          iconDisabledColor: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(width: 16),
+                                      Expanded(
+                                        child: DropdownButtonFormField<String>(
+                                          dropdownColor: primary,
+                                          value: selectedDriver2Id,
+                                          items: driversInRace.map((driver) {
+                                            return DropdownMenuItem(
+                                              value: driver.driverId,
+                                              child: Text(driver.driverName,
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedDriver2Id = value;
+                                              // Fetch lap data for the new driver
+                                              driver2LapDataFuture =
+                                                  APIService()
+                                                      .fetchDriverLapData(
+                                                          year,
+                                                          round,
+                                                          selectedDriver2Id!);
+                                            });
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Select Driver 2',
+                                            labelStyle:
+                                                TextStyle(color: Colors.white),
+                                            enabledBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white),
+                                            ),
+                                            focusedBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide:
+                                                  BorderSide(color: redAccent),
+                                            ),
+                                          ),
+                                          iconEnabledColor: Colors.red,
+                                          iconDisabledColor: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16),
+                                  // Display the comparison table or a loading indicator
+                                  if (driver1LapDataFuture != null &&
+                                      driver2LapDataFuture != null)
+                                    FutureBuilder<List<LapDataResponse?>>(
+                                      future: Future.wait([
+                                        driver1LapDataFuture!,
+                                        driver2LapDataFuture!,
+                                      ]),
+                                      builder: (context,
+                                          AsyncSnapshot<List<LapDataResponse?>>
+                                              snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                                color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return Text(
+                                            'Error loading lap data',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          );
+                                        } else if (snapshot.hasData) {
+                                          // Get the data from the snapshot
+                                          final List<LapDataResponse?>
+                                              responses = snapshot.data!;
+
+                                          if (responses[0] != null &&
+                                              responses[1] != null) {
+                                            driversInRace =
+                                                responses[0]!.drivers;
+                                            final LapData driver1DataResponse =
+                                                responses[0]!.lapData;
+                                            final LapData driver2DataResponse =
+                                                responses[1]!.lapData;
+
+                                            return Expanded(child: LapComparisonTable(
+                                                driver1LapData:
+                                                    driver1DataResponse,
+                                                driver2LapData:
+                                                    driver2DataResponse),);
+                                          } else {
+                                            return Text(
+                                              'No lap data available',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            );
+                                          }
+                                        } else {
+                                          // This else block handles any other unexpected state
+                                          return Text(
+                                            'No lap data available',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          );
+                                        }
+                                      },
+                                    )
+                                ],
+                              ),
                               pitStopError
                                   ? const Text(
                                       'Error loading pit stops',
