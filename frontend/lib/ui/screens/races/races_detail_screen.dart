@@ -59,8 +59,6 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
     );
 
     _myAnimation = CurvedAnimation(curve: Curves.linear, parent: _controller);
-    int round = -1;
-    int year = -1;
     try {
       round = int.parse(widget.race.round.split('/').first);
       year = int.parse(widget.race.date.split('-').first);
@@ -77,13 +75,6 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
     }
 
     selectedDriver1Id = widget.race.winnerDriverId;
-    selectedDriver2Id = widget.race.fastestPitStopDriverId;
-
-    // Fetch lap data for the selected drivers
-    /* driver1LapDataFuture =
-        APIService().fetchDriverLapData(year, round, selectedDriver1Id!);
-    driver2LapDataFuture =
-        APIService().fetchDriverLapData(year, round, selectedDriver2Id!);*/
 
     APIService()
         .fetchDriverLapData(year, round, selectedDriver1Id!)
@@ -687,7 +678,24 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                                                               labelStyle: TextStyle(
                                                                   color: Colors
                                                                       .white),
+                                                              enabledBorder:
+                                                                  const UnderlineInputBorder(
+                                                                borderSide: BorderSide(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              focusedBorder:
+                                                                  const UnderlineInputBorder(
+                                                                borderSide:
+                                                                    BorderSide(
+                                                                        color:
+                                                                            redAccent),
+                                                              ),
                                                             ),
+                                                            iconEnabledColor:
+                                                                Colors.red,
+                                                            iconDisabledColor:
+                                                                Colors.white,
                                                           ),
                                                         ),
                                                         SizedBox(width: 16),
@@ -732,7 +740,24 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                                                               labelStyle: TextStyle(
                                                                   color: Colors
                                                                       .white),
+                                                              enabledBorder:
+                                                                  const UnderlineInputBorder(
+                                                                borderSide: BorderSide(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              focusedBorder:
+                                                                  const UnderlineInputBorder(
+                                                                borderSide:
+                                                                    BorderSide(
+                                                                        color:
+                                                                            redAccent),
+                                                              ),
                                                             ),
+                                                            iconEnabledColor:
+                                                                Colors.red,
+                                                            iconDisabledColor:
+                                                                Colors.white,
                                                           ),
                                                         ),
                                                       ],
