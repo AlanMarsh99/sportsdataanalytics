@@ -8,33 +8,67 @@ import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class CreateLeagueDialog extends StatelessWidget {
-  CreateLeagueDialog({Key? key}) : super(key: key);
+class JoinLeagueDialog extends StatelessWidget {
+  JoinLeagueDialog({Key? key}) : super(key: key);
 
-  final _nameController = TextEditingController();
+  final _codeController = TextEditingController();
 
-  void createLeague(BuildContext context) async {
+  void joinLeague(BuildContext context) async {
     final userId = Provider.of<AuthService>(context, listen: false).userApp!.id;
     try {
-      // Unique code 6 characters
-      final id = const Uuid().v1().substring(0, 6).toUpperCase();
+      final leaguesCollection =
+          FirebaseFirestore.instance.collection('leagues');
+      // Search for league with code
+      final querySnapshot = await leaguesCollection
+          .where('id', isEqualTo: _codeController.text)
+          .get();
 
-      final leagueData = {
-        'id': id,
-        'name': _nameController.text,
-        'userIds': [userId],
-        'createdAt': FieldValue.serverTimestamp(),
-      };
+      if (querySnapshot.docs.isEmpty) {
+        print('League not found'); // League with code not found
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: League not found'),
+            backgroundColor: secondary,
+          ),
+        );
+        return;
+      }
 
+      final leagueDoc = querySnapshot.docs.first;
+      final leagueId = leagueDoc['id'];
+      final leagueName = leagueDoc['name'];
+
+      // Verify if user is already a member of the league
+      final existingMembership = await FirebaseFirestore.instance
+          .collection('userLeagues')
+          .where('userId', isEqualTo: userId)
+          .where('leagueId', isEqualTo: leagueId)
+          .get();
+
+      if (existingMembership.docs.isNotEmpty) {
+        print(
+            'User is already a member of this league'); // The user is already a member of this league
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: You are already a member of this league'),
+            backgroundColor: secondary,
+          ),
+        );
+        return;
+      }
+
+      // Add user to the league
       await FirebaseFirestore.instance
           .collection('leagues')
-          .doc(id)
-          .set(leagueData);
+          .doc(leagueId)
+          .update({
+        'userIds': FieldValue.arrayUnion([userId]),
+      });
 
-      // Asociar al usuario con la liga
+      // Associate user with the league
       final userLeagueData = {
         'userId': userId,
-        'leagueId': id,
+        'leagueId': leagueId,
         'joinedAt': FieldValue.serverTimestamp(),
       };
 
@@ -42,16 +76,23 @@ class CreateLeagueDialog extends StatelessWidget {
           .collection('userLeagues')
           .add(userLeagueData);
 
-      print('League created successfully with code: $id');
+      print('User joined league successfully');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('League created successfully with code: $id'),
+          content:
+              Text('You have joined the league ${leagueName} successfully!'),
           backgroundColor: primary,
         ),
       );
       Navigator.pop(context, true);
     } catch (e) {
-      print('Error creating league: $e');
+      print('Error joining league: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error joining league: $e'),
+          backgroundColor: secondary,
+        ),
+      );
       Navigator.pop(context, false);
     }
   }
@@ -91,12 +132,12 @@ class CreateLeagueDialog extends StatelessWidget {
             padding: EdgeInsets.zero,
           ),
           onPressed: () async {
-            if (_nameController.text.isNotEmpty) {
-              createLeague(context);
+            if (_codeController.text.isNotEmpty) {
+              joinLeague(context);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Error: Name cannot be empty'),
+                  content: Text('Error: Code cannot be empty'),
                   backgroundColor: secondary,
                 ),
               );
@@ -113,7 +154,7 @@ class CreateLeagueDialog extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(vertical: 5),
             child: const Text(
-              'CREATE',
+              'JOIN',
               style: TextStyle(
                   color: white, fontSize: 14.0, fontWeight: FontWeight.w400),
               textAlign: TextAlign.center,
@@ -135,7 +176,7 @@ class CreateLeagueDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            "Create a league",
+            "Join a league",
             style: TextStyle(color: primary, fontWeight: FontWeight.bold),
           ),
           Align(
@@ -161,6 +202,15 @@ class CreateLeagueDialog extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text('Enter the league code to join:',
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400)),
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Container(
                 padding: const EdgeInsets.only(left: 20),
                 alignment: Alignment.centerLeft,
@@ -171,12 +221,12 @@ class CreateLeagueDialog extends StatelessWidget {
                 ),
                 child: TextField(
                   cursorColor: secondary,
-                  controller: _nameController,
+                  controller: _codeController,
                   style: const TextStyle(color: Colors.black, fontSize: 14),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.only(bottom: 10),
-                    hintText: 'League name',
+                    hintText: 'League code',
                     hintStyle: TextStyle(color: gray1, fontSize: 14),
                   ),
                   inputFormatters: [
@@ -186,7 +236,7 @@ class CreateLeagueDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 25),
-            actionButtonRow(context, _nameController.text),
+            actionButtonRow(context, _codeController.text),
           ],
         ),
       ),

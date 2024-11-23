@@ -7,6 +7,7 @@ import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/ranking_league_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/create_league_dialog.dart';
+import 'package:frontend/ui/widgets/dialogs/join_league_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:frontend/ui/widgets/log_in_container.dart';
 import 'package:intl/intl.dart';
@@ -24,14 +25,16 @@ class GameLeaguesScreen extends StatefulWidget {
 
 class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
   late Future<List<League>> _leaguesFuture;
+  bool firstTime = true;
 
   @override
   void initState() {
     super.initState();
     final auth = Provider.of<AuthService>(context, listen: false);
-    ;
+
     if (auth.status == Status.Authenticated && auth.userApp != null) {
       _leaguesFuture = _fetchUserLeagues(auth.userApp!.id);
+      firstTime = false;
     }
   }
 
@@ -131,6 +134,10 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
               builder: (context, auth, child) {
                 if (auth.status == Status.Authenticated &&
                     auth.userApp != null) {
+                  if (firstTime) {
+                    _leaguesFuture = _fetchUserLeagues(auth.userApp!.id);
+                    firstTime = false;
+                  }
                   //userInfo = auth.userApp!;
                   return FutureBuilder<List<League>>(
                     future: _leaguesFuture,
@@ -254,29 +261,17 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                         ),
                                       ),
                                     ),
-                                    onPressed: () {
-                                      Provider.of<AuthService>(context,
-                                                      listen: false)
-                                                  .status ==
-                                              Status.Authenticated
-                                          ? showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return CreateLeagueDialog();
-                                              },
-                                            )
-                                          /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PredictPodiumScreen(),
-                        ),
-                      )*/
-                                          : showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return LogInDialog();
-                                              },
-                                            );
+                                    onPressed: () async {
+                                      bool hasCreated = await showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return CreateLeagueDialog();
+                                        },
+                                      );
+                                      if (hasCreated) {
+                                        _leaguesFuture =
+                                            _fetchUserLeagues(auth.userApp!.id);
+                                      }
                                     },
                                     child: Padding(
                                       padding:
@@ -308,29 +303,17 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                         ),
                                       ),
                                     ),
-                                    onPressed: () {
-                                      Provider.of<AuthService>(context,
-                                                      listen: false)
-                                                  .status ==
-                                              Status.Authenticated
-                                          ? showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return LogInDialog();
-                                              },
-                                            )
-                                          /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PredictPodiumScreen(),
-                        ),
-                      )*/
-                                          : showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return LogInDialog();
-                                              },
-                                            );
+                                    onPressed: () async {
+                                      bool hasJoined = await showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return JoinLeagueDialog();
+                                        },
+                                      );
+                                      if (hasJoined) {
+                                        _leaguesFuture =
+                                            _fetchUserLeagues(auth.userApp!.id);
+                                      }
                                     },
                                     child: Padding(
                                       padding:
