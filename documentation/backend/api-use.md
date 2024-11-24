@@ -37,7 +37,31 @@ When you run the Flask development server using the command `python run.py`, you
     "race_name": "Dutch Grand Prix",
     "race_id": "14",
     "date": "2023-08-27",
-    "hour": "13:00"
+    "hour": "13:00",
+    "drivers": [
+        {
+            "driver_id": "max_verstappen",
+            "driver_name": "Max Verstappen",
+            "team_name": "Red Bull"
+        },
+        {
+            "driver_id": "norris",
+            "driver_name": "Lando Norris",
+            "team_name": "McLaren"
+        },
+        {
+            "driver_id": "leclerc",
+            "driver_name": "Charles Leclerc",
+            "team_name": "Ferrari"
+        },
+        {
+            "driver_id": "piastri",
+            "driver_name": "Oscar Piastri",
+            "team_name": "McLaren"
+
+            // Add more drivers..
+            
+        },]
   }
   ```
 

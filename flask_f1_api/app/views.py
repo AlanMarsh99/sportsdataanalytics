@@ -31,12 +31,35 @@ def get_upcoming_race():
                 "race_name": race['raceName'],
                 "race_id": race['round'],
                 "date": race['date'],
-                "hour": race['time'][:5]  # Extract hour and minute from time
+                "hour": race['time'][:5],  # Extract hour and minute from time
+                "year": race['season'],   # Add year field
+                "drivers": []             # Placeholder for drivers
             }
             break
 
     if not upcoming_race:
         return jsonify({"error": "No upcoming races found"}), 404
+
+    # Fetch all drivers and their teams for the current season
+    standings_url = f"{BASE_ERGAST_URL}/current/driverStandings.json"
+    drivers_response = requests.get(standings_url)
+    
+    if drivers_response.status_code == 200:
+        standings_data = drivers_response.json()
+        standings_list = standings_data.get('MRData', {}).get('StandingsTable', {}).get('StandingsLists', [])
+
+        if standings_list:
+            driver_standings = standings_list[0].get('DriverStandings', [])
+            upcoming_race['drivers'] = [
+                {
+                    "driver_id": driver['Driver']['driverId'],
+                    "driver_name": f"{driver['Driver']['givenName']} {driver['Driver']['familyName']}",
+                    "team_name": driver['Constructors'][0]['name']  # Extract team name from Constructors
+                }
+                for driver in driver_standings
+            ]
+    else:
+        upcoming_race['drivers'] = [{"error": "Failed to fetch driver standings for the current season."}]
 
     return jsonify(upcoming_race)
 
