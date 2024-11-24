@@ -188,54 +188,60 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                               child: ListView.builder(
                                 itemCount: leagues.length,
                                 itemBuilder: (context, index) {
-                                  return GestureDetector(
+                                  return InkWell(
                                     onTap: () {
-                                      /*Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RankingLeagueScreen(
-                                leagueId: leagues[index]["leagueId"].toString(),
-                                leagueName: leagues[index]["name"],
-                              ),
-                            ),
-                          );*/
-                                    },
-                                    child: Card(
-                                      color: Colors.white,
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 4),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: ListTile(
-                                        title: Text(
-                                          leagues[index].name,
-                                          style: const TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RankingLeagueScreen(
+                                            league: leagues[index],
                                           ),
                                         ),
-                                        trailing: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              leagues[index]
-                                                  .userIds
-                                                  .length
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.black,
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            leagues[index].name,
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                leagues[index]
+                                                    .userIds
+                                                    .length
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.black,
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 30),
-                                            const Icon(
-                                              Icons.chevron_right,
-                                              color: secondary,
-                                              size: 28,
-                                            ),
-                                          ],
-                                        ),
+                                              const SizedBox(width: 30),
+                                              const Icon(
+                                                Icons.chevron_right,
+                                                color: secondary,
+                                                size: 28,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   );
