@@ -47,7 +47,7 @@ exports.processRaceResults = functions.pubsub.schedule("every day 00:00")
                 console.error("Error fetching race results:", error.message);
                 return null;
             });
-            
+
             if (!apiResponse || !apiResponse.data) {
                 console.log(`No race results found last race`);
                 return null;
@@ -93,52 +93,54 @@ exports.processRaceResults = functions.pubsub.schedule("every day 00:00")
                 const predictionId = doc.id;
                 const userId = prediction.userId;
 
-                // Extract actual race results from the JSON
-                const actualWinnerId = raceResults.first_position.driver_id;
-                const actualPodiumIds = [
-                    raceResults.first_position.driver_id,
-                    raceResults.second_position.driver_id,
-                    raceResults.third_position.driver_id,
-                ];
-                const actualFastestLapId = raceResults.fastest_lap.driver_id;
+                if (prediction.points === null || prediction.points === undefined) {
+                    // Extract actual race results from the JSON
+                    const actualWinnerId = raceResults.first_position.driver_id;
+                    const actualPodiumIds = [
+                        raceResults.first_position.driver_id,
+                        raceResults.second_position.driver_id,
+                        raceResults.third_position.driver_id,
+                    ];
+                    const actualFastestLapId = raceResults.fastest_lap.driver_id;
 
-                // Initialize points
-                let points = 0;
+                    // Initialize points
+                    let points = 0;
 
-                // Award 30 points for correct winner
-                if (prediction.winnerId === actualWinnerId) {
-                    points += 30; // Correct winner
+                    // Award 30 points for correct winner
+                    if (prediction.winnerId === actualWinnerId) {
+                        points += 30; // Correct winner
+                    }
+
+                    // Award 20 points for matching any driver in the podium
+                    if (prediction.podiumIds) {
+                        const matchedPodiumDrivers = prediction.podiumIds.filter((driver) =>
+                            actualPodiumIds.includes(driver)
+                        );
+                        points += matchedPodiumDrivers.length * 10; // 10 points per correct podium driver
+                    }
+
+                    // Award 30 points for correctly predicting the fastest lap driver
+                    if (prediction.fastestLapId === actualFastestLapId) {
+                        points += 30; // Correct fastest lap
+                    }
+
+                    console.log(`User ${userId} gained ${points} points for race year ${raceYear}, round ${raceRound}`);
+
+                    // Update user points in Firestore
+                    const userRef = db.collection("users").doc(userId);
+                    batch.update(userRef, {
+                        seasonPoints: admin.firestore.FieldValue.increment(points), // Update season points
+                        totalPoints: admin.firestore.FieldValue.increment(points), // Update total points
+                    });
+
+                    // Update prediction document with the points gained
+                    const predictionRef = db.collection("predictions").doc(predictionId);
+                    batch.update(predictionRef, { points: points }); // Add the points to the prediction document
                 }
-
-                // Award 20 points for matching any driver in the podium
-                if (prediction.podiumIds) {
-                    const matchedPodiumDrivers = prediction.podiumIds.filter((driver) =>
-                        actualPodiumIds.includes(driver)
-                    );
-                    points += matchedPodiumDrivers.length * 10; // 10 points per correct podium driver
-                }
-
-                // Award 30 points for correctly predicting the fastest lap driver
-                if (prediction.fastestLapId === actualFastestLapId) {
-                    points += 30; // Correct fastest lap
-                }
-
-                console.log(`User ${userId} gained ${points} points for race year ${raceYear}, round ${raceRound}`);
-
-                // Update user points in Firestore
-                const userRef = db.collection("users").doc(userId);
-                batch.update(userRef, {
-                    seasonPoints: admin.firestore.FieldValue.increment(points), // Update season points
-                    totalPoints: admin.firestore.FieldValue.increment(points), // Update total points
-                });
-
-                // Update prediction document with the points gained
-                const predictionRef = db.collection("predictions").doc(predictionId);
-                batch.update(predictionRef, { points: points }); // Add the points to the prediction document
             });
 
             // Step 5: Call the API to get upcoming race details
-            const apiResponse2 = await axios.get(`https://sportsdataanalytics.onrender.com/home/upcoming_race/`).catch(error => {
+            /*const apiResponse2 = await axios.get(`https://sportsdataanalytics.onrender.com/home/upcoming_race/`).catch(error => {
                 console.error("Error fetching upcoming race details:", error.message);
                 return null;
             });
@@ -161,17 +163,17 @@ exports.processRaceResults = functions.pubsub.schedule("every day 00:00")
             if (isNaN(nextRaceRound)) {
                 console.error("Invalid next race round:", upcomingRace.race_id);
                 return null;
-            }
+            }*/
 
-            // Step 6: Mark the race as processed
+            // Step 5: Mark the race as processed
             batch.update(db.collection("config").doc("lastProcessedRace"), {
-                year: nextRaceYear,
-                round: nextRaceRound,
+                year: raceYear,
+                round: raceRound,
             });
 
             // Commit the batch
             await batch.commit();
-            console.log(`Successfully processed race for year ${year}, round ${round}`);
+            console.log(`Successfully processed race for year ${raceYear}, round ${raceRound}`);
         } catch (error) {
             console.error("Error processing race results:", error);
         }
