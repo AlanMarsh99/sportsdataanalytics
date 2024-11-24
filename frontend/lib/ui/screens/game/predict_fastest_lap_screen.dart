@@ -160,7 +160,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                     ),
                   ),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   Prediction newPrediction = widget.prediction;
                   newPrediction.id = FirebaseFirestore.instance
                       .collection('predictions')
@@ -176,7 +176,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
 
                   try {
                     // Save predictions in the database
-                    FirebaseFirestore.instance
+                    await FirebaseFirestore.instance
                         .collection('predictions')
                         .doc(newPrediction.id)
                         .set(predictionData);
@@ -189,6 +189,12 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                     );
                   } catch (e) {
                     print('Error saving prediction');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Error: Failed to save prediction'),
+                        backgroundColor: secondary,
+                      ),
+                    );
                   }
                 },
                 child: const Text(
