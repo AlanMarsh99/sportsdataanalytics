@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/lap_data.dart';
+import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/responsive.dart';
@@ -22,10 +25,13 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
   late Duration remainingTime;
   late Timer timer;
   bool firstTime = true;
+  DateTime? raceDate;
+  late Future<Prediction?> userPredictionFuture;
 
   @override
   void initState() {
     super.initState();
+    userPredictionFuture = Future.value(null);
   }
 
   @override
@@ -34,22 +40,54 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     super.dispose();
   }
 
+  Future<Prediction?> _checkUserPrediction(
+      Map<String, dynamic> upcomingRaceInfo) async {
+    try {
+      final authProvider = Provider.of<AuthService>(context, listen: false);
+      if (authProvider.status == Status.Authenticated) {
+        int round = int.parse(upcomingRaceInfo!['race_id']);
+        int year = int.parse(upcomingRaceInfo['year']);
+
+        // Query Firestore to find if the user has made a prediction for the race
+        QuerySnapshot predictionSnapshot = await FirebaseFirestore.instance
+            .collection('predictions')
+            .where('userId', isEqualTo: authProvider.userApp!.id)
+            .where('year', isEqualTo: year)
+            .where('round', isEqualTo: round)
+            .limit(1)
+            .get();
+
+        if (predictionSnapshot.docs.isNotEmpty) {
+          // Convert the Firestore document to a Prediction instance
+          return Prediction.fromMap(
+              predictionSnapshot.docs.first.data() as Map<String, dynamic>);
+        }
+        return null; // No prediction found
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
   void startCountdown(Map<String, dynamic> upcomingRaceInfo) {
     // Parse the date and time from the JSON
     String date = upcomingRaceInfo['date']; // e.g., "2023-08-27"
     String hour = upcomingRaceInfo['hour']; // e.g., "13:00"
 
     // Convert date and time strings to DateTime object
-    DateTime raceDate = DateTime.parse("$date $hour:00");
+    raceDate = DateTime.parse("$date $hour:00");
 
     setState(() {
-      remainingTime = raceDate.difference(DateTime.now());
+      remainingTime = raceDate!.difference(DateTime.now());
     });
 
     // Set up the timer to update every second
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        remainingTime = raceDate.difference(DateTime.now());
+        remainingTime = raceDate!.difference(DateTime.now());
         if (remainingTime.isNegative) {
           timer.cancel();
         }
@@ -70,6 +108,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     if (upcomingRaceInfo != null && firstTime) {
       firstTime = false;
       startCountdown(upcomingRaceInfo);
+      userPredictionFuture = _checkUserPrediction(upcomingRaceInfo);
     }
 
     return Column(
@@ -85,9 +124,16 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-          child: Center(
-            child: _countdownContainer(isMobile),
-          ),
+          child: upcomingRaceInfo == null
+              ? Container(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              : _countdownContainer(upcomingRaceInfo, isMobile),
         ),
       ],
     );
@@ -115,7 +161,8 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     );
   }
 
-  Widget _countdownContainer(bool isMobile) {
+  Widget _countdownContainer(
+      Map<String, dynamic> upcomingRaceInfo, bool isMobile) {
     return Container(
       width: double.infinity,
       height: isMobile
@@ -156,7 +203,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                     padding:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     decoration: BoxDecoration(
-                    color: primary.withAlpha(100),
+                      color: primary.withAlpha(100),
                       border: Border.all(
                         color: secondary,
                         width: 2,
@@ -166,7 +213,8 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                     child: Padding(
                       padding: EdgeInsets.all(5),
                       child: Text(
-                        'FORMULA 1 PIRELLI UNITED STATES GRAND PRIX 2024',
+                        'FORMULA 1 ${upcomingRaceInfo['race_name']}'
+                            .toUpperCase(),
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -234,7 +282,218 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                     ],
                   ),
                   SizedBox(height: isMobile ? 25 : 35),
-                  Container(
+                  FutureBuilder<Prediction?>(
+                    future: userPredictionFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return const Center(
+                          child: Text(
+                            "Error checking predictions",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+
+                      final predictionData = snapshot.data;
+
+                      if (predictionData == null) {
+                        // No prediction made
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          width: isMobile ? 270 : 350,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStateProperty.all<Color>(secondary),
+                              shape: WidgetStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(35.0),
+                                ),
+                              ),
+                            ),
+                            onPressed: () async {
+                              final authProvider = Provider.of<AuthService>(
+                                  context,
+                                  listen: false);
+                              if (authProvider.status == Status.Authenticated) {
+                                try {
+                                  int round =
+                                      int.parse(upcomingRaceInfo!['race_id']);
+                                  int year =
+                                      int.parse(upcomingRaceInfo['year']);
+                                  Prediction newPrediction = Prediction(
+                                    userId: authProvider.userApp!.id,
+                                    round: round,
+                                    year: year,
+                                  );
+
+                                  List<DriverInfo> drivers =
+                                      (upcomingRaceInfo['drivers'] as List)
+                                          .map((driverJson) =>
+                                              DriverInfo.fromJson(driverJson))
+                                          .toList();
+
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PredictPodiumScreen(
+                                        prediction: newPrediction,
+                                        drivers: drivers,
+                                        raceName: upcomingRaceInfo['race_name'],
+                                      ),
+                                    ),
+                                  );
+                                  userPredictionFuture =
+                                      _checkUserPrediction(upcomingRaceInfo);
+                                } catch (e) {
+                                  print(e);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Error: Could not load prediction data'),
+                                      backgroundColor: secondary,
+                                    ),
+                                  );
+                                }
+                              } else {
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return LogInDialog();
+                                  },
+                                );
+                                userPredictionFuture =
+                                    _checkUserPrediction(upcomingRaceInfo);
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 0 : 5.0),
+                              child: const Text(
+                                'PLAY',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Prediction found, check if editable
+                        Timestamp timestamp = predictionData.timestamp!;
+                        DateTime predictionTime = timestamp.toDate();
+                        DateTime editDeadline =
+                            raceDate!.subtract(const Duration(days: 2));
+
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Flexible(
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 20.0),
+                                //width: isMobile ? 270 : 350,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            secondary),
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(35.0),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    // Navigate to View Predictions Screen
+                                    /*Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ViewPredictionScreen(
+                        predictionData: predictionData,
+                      ),
+                    ),
+                  );*/
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: isMobile ? 0 : 5.0),
+                                    child: const Text(
+                                      "VIEW PREDICTIONS",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (predictionTime.isBefore(editDeadline))
+                              Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 20.0),
+                                  //width: isMobile ? 270 : 350,
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              secondary),
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(35.0),
+                                        ),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      // Navigate to Edit Predictions Screen
+                                      /*Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditPredictionScreen(
+                          predictionData: predictionData,
+                        ),
+                      ),
+                    );*/
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: isMobile ? 0 : 5.0),
+                                      child: const Text(
+                                        "EDIT PREDICTIONS",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                          ],
+                        );
+                      }
+                    },
+                  )
+                  /* Container(
                     padding: const EdgeInsets.symmetric(vertical: 20.0),
                     width: isMobile ? 270 : 350,
                     child: ElevatedButton(
@@ -249,22 +508,52 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                         ),
                       ),
                       onPressed: () {
-                        Provider.of<AuthService>(context, listen: false)
-                                    .status ==
-                                Status.Authenticated
-                            ? Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const PredictPodiumScreen(),
+                        final authProvider =
+                            Provider.of<AuthService>(context, listen: false);
+                        if (authProvider.status == Status.Authenticated) {
+                          try {
+                            int round = int.parse(upcomingRaceInfo!['race_id']);
+                            int year = int.parse(upcomingRaceInfo['year']);
+                            Prediction newPrediction = Prediction(
+                              userId: authProvider.userApp!.id,
+                              round: round,
+                              year: year,
+                            );
+
+                            List<DriverInfo> drivers =
+                                (upcomingRaceInfo['drivers'] as List)
+                                    .map((driverJson) =>
+                                        DriverInfo.fromJson(driverJson))
+                                    .toList();
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PredictPodiumScreen(
+                                  prediction: newPrediction,
+                                  drivers: drivers,
+                                  raceName: upcomingRaceInfo['race_name'],
                                 ),
-                              )
-                            : showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return LogInDialog();
-                                },
-                              );
+                              ),
+                            );
+                          } catch (e) {
+                            print(e);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Error: Could not load prediction data'),
+                                backgroundColor: secondary,
+                              ),
+                            );
+                          }
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return LogInDialog();
+                            },
+                          );
+                        }
                       },
                       child: Padding(
                         padding:
@@ -279,7 +568,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                         ),
                       ),
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ),

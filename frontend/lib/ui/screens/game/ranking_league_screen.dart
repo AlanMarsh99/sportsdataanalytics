@@ -1,54 +1,28 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/league.dart';
+import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/ui/screens/game/result_prediction_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
 class RankingLeagueScreen extends StatefulWidget {
-  const RankingLeagueScreen(
-      {Key? key, required this.leagueId, required this.leagueName})
-      : super(key: key);
+  const RankingLeagueScreen({Key? key, required this.league}) : super(key: key);
 
-  final String leagueId;
-  final String leagueName;
+  final League league;
 
   _RankingLeagueScreenState createState() => _RankingLeagueScreenState();
 }
 
 class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
-  List<Map<String, dynamic>> rankingLeague = [
-    {
-      "username": "Brendan",
-      "totalPoints": 60,
-      "avatar": "assets/images/placeholder.png",
-    },
-    {
-      "username": "Alan",
-      "totalPoints": 50,
-      "avatar": "assets/images/placeholder.png",
-    },
-    {
-      "username": "Andrea",
-      "totalPoints": 30,
-      "avatar": "assets/images/placeholder.png",
-    },
-    {
-      "username": "Damian",
-      "totalPoints": 20,
-      "avatar": "assets/images/placeholder.png",
-    },
-    {
-      "username": "David",
-      "totalPoints": 15,
-      "avatar": "assets/images/placeholder.png",
-    },
-  ];
-
   List<String> _items = [];
+  late Future<List<UserApp>> usersFuture;
 
   @override
   void initState() {
     super.initState();
+
     _items = [
       'assets/flags/france.png',
       'assets/flags/germany.png',
@@ -63,11 +37,48 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
       'assets/flags/italy.png',
       'assets/flags/united-kingdom.png',
     ];
+
+    usersFuture = _getUsersLeague();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<List<UserApp>> _getUsersLeague() async {
+    try {
+      List<UserApp> users = [];
+      List<String> userIds = widget.league.userIds;
+
+      // Firestore `whereIn` has a limit of 10. If the list is larger, split it.
+      const int batchSize = 10;
+      for (int i = 0; i < userIds.length; i += batchSize) {
+        // Get a batch of up to `batchSize` IDs
+        List<String> batch = userIds.sublist(
+          i,
+          i + batchSize > userIds.length ? userIds.length : i + batchSize,
+        );
+
+        // Query Firestore for users in this batch
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('id', whereIn: batch)
+            .get();
+
+        // Map Firestore documents to UserApp objects
+        users.addAll(
+          snapshot.docs
+              .map((doc) => UserApp.fromMap(doc.data() as Map<String, dynamic>))
+              .toList(),
+        );
+      }
+
+      return users;
+    } catch (e) {
+      print('Error fetching users: $e');
+      return [];
+    }
   }
 
   @override
@@ -100,10 +111,19 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     },
                   ),
                   Text(
-                    widget.leagueName,
+                    widget.league.name,
                     style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    '(League code: ${widget.league.id})',
+                    style: const TextStyle(
+                        fontSize: 18,
                         color: Colors.white),
                   ),
                 ],
@@ -119,16 +139,20 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     );
   }
 
-  Widget _rankingUserContainer(int index) {
-    List<Color> indicators = [Colors.green, Colors.red, Colors.orange,];
-    return GestureDetector(
+  Widget _rankingUserContainer(UserApp user, int index) {
+    List<Color> indicators = [
+      Colors.green,
+      Colors.red,
+      Colors.orange,
+    ];
+    return InkWell(
       onTap: () {
         // Navigate to another screen when the card is tapped
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => ResultPredictionScreen(
-                    userId: rankingLeague[index]["username"].toString(),
+                    userId: user.id,
                     raceId: "",
                   )),
         );
@@ -151,14 +175,13 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
             ),
             SizedBox(width: MediaQuery.of(context).size.width * 0.06),
             CircleAvatar(
-              backgroundImage:
-                  AssetImage(rankingLeague[index]["avatar"].toString()),
+              backgroundImage: AssetImage('assets/avatars/${user.avatar}.png'),
               radius: 20,
             ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                rankingLeague[index]["username"].toString(),
+                user.username.toString(),
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 16,
@@ -171,7 +194,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  rankingLeague[index]["totalPoints"].toString(),
+                  user.seasonPoints.toString(),
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 20,
@@ -322,10 +345,43 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: ListView.builder(
-              itemCount: rankingLeague.length,
-              itemBuilder: (context, index) {
-                return _rankingUserContainer(index);
+            child: FutureBuilder<List<UserApp>>(
+              future: _getUsersLeague(), // Call the function to fetch users
+              builder: (context, snapshot) {
+                // Check the state of the Future
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // While waiting, show a CircularProgressIndicator
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  // If there's an error, display an error message
+                  return Center(
+                    child: Text(
+                      'Error loading ranking: ${snapshot.error}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  // If no data is available, show a message
+                  return Center(
+                    child: Text(
+                      'No users found in this league.',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }
+
+                // If data is available, display the ranking
+                List<UserApp> users = snapshot.data!;
+                return ListView.builder(
+                  itemCount: users.length,
+                  itemBuilder: (context, index) {
+                    return _rankingUserContainer(users[index], index + 1);
+                  },
+                );
               },
             ),
           ),

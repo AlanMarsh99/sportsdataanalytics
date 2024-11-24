@@ -5,6 +5,7 @@ class UserApp {
   String avatar;
   int level;
   int totalPoints;
+  int seasonPoints;
   int leaguesWon;
   int leaguesFinished;
   int numPredictions;
@@ -16,6 +17,7 @@ class UserApp {
     required this.avatar,
     required this.level,
     required this.totalPoints,
+    required this.seasonPoints,
     required this.leaguesWon,
     required this.leaguesFinished,
     required this.numPredictions,
@@ -29,6 +31,7 @@ class UserApp {
       'avatar': avatar,
       'level': level,
       'totalPoints': totalPoints,
+      'seasonPoints': seasonPoints,
       'leaguesWon': leaguesWon,
       'leaguesFinished': leaguesFinished,
       'numPredictions': numPredictions,
@@ -43,6 +46,7 @@ class UserApp {
       avatar: map['avatar'],
       level: map['level'],
       totalPoints: map['totalPoints'],
+      seasonPoints: map['seasonPoints'],
       leaguesWon: map['leaguesWon'],
       leaguesFinished: map['leaguesFinished'],
       numPredictions: map['numPredictions'],
@@ -51,6 +55,6 @@ class UserApp {
 
   @override
   String toString() {
-    return 'UserApp(id: $id, name: $username, email: $email, avatar: $avatar, level: $level, totalPoints: $totalPoints, leaguesFinished: $leaguesFinished,leaguesWon: $leaguesWon, numPredictions: $numPredictions)';
+    return 'UserApp(id: $id, name: $username, email: $email, avatar: $avatar, level: $level, totalPoints: $totalPoints, seasonPoints: $seasonPoints,leaguesFinished: $leaguesFinished,leaguesWon: $leaguesWon, numPredictions: $numPredictions)';
   }
 }

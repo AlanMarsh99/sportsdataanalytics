@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/lap_data.dart';
+import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
@@ -143,23 +145,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      upcomingRaceInfo != null && lastRaceResults != null
-                          ? Column(
-                              children: [
-                                _countdownContainer(upcomingRaceInfo, true),
-                                const SizedBox(height: 16),
-                                _lastRaceResultsContainer(lastRaceResults, true)
-                              ],
-                            )
-                          : SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height * 0.8,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+                      Column(
+                        children: [
+                          upcomingRaceInfo != null
+                              ? _countdownContainer(upcomingRaceInfo, true)
+                              : const SizedBox(),
+                          const SizedBox(height: 16),
+                          lastRaceResults != null
+                              ? _lastRaceResultsContainer(lastRaceResults, true)
+                              : const SizedBox(),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       _driversStandingsContainer(true),
                       const SizedBox(height: 16),
@@ -194,29 +190,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      upcomingRaceInfo != null && lastRaceResults != null
-                          ? Row(
-                              children: [
-                                Flexible(
+                      Row(
+                        children: [
+                          upcomingRaceInfo != null
+                              ? Flexible(
                                   child: _countdownContainer(
                                       upcomingRaceInfo, false),
-                                ),
-                                const SizedBox(width: 16),
-                                Flexible(
+                                )
+                              : const SizedBox(),
+                          const SizedBox(width: 16),
+                          lastRaceResults != null
+                              ? Flexible(
                                   child: _lastRaceResultsContainer(
                                       lastRaceResults, false),
                                 )
-                              ],
-                            )
-                          : SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              height: MediaQuery.of(context).size.height * 0.8,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+                              : const SizedBox(),
+                        ],
+                      ),
                       const SizedBox(height: 16),
                       Row(
                         children: [
@@ -636,21 +626,42 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     onPressed: () {
-                      Provider.of<AuthService>(context, listen: false).status ==
-                              Status.Authenticated
-                          ? Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const PredictPodiumScreen(),
-                              ),
-                            )
-                          : showDialog(
-                              context: context,
-                              builder: (context) {
-                                return LogInDialog();
-                              },
-                            );
+                      if (Provider.of<AuthService>(context, listen: false)
+                              .status ==
+                          Status.Authenticated) {
+                        Prediction newPrediction = Prediction(
+                          userId:
+                              Provider.of<AuthService>(context, listen: false)
+                                  .user!
+                                  .uid,
+                          round: upcomingRaceInfo!['round'],
+                          year: upcomingRaceInfo['year'],
+                        );
+
+                        List<DriverInfo> drivers = (upcomingRaceInfo['drivers']
+                                as List)
+                            .map(
+                                (driverJson) => DriverInfo.fromJson(driverJson))
+                            .toList();
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PredictPodiumScreen(
+                              prediction: newPrediction,
+                              drivers: drivers,
+                              raceName: upcomingRaceInfo['race_name'],
+                            ),
+                          ),
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return LogInDialog();
+                          },
+                        );
+                      }
                     },
                     child: Padding(
                       padding:

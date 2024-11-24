@@ -84,6 +84,7 @@ class AuthService extends ChangeNotifier {
         username: username,
         email: email,
         totalPoints: 0,
+        seasonPoints: 0,
         level: 1,
         avatar: 'default',
         numPredictions: 0,

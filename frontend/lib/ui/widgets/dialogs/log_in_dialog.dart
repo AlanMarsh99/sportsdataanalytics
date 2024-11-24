@@ -52,13 +52,14 @@ class LogInDialog extends StatelessWidget {
                       ),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => LoginScreen(),
                       ),
                     );
+                    Navigator.pop(context);
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 5.0),
@@ -84,13 +85,14 @@ class LogInDialog extends StatelessWidget {
                       ),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => SignUpScreen(),
                       ),
                     );
+                    Navigator.pop(context);
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 5.0),

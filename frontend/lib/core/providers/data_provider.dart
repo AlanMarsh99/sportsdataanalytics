@@ -48,17 +48,23 @@ class DataProvider extends ChangeNotifier {
       // Wait for both API calls to complete before notifying listeners
       final results = await Future.wait([
         apiService.getUpcomingRace(),
-        apiService.getLastRaceResults(),
         apiService.getDriverStandings(DateTime.now().year),
         apiService.getConstructorStandings(DateTime.now().year),
       ]);
 
       _upcomingRaceInfo = results[0];
-      _lastRaceResults = results[1];
-      _driversStandings = results[2]['driver_standings'];
-      _constructorsStandings = results[3]['constructors_standings'];
+      _driversStandings = results[1]['driver_standings'];
+      _constructorsStandings = results[2]['constructors_standings'];
 
-      if (_lastRaceResults != null) {
+      notifyListeners();
+
+      _lastRaceResults = await apiService.getLastRaceResults().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          return {};
+        },
+      );
+      if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
         int lastRaceYear = int.parse(_lastRaceResults!['year']);
         int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
 
