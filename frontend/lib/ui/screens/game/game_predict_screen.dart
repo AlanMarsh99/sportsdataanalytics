@@ -391,16 +391,17 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                         );
                       } else {
                         // Prediction found, check if editable
-                        Timestamp timestamp = predictionData.timestamp!;
+                        /*Timestamp timestamp = predictionData.timestamp!;
                         DateTime predictionTime = timestamp.toDate();
                         DateTime editDeadline =
-                            raceDate!.subtract(const Duration(days: 2));
+                            raceDate!.subtract(const Duration(days: 2));*/
 
-                        return Row(
+                        return /*Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Flexible(
-                              child: Container(
+                              child: */Container(
+                                  width: isMobile ? 270 : 350,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 20.0),
                                 //width: isMobile ? 270 : 350,
@@ -441,9 +442,9 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            if (predictionTime.isBefore(editDeadline))
+                              );
+                            //),
+                            /*if (predictionTime.isBefore(editDeadline))
                               Flexible(
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -487,9 +488,9 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                                     ),
                                   ),
                                 ),
-                              )
-                          ],
-                        );
+                              )*/
+                         // ],
+                        //);
                       }
                     },
                   )
