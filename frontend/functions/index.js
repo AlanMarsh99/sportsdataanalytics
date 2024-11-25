@@ -15,15 +15,17 @@
 //   response.send("Hello from Firebase!");
 // });
 
-const functions = require("firebase-functions");
+const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
 const axios = require("axios");
-const {onSchedule} = require("firebase-functions/v2/scheduler");
-const {logger} = require("firebase-functions");
 
 admin.initializeApp();
 
-exports.processRaceResults = onSchedule("every day 00:00", async (event) => {
+exports.processRaceResults = functions
+    .region('europe-west3')
+    .pubsub.schedule("every day 00:00")
+    .timeZone("UTC")
+    .onRun(async (context) => {
         const db = admin.firestore();
 
         try {
