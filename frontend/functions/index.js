@@ -54,6 +54,31 @@ exports.processRaceResults = functions
 
             const raceResults = apiResponse.data;
 
+            /*const raceResults = {
+                race_id: "23",
+                first_position: {
+                    driver_name: "Max Verstappen",
+                    team_name: "Red Bull",
+                    driver_id: "max_verstappen",
+                },
+                second_position: {
+                    driver_name: "Lewis Hamilton",
+                    team_name: "Mercedes",
+                    driver_id: "hamilton",
+                },
+                third_position: {
+                    driver_name: "Charles Leclerc",
+                    team_name: "Ferrari",
+                    driver_id: "leclerc",
+                },
+                fastest_lap: {
+                    driver_name: "Max Verstappen",
+                    team_name: "Red Bull",
+                    driver_id: "max_verstappen",
+                },
+                year: "2024",
+            };*/
+
             if (raceResults.year === String(year) && raceResults.race_id === String(round)) {
                 console.log(`Race results for year ${year} and round ${round} already processed`);
                 return null;
@@ -110,7 +135,7 @@ exports.processRaceResults = functions
                         points += 30; // Correct winner
                     }
 
-                    // Award 20 points for matching any driver in the podium
+                    // Award 10 points for matching any driver in the podium
                     if (prediction.podiumIds) {
                         const matchedPodiumDrivers = prediction.podiumIds.filter((driver) =>
                             actualPodiumIds.includes(driver)
