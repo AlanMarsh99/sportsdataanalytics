@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/responsive.dart';
+import 'package:frontend/ui/screens/game/tutorial_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/carousel_game_options.dart';
 
@@ -115,8 +116,7 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
         onPressed: () async {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => F1Carousel()
-                //GamePredictScreen(),
+            MaterialPageRoute(builder: (context) => TutorialScreen()
                 ),
           );
         },
