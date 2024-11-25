@@ -161,6 +161,7 @@ class _PredictWinnerScreenState extends State<PredictWinnerScreen> {
                 onPressed: () {
                   Prediction newPrediction = widget.prediction;
                   newPrediction.winnerId = selectedDriver!.driverId;
+                  newPrediction.winnerName = selectedDriver!.driverName;
                   Navigator.push(
                     context,
                     MaterialPageRoute(

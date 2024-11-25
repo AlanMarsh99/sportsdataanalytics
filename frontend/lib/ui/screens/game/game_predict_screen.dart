@@ -8,6 +8,7 @@ import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
+import 'package:frontend/ui/widgets/dialogs/view_predictions_dialog.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 
@@ -400,51 +401,48 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Flexible(
-                              child: */Container(
-                                  width: isMobile ? 270 : 350,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 20.0),
-                                //width: isMobile ? 270 : 350,
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            secondary),
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(35.0),
-                                      ),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    // Navigate to View Predictions Screen
-                                    /*Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ViewPredictionScreen(
-                        predictionData: predictionData,
-                      ),
-                    ),
-                  );*/
-                                  },
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: isMobile ? 0 : 5.0),
-                                    child: const Text(
-                                      "VIEW PREDICTIONS",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
+                              child: */
+                            Container(
+                          width: isMobile ? 270 : 350,
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          //width: isMobile ? 270 : 350,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all<Color>(secondary),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(35.0),
                                 ),
+                              ),
+                            ),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return ViewPredictionsDialog(
+                                      prediction: predictionData,
+                                      raceName: upcomingRaceInfo['race_name']);
+                                },
                               );
-                            //),
-                            /*if (predictionTime.isBefore(editDeadline))
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 0 : 5.0),
+                              child: const Text(
+                                "VIEW PREDICTIONS",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                        //),
+                        /*if (predictionTime.isBefore(editDeadline))
                               Flexible(
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -489,7 +487,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                                   ),
                                 ),
                               )*/
-                         // ],
+                        // ],
                         //);
                       }
                     },

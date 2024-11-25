@@ -15,15 +15,17 @@
 //   response.send("Hello from Firebase!");
 // });
 
-const functions = require("firebase-functions");
+const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
 const axios = require("axios");
-const {onSchedule} = require("firebase-functions/v2/scheduler");
-const {logger} = require("firebase-functions");
 
 admin.initializeApp();
 
-exports.processRaceResults = onSchedule("every day 00:00", async (event) => {
+exports.processRaceResults = functions
+    .region('europe-west3')
+    .pubsub.schedule("every day 00:00")
+    .timeZone("UTC")
+    .onRun(async (context) => {
         const db = admin.firestore();
 
         try {
@@ -51,6 +53,31 @@ exports.processRaceResults = onSchedule("every day 00:00", async (event) => {
             }
 
             const raceResults = apiResponse.data;
+
+            /*const raceResults = {
+                race_id: "23",
+                first_position: {
+                    driver_name: "Max Verstappen",
+                    team_name: "Red Bull",
+                    driver_id: "max_verstappen",
+                },
+                second_position: {
+                    driver_name: "Lewis Hamilton",
+                    team_name: "Mercedes",
+                    driver_id: "hamilton",
+                },
+                third_position: {
+                    driver_name: "Charles Leclerc",
+                    team_name: "Ferrari",
+                    driver_id: "leclerc",
+                },
+                fastest_lap: {
+                    driver_name: "Max Verstappen",
+                    team_name: "Red Bull",
+                    driver_id: "max_verstappen",
+                },
+                year: "2024",
+            };*/
 
             if (raceResults.year === String(year) && raceResults.race_id === String(round)) {
                 console.log(`Race results for year ${year} and round ${round} already processed`);
@@ -108,7 +135,7 @@ exports.processRaceResults = onSchedule("every day 00:00", async (event) => {
                         points += 30; // Correct winner
                     }
 
-                    // Award 20 points for matching any driver in the podium
+                    // Award 10 points for matching any driver in the podium
                     if (prediction.podiumIds) {
                         const matchedPodiumDrivers = prediction.podiumIds.filter((driver) =>
                             actualPodiumIds.includes(driver)
