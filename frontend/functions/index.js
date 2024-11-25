@@ -150,11 +150,41 @@ exports.processRaceResults = functions
 
                     console.log(`User ${userId} gained ${points} points for race year ${raceYear}, round ${raceRound}`);
 
-                    // Update user points in Firestore
+                    // Get user data to calculate new level
                     const userRef = db.collection("users").doc(userId);
-                    batch.update(userRef, {
-                        seasonPoints: admin.firestore.FieldValue.increment(points), // Update season points
-                        totalPoints: admin.firestore.FieldValue.increment(points), // Update total points
+                    userRef.get().then((userDoc) => {
+                        if (userDoc.exists) {
+                            const userData = userDoc.data();
+                            const currentTotalPoints = userData.totalPoints || 0;
+                            const newTotalPoints = currentTotalPoints + points;
+
+                            // Function to calculate level based on total points
+                            const calculateLevel = (points) => {
+                                const basePoints = 100; // Points required for level 2
+                                const growthRate = 1.1; // Exponential growth rate
+                                let level = 1;
+                                while (points >= basePoints * Math.pow(level, growthRate)) {
+                                    level++;
+                                }
+                                return level;
+                            };
+
+                            const currentLevel = userData.level || 1;
+                            const newLevel = calculateLevel(newTotalPoints);
+
+                            // Update user points and level if needed
+                            const updates = {
+                                seasonPoints: admin.firestore.FieldValue.increment(points),
+                                totalPoints: admin.firestore.FieldValue.increment(points),
+                            };
+
+                            if (newLevel > currentLevel) {
+                                updates.level = newLevel;
+                                console.log(`User ${userId} leveled up from ${currentLevel} to ${newLevel}`);
+                            }
+
+                            batch.update(userRef, updates);
+                        }
                     });
 
                     // Update prediction document with the points gained
@@ -162,6 +192,7 @@ exports.processRaceResults = functions
                     batch.update(predictionRef, { points: points }); // Add the points to the prediction document
                 }
             });
+
 
             // Step 5: Call the API to get upcoming race details
             /*const apiResponse2 = await axios.get(`https://sportsdataanalytics.onrender.com/home/upcoming_race/`).catch(error => {
