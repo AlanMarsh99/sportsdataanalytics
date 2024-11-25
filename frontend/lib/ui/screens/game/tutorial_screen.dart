@@ -31,17 +31,40 @@ class _TutorialScreenState extends State<TutorialScreen>
         'assets/tutorial/tutorial1.png',
         //fit: BoxFit.cover,
       ),
+      index: 1,
     ),
     TutorialPage(
-        title: "CREATE AND JOIN LEAGUES",
-        description:
-            "Show your skills and challenge your peers by creating or joining a league, and race to claim the top spot on the podium at every race.",
-        content: Container()),
+      title: "CREATE AND JOIN LEAGUES",
+      description:
+          "Show your skills and challenge your peers by creating or joining a league, and race to claim the top spot on the podium at every race.",
+      content: Container(),
+      index: 2,
+    ),
     TutorialPage(
-        title: "DRIVE TO THE DIFFERENT SCREENS USING THE STEERING WHEEL",
-        description:
-            "Use the steering wheel to navigate through the different game screens. Just turn it left or right as if you were an F1 driver!",
-        content: Container()),
+      title: "DRIVE TO THE DIFFERENT SCREENS USING THE STEERING WHEEL",
+      description:
+          "Use the steering wheel to navigate through the different game screens. Just turn it left or right as if you were an F1 driver!",
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Image.asset('assets/tutorial/tutorial3.png', width: 400),
+          const SizedBox(height: 20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.arrow_upward_rounded,
+                  color: Colors.white, size: 50),
+              Image.asset('assets/images/wheel.png', width: 200),
+              const Icon(Icons.arrow_downward_rounded,
+                  color: Colors.white, size: 50),
+            ],
+          ),
+        ],
+      ),
+      index: 3,
+    ),
   ];
 
   @override
@@ -49,7 +72,7 @@ class _TutorialScreenState extends State<TutorialScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 200),
     );
     _myAnimation = CurvedAnimation(curve: Curves.linear, parent: _controller);
   }
@@ -57,7 +80,7 @@ class _TutorialScreenState extends State<TutorialScreen>
   void _nextPage() {
     if (_currentPage < _pages.length - 1) {
       _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
@@ -68,7 +91,7 @@ class _TutorialScreenState extends State<TutorialScreen>
   void _previousPage() {
     if (_currentPage > 0) {
       _pageController.previousPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -127,7 +150,7 @@ class _TutorialScreenState extends State<TutorialScreen>
                       children: [
                         TextButton(
                           onPressed: _endTour,
-                          child: Text(
+                          child: const Text(
                             "SKIP",
                             style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
@@ -163,7 +186,7 @@ class _TutorialScreenState extends State<TutorialScreen>
                                   ),
                                 ),
                               ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             TextButton(
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -185,7 +208,7 @@ class _TutorialScreenState extends State<TutorialScreen>
                                   _currentPage == _pages.length - 1
                                       ? "END TOUR "
                                       : "NEXT",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       color: white,
                                       fontSize: 14.0,
                                       fontWeight: FontWeight.w400),
@@ -210,9 +233,9 @@ class _TutorialScreenState extends State<TutorialScreen>
               body: Row(
                 children: [
                   NavigationRail(
-                    selectedIconTheme: IconThemeData(color: secondary),
+                    selectedIconTheme: const IconThemeData(color: secondary),
                     unselectedIconTheme:
-                        IconThemeData(color: Colors.white, opacity: 1),
+                        const IconThemeData(color: Colors.white, opacity: 1),
                     extended: nav.extended,
                     selectedIndex: nav.selectedIndex,
                     destinations: _destinations,
@@ -265,7 +288,7 @@ class _TutorialScreenState extends State<TutorialScreen>
                             children: [
                               TextButton(
                                 onPressed: _endTour,
-                                child: Text(
+                                child: const Text(
                                   "SKIP",
                                   style: TextStyle(
                                       fontSize: 16, color: Colors.white),
@@ -303,7 +326,7 @@ class _TutorialScreenState extends State<TutorialScreen>
                                         ),
                                       ),
                                     ),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   TextButton(
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
@@ -325,7 +348,7 @@ class _TutorialScreenState extends State<TutorialScreen>
                                         _currentPage == _pages.length - 1
                                             ? "END TOUR "
                                             : "NEXT",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             color: white,
                                             fontSize: 14.0,
                                             fontWeight: FontWeight.w400),
@@ -352,11 +375,13 @@ class TutorialPage extends StatelessWidget {
   final String title;
   final String description;
   final Widget content;
+  final int index;
 
   const TutorialPage({
     required this.title,
     required this.description,
     required this.content,
+    required this.index,
   });
 
   @override
@@ -376,7 +401,7 @@ class TutorialPage extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
           Text(
             description,
             style: TextStyle(
@@ -384,16 +409,17 @@ class TutorialPage extends StatelessWidget {
               color: Colors.grey[300],
             ),
           ),
-          SizedBox(height: 35),
+          const SizedBox(height: 35),
           Align(
             alignment: Alignment.center,
             child: Container(
-                width: isMobile ? 300 : 450,
+                width: isMobile ? 340 : 450,
                 height: isMobile ? 290 : 440,
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 //height: isMobile ? 350 : 487,
                 decoration: BoxDecoration(
-                  color: primary,
+                  color: index < 3 ? primary : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: content),
