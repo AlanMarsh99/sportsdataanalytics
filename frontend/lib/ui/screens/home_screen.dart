@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/lap_data.dart';
 import 'package:frontend/core/models/prediction.dart';
@@ -12,6 +13,7 @@ import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/screens/teams/teams_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
+import 'package:frontend/ui/widgets/dialogs/view_predictions_dialog.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
@@ -27,24 +29,58 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Duration remainingTime;
-  late Timer timer;
+  Timer? timer;
   bool firstTime = true;
   Race? lastRaceInfo;
   Color buttonColor = Colors.white;
   List<dynamic>? driversStandings;
   List<dynamic>? constructorsStandings;
+  late Future<Prediction?> userPredictionFuture;
 
   @override
   void initState() {
     super.initState();
+    userPredictionFuture = Future.value(null);
   }
 
   @override
   void dispose() {
-    if (timer.isActive) {
-      timer.cancel();
+    if (timer != null) {
+      timer!.cancel();
     }
     super.dispose();
+  }
+
+  Future<Prediction?> _checkUserPrediction(
+      Map<String, dynamic> upcomingRaceInfo) async {
+    try {
+      final authProvider = Provider.of<AuthService>(context, listen: false);
+      if (authProvider.status == Status.Authenticated) {
+        int round = int.parse(upcomingRaceInfo!['race_id']);
+        int year = int.parse(upcomingRaceInfo['year']);
+
+        // Query Firestore to find if the user has made a prediction for the race
+        QuerySnapshot predictionSnapshot = await FirebaseFirestore.instance
+            .collection('predictions')
+            .where('userId', isEqualTo: authProvider.userApp!.id)
+            .where('year', isEqualTo: year)
+            .where('round', isEqualTo: round)
+            .limit(1)
+            .get();
+
+        if (predictionSnapshot.docs.isNotEmpty) {
+          // Convert the Firestore document to a Prediction instance
+          return Prediction.fromMap(
+              predictionSnapshot.docs.first.data() as Map<String, dynamic>);
+        }
+        return null; // No prediction found
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return null;
+    }
   }
 
   static String getMappedTeamName(String apiTeamName) {
@@ -70,19 +106,32 @@ class _HomeScreenState extends State<HomeScreen> {
     // Convert date and time strings to DateTime object
     DateTime raceDate = DateTime.parse("$date $hour:00");
 
-    setState(() {
-      remainingTime = raceDate.difference(DateTime.now());
-    });
+    DateTime deadline = raceDate!.subtract(const Duration(days: 3));
+    remainingTime = deadline!.difference(DateTime.now());
 
-    // Set up the timer to update every second
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    if (remainingTime.isNegative) {
+      timer = null;
       setState(() {
-        remainingTime = raceDate.difference(DateTime.now());
-        if (remainingTime.isNegative) {
-          timer.cancel();
-        }
+        remainingTime =
+            const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
       });
-    });
+    } else {
+      setState(() {
+        remainingTime = deadline!.difference(DateTime.now());
+      });
+
+      // Set up the timer to update every second
+      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          remainingTime = deadline!.difference(DateTime.now());
+          if (remainingTime.isNegative) {
+            remainingTime =
+                const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
+            timer.cancel();
+          }
+        });
+      });
+    }
   }
 
   @override
@@ -96,6 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (upcomingRaceInfo != null && firstTime) {
       firstTime = false;
       startCountdown(upcomingRaceInfo);
+      userPredictionFuture = _checkUserPrediction(upcomingRaceInfo);
     }
 
     final lastRaceResults = dataProvider.lastRaceResults;
@@ -612,71 +662,164 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 SizedBox(height: isMobile ? 25 : 35),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  width: 270,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(secondary),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(35.0),
+                FutureBuilder<Prediction?>(
+                  future: userPredictionFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
                         ),
-                      ),
-                    ),
-                    onPressed: () {
-                      if (Provider.of<AuthService>(context, listen: false)
-                              .status ==
-                          Status.Authenticated) {
-                        Prediction newPrediction = Prediction(
-                          userId:
-                              Provider.of<AuthService>(context, listen: false)
-                                  .user!
-                                  .uid,
-                          round: upcomingRaceInfo!['round'],
-                          year: upcomingRaceInfo['year'],
-                        );
+                      );
+                    }
 
-                        List<DriverInfo> drivers = (upcomingRaceInfo['drivers']
-                                as List)
-                            .map(
-                                (driverJson) => DriverInfo.fromJson(driverJson))
-                            .toList();
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text(
+                          "Error checking predictions",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    }
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PredictPodiumScreen(
-                              prediction: newPrediction,
-                              drivers: drivers,
-                              raceName: upcomingRaceInfo['race_name'],
+                    final predictionData = snapshot.data;
+
+                    if (predictionData == null) {
+                      DateTime editDeadline =
+                          raceDate!.subtract(const Duration(days: 3));
+                      DateTime now = DateTime.now();
+                      bool canMakePrediction = now.isBefore(editDeadline);
+
+                      // No prediction made
+                      return Visibility(
+                        visible: canMakePrediction,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          width: isMobile ? 270 : 350,
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStateProperty.all<Color>(secondary),
+                              shape: WidgetStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(35.0),
+                                ),
+                              ),
+                            ),
+                            onPressed: () async {
+                              final authProvider = Provider.of<AuthService>(
+                                  context,
+                                  listen: false);
+                              if (authProvider.status == Status.Authenticated) {
+                                try {
+                                  int round =
+                                      int.parse(upcomingRaceInfo!['race_id']);
+                                  int year =
+                                      int.parse(upcomingRaceInfo['year']);
+                                  Prediction newPrediction = Prediction(
+                                    userId: authProvider.userApp!.id,
+                                    round: round,
+                                    year: year,
+                                  );
+
+                                  List<DriverInfo> drivers =
+                                      (upcomingRaceInfo['drivers'] as List)
+                                          .map((driverJson) =>
+                                              DriverInfo.fromJson(driverJson))
+                                          .toList();
+
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PredictPodiumScreen(
+                                        prediction: newPrediction,
+                                        drivers: drivers,
+                                        raceName: upcomingRaceInfo['race_name'],
+                                      ),
+                                    ),
+                                  );
+                                  userPredictionFuture =
+                                      _checkUserPrediction(upcomingRaceInfo);
+                                } catch (e) {
+                                  print(e);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Error: Could not load prediction data'),
+                                      backgroundColor: secondary,
+                                    ),
+                                  );
+                                }
+                              } else {
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return LogInDialog();
+                                  },
+                                );
+                                userPredictionFuture =
+                                    _checkUserPrediction(upcomingRaceInfo);
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 0 : 5.0),
+                              child: const Text(
+                                'PLAY',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ),
                           ),
-                        );
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return LogInDialog();
-                          },
-                        );
-                      }
-                    },
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: isMobile ? 0 : 5.0),
-                      child: const Text(
-                        'PLAY',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
                         ),
-                      ),
-                    ),
-                  ),
-                ),
+                      );
+                    } else {
+                      return Container(
+                        width: isMobile ? 270 : 350,
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        //width: isMobile ? 270 : 350,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(secondary),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(35.0),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return ViewPredictionsDialog(
+                                    prediction: predictionData,
+                                    raceName: upcomingRaceInfo['race_name']);
+                              },
+                            );
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: isMobile ? 0 : 5.0),
+                            child: const Text(
+                              "VIEW PREDICTIONS",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                )
               ],
             ),
           ),
