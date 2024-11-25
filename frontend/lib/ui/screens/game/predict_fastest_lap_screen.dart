@@ -167,6 +167,7 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                       .doc()
                       .id;
                   newPrediction.fastestLapId = selectedDriver!.driverId;
+                  newPrediction.fastestLapName = selectedDriver!.driverName;
                   //newPrediction.timestamp = FieldValue.serverTimestamp();
 
                   Map<String, dynamic> predictionData = newPrediction.toMap();

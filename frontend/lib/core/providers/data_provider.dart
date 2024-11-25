@@ -60,9 +60,6 @@ class DataProvider extends ChangeNotifier {
 
       _lastRaceResults = await apiService.getLastRaceResults().timeout(
         const Duration(seconds: 10),
-        onTimeout: () {
-          return {};
-        },
       );
       if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
         int lastRaceYear = int.parse(_lastRaceResults!['year']);

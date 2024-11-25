@@ -168,6 +168,9 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                   newPrediction.podiumIds = selectedDrivers
                       .map((driver) => driver!.driverId)
                       .toList();
+                      newPrediction.podiumNames = selectedDrivers
+                        .map((driver) => driver!.driverName)
+                      .toList();
                   Navigator.push(
                     context,
                     MaterialPageRoute(

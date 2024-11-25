@@ -6,8 +6,11 @@ class Prediction {
   int year;
   int round;
   String? winnerId;
+  String? winnerName;
   List<String>? podiumIds;
+  List<String>? podiumNames;
   String? fastestLapId;
+  String? fastestLapName;
   Timestamp? timestamp;
   int? points;
 
@@ -18,8 +21,11 @@ class Prediction {
     required this.year,
     required this.round,
     this.winnerId,
+    this.winnerName,
     this.podiumIds,
+    this.podiumNames,
     this.fastestLapId,
+    this.fastestLapName,
     this.timestamp,
     this.points
   });
@@ -31,8 +37,11 @@ class Prediction {
       'year': year,
       'round': round,
       'winnerId': winnerId,
+      'winnerName': winnerName,
       'podiumIds': podiumIds,
+      'podiumNames': podiumNames,
       'fastestLapId': fastestLapId,
+      'fastestLapName': fastestLapName,
       'timestamp': timestamp,
       'points': points
     };
@@ -45,8 +54,11 @@ class Prediction {
       year: map['year'],
       round: map['round'],
       winnerId: map['winnerId'],
+      winnerName: map['winnerName'],
       podiumIds: List<String>.from(map['podiumIds']),
+      podiumNames: List<String>.from(map['podiumNames']),
       fastestLapId: map['fastestLapId'],
+      fastestLapName: map['fastestLapName'],
       timestamp: map['timestamp'],
       points: map['points']
     );
