@@ -54,34 +54,33 @@ class _F1CarouselState extends State<F1Carousel> with TickerProviderStateMixin {
     });
   }
 
+  // It works
   void _handlePanUpdate(DragUpdateDetails details) {
     final screenWidth = MediaQuery.of(context).size.width;
     final touchPosition = details.localPosition.dx;
 
-    // Check if the swipe is on the left or right side of the image
-    if (touchPosition < screenWidth / 2) {
-      // Left side of the image
+    // Redefine what counts as "left" and "right" sides:
+    final double rightSideThreshold = screenWidth * 0.05; // 5% of the screen width is left side
+
+    if (touchPosition < rightSideThreshold) {
+      // Treat as left side (5% of the screen width)
       if (details.delta.dy < 0) {
-        // Swiping up on the left side (rotate to the right)
-        _rotateWheel(_delta);
+        _rotateWheel(_delta); // Rotate to the right
         _goToNextPage();
         _hasChangedScreen = true;
       } else if (details.delta.dy > 0) {
-        // Swiping down on the left side (rotate to the left)
-        _rotateWheel(-1 * _delta);
+        _rotateWheel(-1 * _delta); // Rotate to the left
         _goToPreviousPage();
         _hasChangedScreen = true;
       }
     } else {
-      // Right side of the image
+      // Treat as right side (remaining 95% of the screen width)
       if (details.delta.dy < 0) {
-        // Swiping up on the right side (rotate to the left)
-        _rotateWheel(-1 * _delta);
+        _rotateWheel(-1 * _delta); // Rotate to the left
         _goToPreviousPage();
         _hasChangedScreen = true;
       } else if (details.delta.dy > 0) {
-        // Swiping down on the right side (rotate to the right)
-        _rotateWheel(_delta);
+        _rotateWheel(_delta); // Rotate to the right
         _goToNextPage();
         _hasChangedScreen = true;
       }

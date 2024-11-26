@@ -11,7 +11,7 @@ BASE_ERGAST_URL = "http://ergast.com/api/f1"
 
 # Get upcoming race information - WORKS
 @api_blueprint.route('/home/upcoming_race/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_upcoming_race():
     # Fetch the current season's schedule
     schedule_url = f"{BASE_ERGAST_URL}/current.json"
@@ -31,19 +31,42 @@ def get_upcoming_race():
                 "race_name": race['raceName'],
                 "race_id": race['round'],
                 "date": race['date'],
-                "hour": race['time'][:5]  # Extract hour and minute from time
+                "hour": race['time'][:5],  # Extract hour and minute from time
+                "year": race['season'],   # Add year field
+                "drivers": []             # Placeholder for drivers
             }
             break
 
     if not upcoming_race:
         return jsonify({"error": "No upcoming races found"}), 404
 
+    # Fetch all drivers and their teams for the current season
+    standings_url = f"{BASE_ERGAST_URL}/current/driverStandings.json"
+    drivers_response = requests.get(standings_url)
+    
+    if drivers_response.status_code == 200:
+        standings_data = drivers_response.json()
+        standings_list = standings_data.get('MRData', {}).get('StandingsTable', {}).get('StandingsLists', [])
+
+        if standings_list:
+            driver_standings = standings_list[0].get('DriverStandings', [])
+            upcoming_race['drivers'] = [
+                {
+                    "driver_id": driver['Driver']['driverId'],
+                    "driver_name": f"{driver['Driver']['givenName']} {driver['Driver']['familyName']}",
+                    "team_name": driver['Constructors'][0]['name']  # Extract team name from Constructors
+                }
+                for driver in driver_standings
+            ]
+    else:
+        upcoming_race['drivers'] = [{"error": "Failed to fetch driver standings for the current season."}]
+
     return jsonify(upcoming_race)
 
 
 # Get last race results - WORKS
 @api_blueprint.route('/home/last_race_results/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_last_race_results():
     # Fetch the current season's schedule
     schedule_url = f"{BASE_ERGAST_URL}/current.json"
@@ -114,7 +137,7 @@ def get_last_race_results():
 
 # Get single specific race details (See More on home screen) - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_race_by_year_and_round(year, round):
     # Fetch race data for the specific year and round
     race_url = f"{BASE_ERGAST_URL}/{year}/{round}.json"
@@ -229,7 +252,7 @@ def get_race_by_year_and_round(year, round):
 
 # Get current season constructors standings - WORKS
 @api_blueprint.route('/constructors/<int:year>/standings/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_constructors_standings(year):
     # Retrieve constructors' current points tally and names for the specified season
     standings_url = f"{BASE_ERGAST_URL}/{year}/constructorStandings.json"
@@ -255,7 +278,7 @@ def get_constructors_standings(year):
 
 # Get drivers' current points tally and names for the given season - WORKS
 @api_blueprint.route('/drivers/<int:year>/standings/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_drivers_current_points(year):
     # Define the Ergast API endpoint for driver standings
     driver_standings_url = f"{BASE_ERGAST_URL}/{year}/driverStandings.json"
@@ -291,7 +314,7 @@ def get_drivers_current_points(year):
 
 # Get lap-by-lap positions for a specific race - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/positions/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_race_positions(year, round):
     # Fetch race results to determine the total number of laps
     results_url = f"{BASE_ERGAST_URL}/{year}/{round}/results.json"
@@ -374,7 +397,7 @@ def get_race_positions(year, round):
 
 # Get lap-by-lap positions and lap times for a single driver and list of drivers for a specific race - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/driver/<string:driver_id>/lap_data/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_driver_lap_data_with_drivers(year, round, driver_id):
     # Fetch lap data for the driver
     limit = 1000  # Ensure we retrieve all laps
@@ -447,7 +470,7 @@ def get_driver_lap_data_with_drivers(year, round, driver_id):
 
 # Get list of all races in selected year - WORKS
 @api_blueprint.route('/races/<int:year>/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_races_by_year(year):
     # Fetch all races in the selected year
     races_url = f"{BASE_ERGAST_URL}/{year}.json"
@@ -577,7 +600,7 @@ def get_races_by_year(year):
 
 # Get detailed results for a specific race - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/results/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_race_results(year, round):
     # Fetch race results for a specific race
     results_url = f"{BASE_ERGAST_URL}/{year}/{round}/results.json"
@@ -607,7 +630,7 @@ def get_race_results(year, round):
 
 # Get lap by lap details for specific driver in a race - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/driver/<string:driver_id>/laps/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_driver_lap_times(year, round, driver_id):
     lap = 1
     lap_times = []
@@ -637,7 +660,7 @@ def get_driver_lap_times(year, round, driver_id):
 
 # Get pit stop data - WORKS
 @api_blueprint.route('/race/<int:year>/<int:round>/pitstops/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_pit_stops(year, round):
     # Fetch pit stop data for a specific race
     pitstop_url = f"{BASE_ERGAST_URL}/{year}/{round}/pitstops.json?limit=1000"
@@ -715,7 +738,7 @@ def get_pit_stops(year, round):
 
 # Get all drivers in a given year - WORKS
 @api_blueprint.route('/drivers/<int:year>/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_drivers_by_year(year):
     # Fetch all drivers who participated in the selected year
     drivers_url = f"{BASE_ERGAST_URL}/{year}/drivers.json"
@@ -935,7 +958,7 @@ def get_driver_stats(driver_id, year):
 
 # Get driver race stats for a given year - WORKS
 @api_blueprint.route('/driver/<string:driver_id>/<int:year>/races/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_driver_races(year, driver_id):
     # Fetch all races for the driver in the specified year
     race_results_url = f"{BASE_ERGAST_URL}/{year}/drivers/{driver_id}/results.json"
@@ -964,7 +987,7 @@ def get_driver_races(year, driver_id):
 
 # Get teams in a year - WORKS
 @api_blueprint.route('/teams/<int:year>/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_teams_by_year(year):
     # Fetch all constructors for the selected year
     constructors_url = f"{BASE_ERGAST_URL}/{year}/constructors.json"
@@ -1022,7 +1045,7 @@ def get_teams_by_year(year):
 
 # Get detailed team stats
 @api_blueprint.route('/team/<string:team_id>/<int:year>/stats/', methods=['GET'])
-@cache.cached(timeout=0)
+@cache.cached(timeout=86400)
 def get_team_stats(team_id, year):
     # Initialize all-time stats and season results
     all_time_stats = {
