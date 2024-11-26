@@ -163,7 +163,7 @@ exports.processRaceResults = functions
 
                                 // Calculate level
                                 const calculateLevel = (points) => {
-                                    const basePoints = 100; // Points for level 2
+                                    const basePoints = 30; // Points for level 2
                                     const growthRate = 1.1;
                                     let level = 1;
                                     while (points >= basePoints * Math.pow(level, growthRate)) {
