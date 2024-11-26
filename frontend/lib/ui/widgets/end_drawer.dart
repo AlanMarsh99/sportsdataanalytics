@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:provider/provider.dart';
+import 'dialogs/avatar_selection_dialog.dart';
 
 class EndDrawer extends StatelessWidget {
   const EndDrawer({Key? key}) : super(key: key);
@@ -47,17 +48,40 @@ class EndDrawer extends StatelessWidget {
                       auth.userApp != null) {
                     return Column(
                       children: [
+                        // Display Current Avatar
                         CircleAvatar(
                           radius: 50,
                           backgroundColor: Colors.white,
                           backgroundImage: AssetImage(
-                              'assets/avatars/${auth.userApp!.avatar}.png'),
+                              'avatars/${auth.userApp!.avatar}.png'),
                         ),
                         const SizedBox(height: 15),
+                        // Display Username
                         Text(
                           auth.userApp!.username,
                           style: const TextStyle(
                               color: Colors.white, fontSize: 14),
+                        ),
+                        const SizedBox(height: 10),
+                        // "Change Avatar" Button
+                        TextButton(
+                          onPressed: () {
+                            // Open Avatar Selection Dialog
+                            showDialog(
+                              context: context,
+                              useRootNavigator: true,
+                              builder: (context) => AvatarSelectionDialog(
+                                userApp: auth.userApp!,
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Change Avatar',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
                         ),
                         const SizedBox(
                           height: 30,
@@ -77,9 +101,9 @@ class EndDrawer extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 children: <Widget>[
                   /*_buildDrawerItem(context, 'PROFILE', 6),
-                    const SizedBox(height: 10),
-                    _buildDrawerItem(context, 'SETTINGS', 7),
-                    const SizedBox(height: 10),*/
+                  const SizedBox(height: 10),
+                  _buildDrawerItem(context, 'SETTINGS', 7),
+                  const SizedBox(height: 10),*/
                   _buildLogOutItem(context),
                 ],
               ),

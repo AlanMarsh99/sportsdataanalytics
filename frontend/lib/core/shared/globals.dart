@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/core/models/avatar.dart';
 
 import 'package:intl/intl.dart';
 
@@ -21,6 +22,7 @@ class Globals {
 
   static final Map models = {
     UserApp: (data) => UserApp.fromMap(data),
+    Avatar: (data) => Avatar.fromMap(data),
   };
 
   static final Map<String, String> teamLogos = {
