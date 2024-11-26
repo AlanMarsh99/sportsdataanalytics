@@ -358,6 +358,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                                       userId: authProvider.userApp!.id,
                                       round: round,
                                       year: year,
+                                      raceCountry: upcomingRaceInfo['country'],
                                     );
 
                                     List<DriverInfo> drivers =

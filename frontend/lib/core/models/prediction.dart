@@ -13,13 +13,14 @@ class Prediction {
   String? fastestLapName;
   Timestamp? timestamp;
   int? points;
-
+  String? raceCountry;
 
   Prediction({
     this.id,
     required this.userId,
     required this.year,
     required this.round,
+    required this.raceCountry,
     this.winnerId,
     this.winnerName,
     this.podiumIds,
@@ -27,7 +28,7 @@ class Prediction {
     this.fastestLapId,
     this.fastestLapName,
     this.timestamp,
-    this.points
+    this.points,
   });
 
   Map<String, dynamic> toMap() {
@@ -36,6 +37,7 @@ class Prediction {
       'userId': userId,
       'year': year,
       'round': round,
+      'country': raceCountry,
       'winnerId': winnerId,
       'winnerName': winnerName,
       'podiumIds': podiumIds,
@@ -49,19 +51,19 @@ class Prediction {
 
   factory Prediction.fromMap(Map<String, dynamic> map) {
     return Prediction(
-      id: map['id'],
-      userId: map['userId'],
-      year: map['year'],
-      round: map['round'],
-      winnerId: map['winnerId'],
-      winnerName: map['winnerName'],
-      podiumIds: List<String>.from(map['podiumIds']),
-      podiumNames: List<String>.from(map['podiumNames']),
-      fastestLapId: map['fastestLapId'],
-      fastestLapName: map['fastestLapName'],
-      timestamp: map['timestamp'],
-      points: map['points']
-    );
+        id: map['id'],
+        userId: map['userId'],
+        year: map['year'],
+        round: map['round'],
+        raceCountry: map['country'],
+        winnerId: map['winnerId'],
+        winnerName: map['winnerName'],
+        podiumIds: List<String>.from(map['podiumIds']),
+        podiumNames: List<String>.from(map['podiumNames']),
+        fastestLapId: map['fastestLapId'],
+        fastestLapName: map['fastestLapName'],
+        timestamp: map['timestamp'],
+        points: map['points']);
   }
 
   @override
