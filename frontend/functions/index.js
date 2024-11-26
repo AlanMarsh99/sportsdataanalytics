@@ -109,9 +109,10 @@ exports.processRaceResults = functions
                 return null;
             }
 
-            const batch = db.batch();
-
             // Step 4: Compare predictions with results and update points
+            const batch = db.batch();
+            const updatePromises = []; // Store promises for async operations
+
             predictionsSnapshot.forEach((doc) => {
                 const prediction = doc.data();
                 const predictionId = doc.id;
@@ -151,47 +152,52 @@ exports.processRaceResults = functions
                     console.log(`User ${userId} gained ${points} points for race year ${raceYear}, round ${raceRound}`);
 
                     // Get user data to calculate new level
-                    const userRef = db.collection("users").doc(userId);
-                    userRef.get().then((userDoc) => {
-                        if (userDoc.exists) {
-                            const userData = userDoc.data();
-                            const currentTotalPoints = userData.totalPoints || 0;
-                            const newTotalPoints = currentTotalPoints + points;
+                    updatePromises.push(
+                        (async () => {
+                            const userRef = db.collection("users").doc(userId);
+                            const userDoc = await userRef.get();
+                            if (userDoc.exists) {
+                                const userData = userDoc.data();
+                                const currentTotalPoints = userData.totalPoints || 0;
+                                const newTotalPoints = currentTotalPoints + points;
 
-                            // Function to calculate level based on total points
-                            const calculateLevel = (points) => {
-                                const basePoints = 100; // Points required for level 2
-                                const growthRate = 1.1; // Exponential growth rate
-                                let level = 1;
-                                while (points >= basePoints * Math.pow(level, growthRate)) {
-                                    level++;
+                                // Calculate level
+                                const calculateLevel = (points) => {
+                                    const basePoints = 100; // Points for level 2
+                                    const growthRate = 1.1;
+                                    let level = 1;
+                                    while (points >= basePoints * Math.pow(level, growthRate)) {
+                                        level++;
+                                    }
+                                    return level;
+                                };
+
+                                const currentLevel = userData.level || 1;
+                                const newLevel = calculateLevel(newTotalPoints);
+
+                                // Prepare updates
+                                const updates = {
+                                    seasonPoints: admin.firestore.FieldValue.increment(points),
+                                    totalPoints: admin.firestore.FieldValue.increment(points),
+                                };
+                                if (newLevel > currentLevel) {
+                                    updates.level = newLevel;
+                                    console.log(`User ${userId} leveled up from ${currentLevel} to ${newLevel}.`);
                                 }
-                                return level;
-                            };
 
-                            const currentLevel = userData.level || 1;
-                            const newLevel = calculateLevel(newTotalPoints);
-
-                            // Update user points and level if needed
-                            const updates = {
-                                seasonPoints: admin.firestore.FieldValue.increment(points),
-                                totalPoints: admin.firestore.FieldValue.increment(points),
-                            };
-
-                            if (newLevel > currentLevel) {
-                                updates.level = newLevel;
-                                console.log(`User ${userId} leveled up from ${currentLevel} to ${newLevel}`);
+                                batch.update(userRef, updates);
                             }
-
-                            batch.update(userRef, updates);
-                        }
-                    });
+                        })()
+                    );
 
                     // Update prediction document with the points gained
                     const predictionRef = db.collection("predictions").doc(predictionId);
                     batch.update(predictionRef, { points: points }); // Add the points to the prediction document
                 }
             });
+
+            // Wait for all async operations to finish
+            await Promise.all(updatePromises);
 
 
             // Step 5: Call the API to get upcoming race details
