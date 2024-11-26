@@ -33,6 +33,7 @@ def get_upcoming_race():
                 "date": race['date'],
                 "hour": race['time'][:5],  # Extract hour and minute from time
                 "year": race['season'],   # Add year field
+                "country": race['Circuit']['Location']['country'],
                 "drivers": []             # Placeholder for drivers
             }
             break
