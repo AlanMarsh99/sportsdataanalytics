@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/avatar.dart';
 import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/services/firestore_service.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
@@ -34,6 +36,8 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
   Future<void> _updateAvatar(String avatarName) async {
     try {
       await _firestoreService.updateUserAvatar(widget.userApp.id, avatarName);
+      AuthService authService = Provider.of<AuthService>(context, listen: false);
+      authService.updateAvatar(avatarName);
       Navigator.of(context).pop(true); // Indicate success
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
