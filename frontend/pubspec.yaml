@@ -39,10 +39,10 @@ dependencies:
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.2
   cloud_firestore: ^5.4.5
-  flutter_phoenix: ^1.1.1
   fl_chart: ^0.69.0
   uuid: ^4.5.1
   collection: ^1.18.0
+  flutter_phoenix: ^1.1.1
 
 
 

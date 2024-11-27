@@ -128,6 +128,15 @@ exports.processRaceResults = functions
                     ];
                     const actualFastestLapId = raceResults.fastest_lap.driver_id;
 
+                    // Get names for actual results
+                    const actualWinnerName = raceResults.first_position.driver_name;
+                    const actualPodiumNames = [
+                        raceResults.first_position.driver_name,
+                        raceResults.second_position.driver_name,
+                        raceResults.third_position.driver_name,
+                    ];
+                    const actualFastestLapName = raceResults.fastest_lap.driver_name;
+
                     // Initialize points
                     let points = 0;
 
@@ -192,7 +201,12 @@ exports.processRaceResults = functions
 
                     // Update prediction document with the points gained
                     const predictionRef = db.collection("predictions").doc(predictionId);
-                    batch.update(predictionRef, { points: points }); // Add the points to the prediction document
+                    batch.update(predictionRef, {
+                        points: points,
+                        actualWinnerName: actualWinnerName,
+                        actualPodiumNames: actualPodiumNames,
+                        actualFastestLapName: actualFastestLapName,
+                    }); // Add the points and the actual results to the prediction document
                 }
             });
 

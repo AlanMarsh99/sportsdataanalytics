@@ -100,6 +100,44 @@ class Globals {
     'Magnussen': 'assets/drivers/magnussen.webp',
   };
 
+  static const Map<String, String> countryFlags = {
+    "Argentina": "assets/flags/argentina.png",
+    "Australia": "assets/flags/australia.png",
+    "Austria": "assets/flags/austria.png",
+    "Azerbaijan": "assets/flags/azerbaijan.png",
+    "Bahrain": "assets/flags/bahrain.png",
+    "Belgium": "assets/flags/belgium.png",
+    "Brazil": "assets/flags/brazil.png",
+    "Canada": "assets/flags/canada.png",
+    "China": "assets/flags/china.png",
+    "France": "assets/flags/france.png",
+    "Germany": "assets/flags/germany.png",
+    "Hungary": "assets/flags/hungary.png",
+    "India": "assets/flags/india.png",
+    "Italy": "assets/flags/italy.png",
+    "Japan": "assets/flags/japan.png",
+    "Korea": "assets/flags/south-korea.png",
+    "Malaysia": "assets/flags/malaysia.png",
+    "Mexico": "assets/flags/mexico.png",
+    "Monaco": "assets/flags/monaco.png",
+    "Morocco": "assets/flags/morocco.png",
+    "Netherlands": "assets/flags/netherlands.png",
+    "Portugal": "assets/flags/portugal.png",
+    "Qatar": "assets/flags/qatar.png",
+    "Russia": "assets/flags/russia.png",
+    "Saudi Arabia": "assets/flags/saudi-arabia.png",
+    "Singapore": "assets/flags/singapore.png",
+    "South Africa": "assets/flags/south-africa.png",
+    "Spain": "assets/flags/spain.png",
+    "Sweden": "assets/flags/sweden.png",
+    "Switzerland": "assets/flags/switzerland.png",
+    "Turkey": "assets/flags/turkey.png",
+    "UAE": "assets/flags/united-arab-emirates.png",
+    "UK": "assets/flags/united-kingdom.png",
+    "USA": "assets/flags/united-states.png",
+    "United States": "assets/flags/united-states.png",
+  };
+
   static String toLocalDate(DateTime d) {
     String date = DateFormat('dd/MM/yyyy HH:mm').format(d);
     return date;

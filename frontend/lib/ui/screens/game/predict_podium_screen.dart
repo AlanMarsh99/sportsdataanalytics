@@ -10,12 +10,10 @@ class PredictPodiumScreen extends StatefulWidget {
     Key? key,
     required this.prediction,
     required this.drivers,
-    required this.raceName,
   }) : super(key: key);
 
   final Prediction prediction;
   final List<DriverInfo> drivers;
-  final String raceName;
 
   _PredictPodiumScreenState createState() => _PredictPodiumScreenState();
 }
@@ -110,7 +108,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      'Predict your podium for the ${widget.raceName}',
+                      'Predict your podium for the ${widget.prediction.raceName}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -175,8 +173,7 @@ class _PredictPodiumScreenState extends State<PredictPodiumScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PredictWinnerScreen(prediction: newPrediction,
-                                drivers: widget.drivers,
-                                raceName: widget.raceName,),
+                                drivers: widget.drivers,),
                     ),
                   );
                 },

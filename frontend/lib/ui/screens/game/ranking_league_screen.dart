@@ -6,6 +6,7 @@ import 'package:frontend/core/models/league.dart';
 import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/models/race_league.dart';
 import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/game/result_prediction_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
@@ -25,14 +26,6 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
   bool showTotal = false;
   List<Prediction> predictions = [];
   List<UserApp> usersInfo = [];
-
-  Map<String, String> countryFlags = {
-    "United States": "assets/flags/united-states.png",
-    "UK": "assets/flags/united-kingdom.png",
-    "Germany": "assets/flags/germany.png",
-    "France": "assets/flags/france.png",
-    "Qatar": "assets/flags/france.png",
-  };
 
   @override
   void initState() {
@@ -118,6 +111,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
         year: p.year,
         round: p.round,
         country: p.raceCountry!,
+        raceName: p.raceName!,
       );
     }).toSet();
 
@@ -200,7 +194,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
 
                   final data = snapshot.data!;
                   final users = data["users"] as List<UserApp>;
-                  final predictions = data["predictions"] as List<Prediction>;
+                  predictions = data["predictions"] as List<Prediction>;
                   predictionRaces = data["races"] as List<RaceLeague>;
 
                   return Expanded(
@@ -223,17 +217,22 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     ];*/
 
     return InkWell(
-      onTap: () {
-        // Navigate to another screen when the card is tapped
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ResultPredictionScreen(
-                    userId: user.id,
-                    raceId: "",
-                  )),
-        );
-      },
+      onTap: showTotal
+          ? null
+          : () {
+              // Navigate to another screen when the card is tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResultPredictionScreen(
+                    user: user,
+                    race: selectedRace!,
+                    predictions: predictions,
+                    races: predictionRaces,
+                  ),
+                ),
+              );
+            },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -307,11 +306,12 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
               ],
             ),*/
             const SizedBox(width: 10),
-            const Icon(
-              Icons.chevron_right,
-              color: secondary,
-              size: 28,
-            ),
+            if (!showTotal)
+              const Icon(
+                Icons.chevron_right,
+                color: secondary,
+                size: 28,
+              ),
           ],
         ),
       ),
@@ -340,7 +340,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
               round: selectedRace!.round,
               year: selectedRace!.year)
           : user.seasonPoints;
-      user.predictionPoints = points;
+      user.predictionPoints = points ?? -1;
       return user;
     }).toList()
       ..sort((a, b) => b.predictionPoints!.compareTo(a.predictionPoints!));
@@ -417,7 +417,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Image.asset(
-                                              countryFlags[race.country]! ?? "",
+                                              Globals.countryFlags[race.country]! ?? "",
                                               width: 30.0,
                                             ),
                                             SizedBox(

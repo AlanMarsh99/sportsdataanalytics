@@ -1,34 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:frontend/core/models/prediction.dart';
+import 'package:frontend/core/models/race_league.dart';
+import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/theme.dart';
 
 class ResultPredictionScreen extends StatefulWidget {
   const ResultPredictionScreen(
-      {Key? key, required this.userId, required this.raceId})
+      {Key? key,
+      required this.user,
+      required this.predictions,
+      required this.races,
+      required this.race})
       : super(key: key);
 
-  final String userId;
-  final String raceId;
+  final UserApp user;
+  final List<Prediction> predictions;
+  final List<RaceLeague> races;
+  final RaceLeague race;
 
   _ResultPredictionScreenState createState() => _ResultPredictionScreenState();
 }
 
 class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
-  // List of flag images for the carousel slider
-  final List<String> flagImages = [
-    'assets/flags/france.png',
-    'assets/flags/germany.png',
-    'assets/flags/spain.png',
-    'assets/flags/united-states.png',
-    'assets/flags/italy.png',
-    'assets/flags/united-kingdom.png',
-    'assets/flags/france.png',
-    'assets/flags/germany.png',
-    'assets/flags/spain.png',
-    'assets/flags/united-states.png',
-    'assets/flags/italy.png',
-    'assets/flags/united-kingdom.png',
-  ];
+  late RaceLeague selectedRace;
+  late Prediction selectedPrediction;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedRace = widget.race;
+    selectedPrediction = widget.predictions.firstWhere((element) =>
+        element.round == selectedRace.round &&
+        element.year == selectedRace.year &&
+        element.userId == widget.user.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +67,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                     },
                   ),
                   Text(
-                    '${widget.userId} predictions',
+                    '${widget.user.username} predictions',
                     style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -98,15 +105,44 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                 reverse: true,
                 viewportFraction: 0.2,
                 enableInfiniteScroll: false),
-            items: flagImages.map((imagePath) {
+            items: widget.races.map((race) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  height: 30,
-                ),
-              );
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        selectedRace = race;
+                        selectedPrediction = widget.predictions.firstWhere(
+                            (element) =>
+                                element.round == selectedRace.round &&
+                                element.year == selectedRace.year &&
+                                element.userId == widget.user.id);
+                      });
+                    },
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              Globals.countryFlags[race.country]! ?? "",
+                              width: 30.0,
+                            ),
+                            SizedBox(
+                              height: 8.0,
+                            ),
+                          ],
+                        ),
+                        if (selectedRace == race)
+                          Container(
+                            width: 40,
+                            height: 4.0,
+                            color: secondary,
+                          ),
+                      ],
+                    ),
+                  ));
             }).toList(),
           ),
           const SizedBox(height: 30),
@@ -121,10 +157,10 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(5),
               child: Text(
-                'UNITED STATES GRAND PRIX',
+                selectedPrediction.raceName!,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -176,7 +212,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                           Container(
                             width: 115,
                             child: Text(
-                              widget.userId.toUpperCase(),
+                              widget.user.username.toUpperCase(),
                               style: const TextStyle(
                                   color: Colors.redAccent,
                                   fontSize: 12,
@@ -199,22 +235,27 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                     ),
                     _buildResultRow(
                         'Podium',
-                        ['Norris, L', 'Verstappen, M', 'Piastri, O'],
-                        ['Norris, L', 'Verstappen, M', 'Piastri, O'],
-                        ['Norris, L', 'Verstappen, M', 'Piastri, O'],
-                        '+10'),
+                        selectedPrediction.actualPodiumNames!,
+                        selectedPrediction.podiumNames!,
+                        ['Norris, L', 'Verstappen, M', 'Piastri, O']),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
                     ),
-                    _buildResultRow('Winner', ['Norris, L'], ['Verstappen, M'],
-                        ['Verstappen, M'], '+0'),
+                    _buildResultRow(
+                        'Winner',
+                        [selectedPrediction.actualWinnerName!],
+                        [selectedPrediction.winnerName!],
+                        ['Verstappen, M']),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
                     ),
-                    _buildResultRow('Fastest lap', ['Ricciardo, D'],
-                        ['Verstappen, M'], ['Verstappen, M'], '+5'),
+                    _buildResultRow(
+                        'Fastest lap',
+                        [selectedPrediction.actualFastestLapName!],
+                        [selectedPrediction.fastestLapName!],
+                        ['Verstappen, M']),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
@@ -230,7 +271,8 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
   }
 
   Widget _buildResultRow(String label, List<String> actualResults,
-      List<String> userResults, List<String> AIResults, String points) {
+      List<String> userResults, List<String> AIResults) {
+    String points = '';
     return Column(
       children: [
         Row(
