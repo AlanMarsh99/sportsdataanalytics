@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:provider/provider.dart';
 import 'dialogs/avatar_selection_dialog.dart';
@@ -19,7 +19,7 @@ class EndDrawer extends StatelessWidget {
       ),
       onPressed: () async {
         await AuthService().signOut();
-       // Phoenix.rebirth(context);
+        Phoenix.rebirth(context);
       },
     );
   }
