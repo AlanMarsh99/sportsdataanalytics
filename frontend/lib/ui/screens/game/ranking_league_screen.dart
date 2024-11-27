@@ -1,7 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/league.dart';
+import 'package:frontend/core/models/prediction.dart';
+import 'package:frontend/core/models/race_league.dart';
 import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/ui/screens/game/result_prediction_screen.dart';
 import 'package:frontend/ui/theme.dart';
@@ -16,34 +19,43 @@ class RankingLeagueScreen extends StatefulWidget {
 }
 
 class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
-  List<String> _items = [];
-  late Future<List<UserApp>> usersFuture;
+  late Future<Map<String, dynamic>> leagueDataFuture;
+  List<RaceLeague> predictionRaces = [];
+  RaceLeague? selectedRace;
+  bool showTotal = false;
+  List<Prediction> predictions = [];
+  List<UserApp> usersInfo = [];
+
+  Map<String, String> countryFlags = {
+    "United States": "assets/flags/united-states.png",
+    "UK": "assets/flags/united-kingdom.png",
+    "Germany": "assets/flags/germany.png",
+    "France": "assets/flags/france.png",
+    "Qatar": "assets/flags/france.png",
+  };
 
   @override
   void initState() {
     super.initState();
-
-    _items = [
-      'assets/flags/france.png',
-      'assets/flags/germany.png',
-      'assets/flags/spain.png',
-      'assets/flags/united-states.png',
-      'assets/flags/italy.png',
-      'assets/flags/united-kingdom.png',
-      'assets/flags/france.png',
-      'assets/flags/germany.png',
-      'assets/flags/spain.png',
-      'assets/flags/united-states.png',
-      'assets/flags/italy.png',
-      'assets/flags/united-kingdom.png',
-    ];
-
-    usersFuture = _getUsersLeague();
+    leagueDataFuture = _fetchLeagueData();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  Future<Map<String, dynamic>> _fetchLeagueData() async {
+    final users = await _getUsersLeague();
+    final predictions = await _getPredictions();
+
+    final races = _extractUniqueRaces(predictions);
+
+    return {
+      "users": users,
+      "predictions": predictions,
+      "races": races,
+    };
   }
 
   Future<List<UserApp>> _getUsersLeague() async {
@@ -79,6 +91,42 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
       print('Error fetching users: $e');
       return [];
     }
+  }
+
+  Future<List<Prediction>> _getPredictions() async {
+    try {
+      final predictionsCollection =
+          FirebaseFirestore.instance.collection("predictions");
+      final querySnapshot = await predictionsCollection
+          .where("userId", whereIn: widget.league.userIds)
+          .get();
+
+      List<Prediction> predictions = querySnapshot.docs.map((doc) {
+        return Prediction.fromMap(doc.data());
+      }).toList();
+
+      return predictions;
+    } catch (e) {
+      print('Error fetching predictions: $e');
+      return [];
+    }
+  }
+
+  List<RaceLeague> _extractUniqueRaces(List<Prediction> predictions) {
+    final raceSet = predictions.map((p) {
+      return RaceLeague(
+        year: p.year,
+        round: p.round,
+        country: p.raceCountry!,
+      );
+    }).toSet();
+
+    final sortedRaces = raceSet.toList()..sort(RaceLeague.compare);
+    if (sortedRaces.isNotEmpty) {
+      selectedRace = sortedRaces.first;
+    }
+
+    return sortedRaces;
   }
 
   @override
@@ -122,16 +170,44 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                   ),
                   Text(
                     '(League code: ${widget.league.id})',
-                    style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.white),
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              Expanded(
-                child: _leaguesContainer(),
-              ),
+              FutureBuilder<Map<String, dynamic>>(
+                future: leagueDataFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
+                  } else if (!snapshot.hasData) {
+                    return const Center(
+                      child: Text(
+                        'No data available.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+
+                  final data = snapshot.data!;
+                  final users = data["users"] as List<UserApp>;
+                  final predictions = data["predictions"] as List<Prediction>;
+                  predictionRaces = data["races"] as List<RaceLeague>;
+
+                  return Expanded(
+                    child: _leaguesContainer(users, predictions),
+                  );
+                },
+              )
             ],
           ),
         ),
@@ -140,11 +216,12 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
   }
 
   Widget _rankingUserContainer(UserApp user, int index) {
-    List<Color> indicators = [
+    /*List<Color> indicators = [
       Colors.green,
       Colors.red,
       Colors.orange,
-    ];
+    ];*/
+
     return InkWell(
       onTap: () {
         // Navigate to another screen when the card is tapped
@@ -179,17 +256,30 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
               radius: 20,
             ),
             const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                user.username.toString(),
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+            /* Expanded(
+              child:*/
+            Text(
+              user.username.toString(),
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Column(
+            // ),
+            Spacer(),
+            Text(
+              showTotal
+                  ? user.seasonPoints.toString()
+                  : user.predictionPoints != -1
+                      ? user.predictionPoints.toString()
+                      : "-",
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+              ),
+            ),
+            /*Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -215,7 +305,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                   }).toList(),
                 ),
               ],
-            ),
+            ),*/
             const SizedBox(width: 10),
             const Icon(
               Icons.chevron_right,
@@ -228,7 +318,33 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     );
   }
 
-  Widget _leaguesContainer() {
+  int? _getUserPointsForRace({
+    required List<Prediction> predictions,
+    required String userId,
+    required int round,
+    required int year,
+  }) {
+    final prediction = predictions.firstWhereOrNull(
+      (p) => p.userId == userId && p.round == round && p.year == year,
+    );
+
+    return prediction?.points;
+  }
+
+  Widget _leaguesContainer(List<UserApp> users, List<Prediction> predictions) {
+    final List<UserApp> rankedUsers = users.map((user) {
+      final points = selectedRace != null
+          ? _getUserPointsForRace(
+              predictions: predictions,
+              userId: user.id,
+              round: selectedRace!.round,
+              year: selectedRace!.year)
+          : user.seasonPoints;
+      user.predictionPoints = points;
+      return user;
+    }).toList()
+      ..sort((a, b) => b.predictionPoints!.compareTo(a.predictionPoints!));
+
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.all(16),
@@ -243,63 +359,95 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 100,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: secondary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                ),
+                onPressed: () {
+                  setState(() {
+                    showTotal = true;
+                    selectedRace = null;
+                  });
+                },
+                child: Container(
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: showTotal ? secondary : Colors.transparent,
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(20),
                     ),
+                    border: Border.all(color: secondary, width: 2),
                   ),
-                  onPressed: () {
-                    // Add join league functionality
-                  },
-                  child: const Text(
-                    'TOTAL',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: Text(
+                    "TOTAL",
+                    style: const TextStyle(
+                        color: white,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
+
               const SizedBox(
                 width: 20,
               ),
-              Expanded(
-                child: CarouselSlider(
-                  items: _items.map((path) {
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                          child: Image.asset(
-                            path,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    );
-                  }).toList(),
-                  options: CarouselOptions(
-                    reverse: true,
-                    viewportFraction: 0.20,
-                    height: 30.0,
-                    padEnds: false,
-                    enableInfiniteScroll: false,
-                    //initialPage: _currentIndex,
-                    scrollDirection: Axis.horizontal,
-                    /*onPageChanged: (index, reason) {
-                        setState(() {
-                          _currentIndex = index;
-                          _pageController.jumpToPage(index);
-                        });
-                      },*/
-                  ),
-                ),
-              )
+              //Expanded(
+              predictionRaces.isNotEmpty
+                  ? Expanded(
+                      child: CarouselSlider(
+                        items: predictionRaces.map((race) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 5.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedRace = race;
+                                        showTotal = false;
+                                      });
+                                    },
+                                    child: Stack(
+                                      alignment: Alignment.bottomCenter,
+                                      children: [
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Image.asset(
+                                              countryFlags[race.country]! ?? "",
+                                              width: 30.0,
+                                            ),
+                                            SizedBox(
+                                              height: 8.0,
+                                            ),
+                                          ],
+                                        ),
+                                        if (selectedRace == race)
+                                          Container(
+                                            width: 40,
+                                            height: 4.0,
+                                            color: secondary,
+                                          ),
+                                      ],
+                                    ),
+                                  ));
+                            },
+                          );
+                        }).toList(),
+                        options: CarouselOptions(
+                          reverse: true,
+                          viewportFraction: 0.20,
+                          height: 50.0,
+                          padEnds: false,
+                          enableInfiniteScroll: false,
+                          scrollDirection: Axis.horizontal,
+                        ),
+                      ),
+                    )
+                  : Container(),
             ],
           ),
           const SizedBox(height: 30),
@@ -344,47 +492,23 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          Expanded(
-            child: FutureBuilder<List<UserApp>>(
-              future: _getUsersLeague(), // Call the function to fetch users
-              builder: (context, snapshot) {
-                // Check the state of the Future
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // While waiting, show a CircularProgressIndicator
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  // If there's an error, display an error message
-                  return Center(
-                    child: Text(
-                      'Error loading ranking: ${snapshot.error}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  // If no data is available, show a message
-                  return Center(
-                    child: Text(
-                      'No users found in this league.',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                }
-
-                // If data is available, display the ranking
-                List<UserApp> users = snapshot.data!;
-                return ListView.builder(
-                  itemCount: users.length,
-                  itemBuilder: (context, index) {
-                    return _rankingUserContainer(users[index], index + 1);
-                  },
-                );
-              },
-            ),
-          ),
+          //Expanded(
+          rankedUsers.isNotEmpty
+              ? Expanded(
+                  child: ListView.builder(
+                    itemCount: rankedUsers.length,
+                    itemBuilder: (context, index) {
+                      return _rankingUserContainer(
+                          rankedUsers[index], index + 1);
+                    },
+                  ),
+                )
+              : Center(
+                  child: Text(
+                    'No users available',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
         ],
       ),
     );

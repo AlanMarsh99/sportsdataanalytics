@@ -714,13 +714,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (authProvider.status == Status.Authenticated) {
                                 try {
                                   int round =
-                                      int.parse(upcomingRaceInfo!['race_id']);
+                                      int.parse(upcomingRaceInfo['race_id']);
                                   int year =
                                       int.parse(upcomingRaceInfo['year']);
                                   Prediction newPrediction = Prediction(
                                     userId: authProvider.userApp!.id,
                                     round: round,
                                     year: year,
+                                    raceCountry: upcomingRaceInfo['country'],
                                   );
 
                                   List<DriverInfo> drivers =

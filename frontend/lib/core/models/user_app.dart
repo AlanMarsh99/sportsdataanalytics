@@ -9,6 +9,7 @@ class UserApp {
   int leaguesWon;
   int leaguesFinished;
   int numPredictions;
+  int? predictionPoints;
 
   UserApp({
     required this.id,
@@ -21,6 +22,7 @@ class UserApp {
     required this.leaguesWon,
     required this.leaguesFinished,
     required this.numPredictions,
+    this.predictionPoints,
   });
 
   Map<String, dynamic> toMap() {
