@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:frontend/core/models/prediction.dart';
@@ -26,15 +27,32 @@ class ResultPredictionScreen extends StatefulWidget {
 class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
   late RaceLeague selectedRace;
   late Prediction selectedPrediction;
+  late Future<Map<String, dynamic>> predictionAIFuture;
 
   @override
   void initState() {
     super.initState();
     selectedRace = widget.race;
+    predictionAIFuture = _fetchPredictionAI();
     selectedPrediction = widget.predictions.firstWhere((element) =>
         element.round == selectedRace.round &&
         element.year == selectedRace.year &&
         element.userId == widget.user.id);
+  }
+
+  Future<Map<String, dynamic>> _fetchPredictionAI() async {
+    try {
+      final AICollection = FirebaseFirestore.instance.collection("AI");
+      final querySnapshot =
+          await AICollection.where("round", isEqualTo: selectedRace.round)
+              .where("year", isEqualTo: selectedRace.year)
+              .get();
+
+      return querySnapshot.docs.first.data();
+    } catch (e) {
+      print('Error fetching AI predictions: $e');
+      return {};
+    }
   }
 
   @override
@@ -77,7 +95,32 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: _predictionsContainer(),
+                child: FutureBuilder<Map<String, dynamic>>(
+                  future: predictionAIFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'Error: ${snapshot.error}',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      );
+                    } else if (!snapshot.hasData) {
+                      return const Center(
+                        child: Text(
+                          'No data available.',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    }
+                    Map<String, dynamic> predictionAI = snapshot.data!;
+                    return _predictionsContainer(predictionAI);
+                  },
+                ),
               ),
             ],
           ),
@@ -86,7 +129,14 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
     );
   }
 
-  Widget _predictionsContainer() {
+  Widget _predictionsContainer(Map<String, dynamic> predictionAI) {
+    List<String> podiumNamesAI = [];
+    if (predictionAI['podiumNames'] != null) {
+      podiumNamesAI = List<String>.from(predictionAI['podiumNames']);
+    }
+    String winnerNameAI = predictionAI['winnerName'] ?? "";
+    String fastestLapNameAI = predictionAI['fastestLapName'] ?? "";
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -117,6 +167,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                                 element.round == selectedRace.round &&
                                 element.year == selectedRace.year &&
                                 element.userId == widget.user.id);
+                        predictionAIFuture = _fetchPredictionAI();
                       });
                     },
                     child: Stack(
@@ -237,7 +288,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         'Podium',
                         selectedPrediction.actualPodiumNames!,
                         selectedPrediction.podiumNames!,
-                        ['Norris, L', 'Verstappen, M', 'Piastri, O']),
+                        podiumNamesAI),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
@@ -246,7 +297,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         'Winner',
                         [selectedPrediction.actualWinnerName!],
                         [selectedPrediction.winnerName!],
-                        ['Verstappen, M']),
+                        [winnerNameAI]),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
@@ -255,7 +306,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         'Fastest lap',
                         [selectedPrediction.actualFastestLapName!],
                         [selectedPrediction.fastestLapName!],
-                        ['Verstappen, M']),
+                        [fastestLapNameAI]),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
