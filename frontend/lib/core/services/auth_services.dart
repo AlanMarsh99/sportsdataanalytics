@@ -147,6 +147,11 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  void updateAvatar(String avatar) {
+    userApp!.avatar = avatar;
+    notifyListeners();
+  }
+
   /// Attempts to sign out from Firebase Auth
   Future<void> signOut() async {
     await _auth.signOut();

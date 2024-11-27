@@ -5,6 +5,7 @@ import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/dialogs/avatar_selection_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:frontend/ui/widgets/log_in_container.dart';
 import 'package:provider/provider.dart';
@@ -87,13 +88,15 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                                     ),
                                     const SizedBox(height: 5),
                                     TextButton(
-                                      onPressed: () {
-                                        /*Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PredictPodiumScreen(),
-                        ),
-                      )*/
+                                      onPressed: () async {
+                                        await showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AvatarSelectionDialog(
+                                              userApp: userInfo,
+                                            );
+                                          },
+                                        );
                                       },
                                       child: const Text(
                                         'Change avatar',
