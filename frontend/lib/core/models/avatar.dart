@@ -1,15 +1,15 @@
 class Avatar {
-  final String id;
+  final String name;
   final int level;
 
   Avatar({
-    required this.id,
+    required this.name,
     required this.level,
   });
 
   factory Avatar.fromMap(Map<String, dynamic> map) {
     return Avatar(
-      id: map['id'] as String,
+      name: map['name'] as String,
       level: map['level'] is int
           ? map['level'] as int
           : int.tryParse(map['level'].toString()) ?? 0, // Safeguard against non-integer levels
@@ -18,7 +18,7 @@ class Avatar {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'name': name,
       'level': level,
     };
   }

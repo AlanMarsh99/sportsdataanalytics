@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/models/avatar.dart';
 import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/core/services/firestore_service.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class AvatarSelectionDialog extends StatefulWidget {
@@ -18,6 +20,8 @@ class AvatarSelectionDialog extends StatefulWidget {
 class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
   final FirestoreService _firestoreService = FirestoreService();
   late Future<List<Avatar>> _avatarsFuture;
+  String? selectedAvatar;
+  bool isMobile = false;
 
   @override
   void initState() {
@@ -27,9 +31,9 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
   }
 
   /// Updates the user's avatar in Firestore and provides feedback.
-  Future<void> _updateAvatar(String avatarId) async {
+  Future<void> _updateAvatar(String avatarName) async {
     try {
-      await _firestoreService.updateUserAvatar(widget.userApp.id, avatarId);
+      await _firestoreService.updateUserAvatar(widget.userApp.id, avatarName);
       Navigator.of(context).pop(true); // Indicate success
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -81,6 +85,37 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
               ),
             ),
           ),
+          const SizedBox(
+            width: 15,
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+            ),
+            onPressed: () async {
+              await _updateAvatar(selectedAvatar!);
+            },
+            child: Container(
+              width: 110,
+              decoration: BoxDecoration(
+                color: secondary,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(20),
+                ),
+                border: Border.all(color: secondary, width: 2),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: const Text(
+                'SAVE',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.w400,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -89,12 +124,15 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
   /// Builds the grid of avatars.
   Widget _buildAvatarsGrid(List<Avatar> avatars) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.5, // 50% of screen height
-      width: double.infinity, // Take up all available width
+      height: isMobile
+          ? MediaQuery.of(context).size.height * 0.6
+          : MediaQuery.of(context).size.height * 0.5,
+      width: isMobile ? MediaQuery.of(context).size.width - 50 : 350,
       child: GridView.builder(
         shrinkWrap: true,
+        //physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: MediaQuery.of(context).size.width > 600 ? 5 : 3,
+          crossAxisCount: isMobile ? 4 : 3,
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
           childAspectRatio: 1, // Maintain square cells
@@ -103,40 +141,55 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
         itemBuilder: (context, index) {
           Avatar avatar = avatars[index];
           bool isUnlocked = widget.userApp.level >= avatar.level;
-          bool isSelected = widget.userApp.avatar == avatar.id;
+          //bool isSelected = widget.userApp.avatar == avatar.id;
 
-          return GestureDetector(
-            onTap: isUnlocked
-                ? () async {
-                    await _updateAvatar(avatar.id);
-                  }
-                : null, // Do nothing if avatar is locked
-            child: Stack(
-              children: [
-                // Display Avatar Image
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage:
-                      AssetImage('assets/avatars/${avatar.id}.png'),
-                  child: !isUnlocked
-                      ? const Icon(
-                          Icons.lock,
-                          color: Colors.white,
-                        )
-                      : null,
-                ),
-                // Display Checkmark if Avatar is Selected
-                if (isSelected)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Icon(
-                      Icons.check_circle,
-                      color: Colors.green[700],
-                    ),
+          return Tooltip(
+            message: isUnlocked ? '' : 'Level ${avatar.level} required',
+            child: InkWell(
+              onTap: () {
+                if (isUnlocked) {
+                  setState(() {
+                    selectedAvatar = avatar.name;
+                  });
+                }
+              },
+              child: Stack(
+                children: [
+                  // Display Avatar Image
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage:
+                        AssetImage('assets/avatars/${avatar.name}.png'),
+                    child: !isUnlocked
+                        ? Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(60),
+                              color: Colors.black.withOpacity(0.7),
+                            ),
+                            child: const Icon(
+                              Icons.lock,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                          )
+                        : null,
                   ),
-              ],
+                  // Display Checkmark if Avatar is Selected
+                  if (isUnlocked)
+                    if (selectedAvatar == avatar.name)
+                      Positioned(
+                        top: 0,
+                        right: 20,
+                        child: Icon(
+                          Icons.check_circle,
+                          color: Colors.green[900],
+                        ),
+                      ),
+                ],
+              ),
             ),
           );
         },
@@ -146,6 +199,7 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    isMobile = Responsive.isMobile(context);
     return AlertDialog(
       backgroundColor: white,
       shape: RoundedRectangleBorder(
@@ -155,7 +209,7 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            "Select Avatar",
+            "Change avatar",
             style: TextStyle(color: primary, fontWeight: FontWeight.bold),
           ),
           IconButton(
@@ -171,16 +225,19 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
           ),
         ],
       ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FutureBuilder<List<Avatar>>(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: FutureBuilder<List<Avatar>>(
               future: _avatarsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   // Show loading indicator while fetching avatars
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator(
+                    color: primary,
+                  ));
                 } else if (snapshot.hasError) {
                   // Show detailed error message if fetching fails
                   return Center(
@@ -191,17 +248,20 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   // Show message if no avatars are available
-                  return const Center(child: Text('No avatars available.'));
+                  return const Center(
+                      child: Text('No avatars available.',
+                          style: TextStyle(color: Colors.black)));
                 } else {
                   List<Avatar> avatars = snapshot.data!;
+                  selectedAvatar = selectedAvatar ?? widget.userApp.avatar;
                   return _buildAvatarsGrid(avatars);
                 }
               },
             ),
-            const SizedBox(height: 25),
-            _actionButtonRow(),
-          ],
-        ),
+          ),
+          const SizedBox(height: 25),
+          _actionButtonRow(),
+        ],
       ),
     );
   }

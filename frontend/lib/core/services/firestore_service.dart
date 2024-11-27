@@ -104,8 +104,8 @@ class FirestoreService {
 
 
   /// Update the avatar field in a user's document.
-  Future<void> updateUserAvatar(String userId, String avatarId) async {
+  Future<void> updateUserAvatar(String userId, String avatarName) async {
     final document = _db.collection('users').doc(userId);
-    await document.update({'avatar': avatarId});
+    await document.update({'avatar': avatarName});
   }
 }
