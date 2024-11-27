@@ -206,28 +206,6 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                   return Expanded(
                     child: _leaguesContainer(users, predictions),
                   );
-
-                  // If data is available, display the ranking
-                  /*List<UserApp> users = snapshot.data!;
-                        List<UserApp> usersUpdated = [];
-                        if (!showTotal) {
-                          if (selectedRace != null) {
-                            for (var user in users) {
-                              int points = getUserPointsForRace(
-                                      predictions: predictions,
-                                      userId: user.id,
-                                      round: selectedRace!.round,
-                                      year: selectedRace!.year) ??
-                                  -1;
-                              user.predictionPoints = points;
-                              usersUpdated.add(user);
-                            }
-                            usersUpdated.sort((a, b) => b.predictionPoints!
-                                .compareTo(a.predictionPoints!));
-                          }
-                        }
-
-                        usersInfo = showTotal ? users : usersUpdated;*/
                 },
               )
             ],
@@ -381,28 +359,37 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 100,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: secondary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                ),
+                onPressed: () {
+                  setState(() {
+                    showTotal = true;
+                    selectedRace = null;
+                  });
+                },
+                child: Container(
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: showTotal ? secondary : Colors.transparent,
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(20),
                     ),
+                    border: Border.all(color: secondary, width: 2),
                   ),
-                  onPressed: () {
-                    // Add join league functionality
-                  },
-                  child: const Text(
-                    'TOTAL',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: Text(
+                    "TOTAL",
+                    style: const TextStyle(
+                        color: white,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
+
               const SizedBox(
                 width: 20,
               ),
@@ -414,30 +401,49 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                           return Builder(
                             builder: (BuildContext context) {
                               return Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 5.0),
-                                child: Image.asset(
-                                  countryFlags[race.country] ?? "",
-                                  fit: BoxFit.cover,
-                                ),
-                              );
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 5.0),
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        selectedRace = race;
+                                        showTotal = false;
+                                      });
+                                    },
+                                    child: Stack(
+                                      alignment: Alignment.bottomCenter,
+                                      children: [
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Image.asset(
+                                              countryFlags[race.country]! ?? "",
+                                              width: 30.0,
+                                            ),
+                                            SizedBox(
+                                              height: 8.0,
+                                            ),
+                                          ],
+                                        ),
+                                        if (selectedRace == race)
+                                          Container(
+                                            width: 40,
+                                            height: 4.0,
+                                            color: secondary,
+                                          ),
+                                      ],
+                                    ),
+                                  ));
                             },
                           );
                         }).toList(),
                         options: CarouselOptions(
                           reverse: true,
                           viewportFraction: 0.20,
-                          height: 30.0,
+                          height: 50.0,
                           padEnds: false,
                           enableInfiniteScroll: false,
-                          //initialPage: _currentIndex,
                           scrollDirection: Axis.horizontal,
-                          /*onPageChanged: (index, reason) {
-                        setState(() {
-                          _currentIndex = index;
-                          _pageController.jumpToPage(index);
-                        });
-                      },*/
                         ),
                       ),
                     )
