@@ -1,6 +1,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/core/models/avatar.dart';
+import 'package:frontend/core/models/user_app.dart';
 
 class Document<T> {
   Document({required this.path}) {
@@ -63,4 +65,47 @@ class Collection<T> {
 
 String generatePushId(String collection) {
   return FirebaseFirestore.instance.collection(collection).doc().id;
+}
+
+class FirestoreService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  /// Retrieves a list of Avatars from Firestore ordered by their level.
+  Future<List<Avatar>> getAvatars() async {
+    try {
+      // Reference to the 'avatars' collection in Firestore
+      CollectionReference avatarsCollection = _db.collection('avatars');
+
+      // Query Firestore to get all avatars ordered by 'level'
+      QuerySnapshot avatarsSnapshot = await avatarsCollection
+          .orderBy('level')
+          .get();
+
+      // Check if any avatars were found
+      if (avatarsSnapshot.docs.isNotEmpty) {
+        // Convert each Firestore document to an Avatar instance
+        List<Avatar> avatars = avatarsSnapshot.docs.map((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          data['id'] = doc.id; // Include the document ID in the data
+          return Avatar.fromMap(data);
+        }).toList();
+
+        return avatars;
+      } else {
+        // No avatars found, return an empty list
+        return [];
+      }
+    } catch (e) {
+      // Handle any errors that occur during the fetch
+      print('Error fetching avatars: $e');
+      return [];
+    }
+  }
+
+
+  /// Update the avatar field in a user's document.
+  Future<void> updateUserAvatar(String userId, String avatarName) async {
+    final document = _db.collection('users').doc(userId);
+    await document.update({'avatar': avatarName});
+  }
 }
