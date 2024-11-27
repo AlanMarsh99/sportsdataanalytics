@@ -36,7 +36,8 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
   Future<void> _updateAvatar(String avatarName) async {
     try {
       await _firestoreService.updateUserAvatar(widget.userApp.id, avatarName);
-      AuthService authService = Provider.of<AuthService>(context, listen: false);
+      AuthService authService =
+          Provider.of<AuthService>(context, listen: false);
       authService.updateAvatar(avatarName);
       Navigator.of(context).pop(true); // Indicate success
       ScaffoldMessenger.of(context).showSnackBar(
@@ -176,7 +177,7 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
                             child: const Icon(
                               Icons.lock,
                               color: Colors.white,
-                              size: 40,
+                              size: 28,
                             ),
                           )
                         : null,
@@ -238,10 +239,14 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   // Show loading indicator while fetching avatars
-                  return const Center(
+                  return Container(
+                    height: 300,
+                    child: const Center(
                       child: CircularProgressIndicator(
-                    color: primary,
-                  ));
+                        color: primary,
+                      ),
+                    ),
+                  );
                 } else if (snapshot.hasError) {
                   // Show detailed error message if fetching fails
                   return Center(

@@ -217,7 +217,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     ];*/
 
     return InkWell(
-      onTap: showTotal
+      onTap: showTotal || user.predictionPoints == -1
           ? null
           : () {
               // Navigate to another screen when the card is tapped
@@ -307,9 +307,9 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
             ),*/
             const SizedBox(width: 10),
             if (!showTotal)
-              const Icon(
+              Icon(
                 Icons.chevron_right,
-                color: secondary,
+                color: user.predictionPoints != -1 ? secondary : Colors.white,
                 size: 28,
               ),
           ],
@@ -417,7 +417,9 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Image.asset(
-                                              Globals.countryFlags[race.country]! ?? "",
+                                              Globals.countryFlags[
+                                                      race.country]! ??
+                                                  "",
                                               width: 30.0,
                                             ),
                                             SizedBox(
