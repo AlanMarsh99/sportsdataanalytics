@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_phoenix/generated/i18n.dart';
 import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/models/race_league.dart';
 import 'package:frontend/core/models/user_app.dart';

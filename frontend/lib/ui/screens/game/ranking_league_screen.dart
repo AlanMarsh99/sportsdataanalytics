@@ -340,7 +340,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
               round: selectedRace!.round,
               year: selectedRace!.year)
           : user.seasonPoints;
-      user.predictionPoints = points;
+      user.predictionPoints = points ?? -1;
       return user;
     }).toList()
       ..sort((a, b) => b.predictionPoints!.compareTo(a.predictionPoints!));

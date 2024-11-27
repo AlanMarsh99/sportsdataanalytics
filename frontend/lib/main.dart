@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
+//import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/providers/user_provider.dart';
@@ -19,8 +19,8 @@ void main() async {
   );
 
   runApp(
-    Phoenix(
-      child: MultiProvider(providers: [
+    /*Phoenix(
+      child: */MultiProvider(providers: [
         ChangeNotifierProvider.value(value: AuthService()),
         ChangeNotifierProvider(
           create: (_) => NavigationProvider(),
@@ -30,7 +30,7 @@ void main() async {
         ),
         //ChangeNotifierProvider(create: (_) => UserProvider()),
       ], child: const MyApp()),
-    ),
+   // ),
   );
 }
 

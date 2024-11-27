@@ -78,7 +78,9 @@ class Prediction {
         points: map['points'],
         raceName: map['raceName'],
         actualWinnerName: map['actualWinnerName'],
-        actualPodiumNames: List<String>.from(map['actualPodiumNames']),
+        actualPodiumNames: map['actualPodiumNames'] != null
+            ? List<String>.from(map['actualPodiumNames'])
+            : null,
         actualFastestLapName: map['actualFastestLapName']);
   }
 
