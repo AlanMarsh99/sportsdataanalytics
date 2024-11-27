@@ -11,12 +11,10 @@ class PredictFastestLapScreen extends StatefulWidget {
     Key? key,
     required this.prediction,
     required this.drivers,
-    required this.raceName,
   }) : super(key: key);
 
   final Prediction prediction;
   final List<DriverInfo> drivers;
-  final String raceName;
 
   _PredictFastestLapScreenState createState() =>
       _PredictFastestLapScreenState();

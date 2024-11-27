@@ -2,8 +2,9 @@ class RaceLeague {
   int year;
   int round;
   String country;
+  String raceName;
 
-  RaceLeague({required this.year, required this.round, required this.country});
+  RaceLeague({required this.year, required this.round, required this.country, required this.raceName});
 
 // Override equality operator
   @override

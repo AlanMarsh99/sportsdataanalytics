@@ -359,6 +359,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                                       round: round,
                                       year: year,
                                       raceCountry: upcomingRaceInfo['country'],
+                                      raceName: upcomingRaceInfo['race_name'],
                                     );
 
                                     List<DriverInfo> drivers =
@@ -374,8 +375,6 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                                             PredictPodiumScreen(
                                           prediction: newPrediction,
                                           drivers: drivers,
-                                          raceName:
-                                              upcomingRaceInfo['race_name'],
                                         ),
                                       ),
                                     );

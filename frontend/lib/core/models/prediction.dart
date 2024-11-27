@@ -7,13 +7,17 @@ class Prediction {
   int round;
   String? winnerId;
   String? winnerName;
+  String? actualWinnerName;
   List<String>? podiumIds;
   List<String>? podiumNames;
+  List<String>? actualPodiumNames;
   String? fastestLapId;
   String? fastestLapName;
+  String? actualFastestLapName;
   Timestamp? timestamp;
   int? points;
   String? raceCountry;
+  String? raceName;
 
   Prediction({
     this.id,
@@ -29,6 +33,10 @@ class Prediction {
     this.fastestLapName,
     this.timestamp,
     this.points,
+    this.raceName,
+    this.actualWinnerName,
+    this.actualPodiumNames,
+    this.actualFastestLapName,
   });
 
   Map<String, dynamic> toMap() {
@@ -45,7 +53,11 @@ class Prediction {
       'fastestLapId': fastestLapId,
       'fastestLapName': fastestLapName,
       'timestamp': timestamp,
-      'points': points
+      'points': points,
+      'raceName': raceName,
+      'actualWinnerName': actualWinnerName,
+      'actualPodiumNames': actualPodiumNames,
+      'actualFastestLapName': actualFastestLapName,
     };
   }
 
@@ -63,7 +75,11 @@ class Prediction {
         fastestLapId: map['fastestLapId'],
         fastestLapName: map['fastestLapName'],
         timestamp: map['timestamp'],
-        points: map['points']);
+        points: map['points'],
+        raceName: map['raceName'],
+        actualWinnerName: map['actualWinnerName'],
+        actualPodiumNames: List<String>.from(map['actualPodiumNames']),
+        actualFastestLapName: map['actualFastestLapName']);
   }
 
   @override

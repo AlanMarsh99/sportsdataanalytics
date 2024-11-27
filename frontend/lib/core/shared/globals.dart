@@ -100,6 +100,14 @@ class Globals {
     'Magnussen': 'assets/drivers/magnussen.webp',
   };
 
+  static const Map<String, String> countryFlags = {
+    "United States": "assets/flags/united-states.png",
+    "UK": "assets/flags/united-kingdom.png",
+    "Germany": "assets/flags/germany.png",
+    "France": "assets/flags/france.png",
+    "Qatar": "assets/flags/france.png",
+  };
+
   static String toLocalDate(DateTime d) {
     String date = DateFormat('dd/MM/yyyy HH:mm').format(d);
     return date;
