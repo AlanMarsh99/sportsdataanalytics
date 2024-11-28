@@ -117,7 +117,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
 
     final sortedRaces = raceSet.toList()..sort(RaceLeague.compare);
     if (sortedRaces.isNotEmpty) {
-      selectedRace = sortedRaces.first;
+      selectedRace = sortedRaces.last;
     }
 
     return sortedRaces;
@@ -228,7 +228,6 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     user: user,
                     race: selectedRace!,
                     predictions: predictions,
-                    races: predictionRaces,
                   ),
                 ),
               );
@@ -251,6 +250,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
             ),
             SizedBox(width: MediaQuery.of(context).size.width * 0.06),
             CircleAvatar(
+              backgroundColor: Colors.white,
               backgroundImage: AssetImage('assets/avatars/${user.avatar}.png'),
               radius: 20,
             ),
@@ -306,12 +306,14 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
               ],
             ),*/
             const SizedBox(width: 10),
-            if (!showTotal)
-              Icon(
-                Icons.chevron_right,
-                color: user.predictionPoints != -1 ? secondary : Colors.white,
-                size: 28,
-              ),
+
+            Icon(
+              Icons.chevron_right,
+              color: user.predictionPoints != -1 && !showTotal
+                  ? secondary
+                  : Colors.white,
+              size: 28,
+            ),
           ],
         ),
       ),
@@ -440,7 +442,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                           );
                         }).toList(),
                         options: CarouselOptions(
-                          reverse: true,
+                          reverse: false,
                           viewportFraction: 0.20,
                           height: 50.0,
                           padEnds: false,
