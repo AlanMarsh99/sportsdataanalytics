@@ -295,7 +295,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
             } else if (filename == 'last_race_results') {
               title = 'Last Race Results';
               dataList = [
-                {'Race ID': data['race_id'].toString()},
+                {'Round': data['race_id'].toString()},
                 {'Year': data['year'].toString()},
                 {'First Position': data['first_position']['driver_name'].toString()},
                 {'Second Position': data['second_position']['driver_name'].toString()},
@@ -308,11 +308,10 @@ class _DownloadScreenState extends State<DownloadScreen> {
             } else if (filename == 'race_info') {
               title = 'Race Information';
               dataList = [
-                {'Race ID': data['race_id'].toString()},
                 {'Race Name': data['race_name'].toString()},
                 {'Date': data['date'].toString()},
                 {'Circuit Name': data['circuit_name'].toString()},
-                {'Round': data['round'].toString()},
+                {'Round': data['race_id'].toString()},
                 {'Location': data['location'].toString()},
                 {'Winner': data['winner'].toString()},
                 {'Winner Driver ID': data['winner_driver_id'].toString()},
