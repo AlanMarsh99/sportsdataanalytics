@@ -190,6 +190,12 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
               viewportFraction: 0.2,
               enableInfiniteScroll: false,
               initialPage: predictions.indexOf(selectedPrediction),
+              onPageChanged: (index, reason) {
+                setState(() {
+                  selectedPrediction = predictions[index];
+                  predictionAIFuture = _fetchPredictionAI();
+                });
+              },
             ),
             items: predictions.map((race) {
               return Padding(
