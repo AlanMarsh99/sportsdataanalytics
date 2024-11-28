@@ -1,13 +1,11 @@
-// lib/ui/screens/download_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/api_service.dart';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:frontend/utils/download_utils.dart'; // Ensure correct path
+import 'package:frontend/utils/download_utils.dart';
 import 'package:csv/csv.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:frontend/ui/theme.dart'; // Import your theme for gradient colors
+import 'package:frontend/ui/theme.dart';
 
 class DownloadScreen extends StatefulWidget {
   const DownloadScreen({Key? key}) : super(key: key);
@@ -168,7 +166,6 @@ class _DownloadScreenState extends State<DownloadScreen> {
   // Function to download Upcoming Race as CSV
   Future<void> _downloadUpcomingRaceCsv(Map<String, dynamic> data) async {
     try {
-      // Assuming upcomingRace data structure
       List<List<dynamic>> rows = [
         ['Race ID', 'Race Name', 'Date', 'Time', 'Year', 'Country'],
         [
@@ -179,7 +176,6 @@ class _DownloadScreenState extends State<DownloadScreen> {
           data['year'],
           data['country']
         ],
-        // Add more rows if needed
       ];
       String csvData = const ListToCsvConverter().convert(rows);
       Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
@@ -381,6 +377,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
     );
   }
 
+  // Build widget
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -388,7 +385,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [darkGradient, lightGradient], // Ensure these are defined in theme.dart
+          colors: [darkGradient, lightGradient],
         ),
       ),
       child: Scaffold(
@@ -470,6 +467,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                                 horizontal: 16.0, vertical: 12.0),
                           ),
                           dropdownColor: Colors.white,
+                          // Icons for different file types
                           isExpanded: true,
                           items: ['CSV', 'JSON', 'PDF'].map((String value) {
                             IconData icon;
@@ -594,7 +592,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: DropdownButtonFormField<String>(
-                          isDense: false, // Ensures adequate vertical space
+                          isDense: false,
                           value: _selectedFormatLastRaceResults,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(
