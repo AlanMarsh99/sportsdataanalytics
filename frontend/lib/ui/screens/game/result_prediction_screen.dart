@@ -56,6 +56,35 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
     }
   }
 
+  int calculatePointsWinner() {
+    if (selectedPrediction.winnerName == selectedPrediction.actualWinnerName) {
+      return 30;
+    }
+    return 0;
+  }
+
+  int calculatePointsPodium() {
+    int points = 0;
+
+    if (selectedPrediction.podiumNames!.length == 3) {
+      for (String predictedDriver in selectedPrediction.podiumNames!) {
+        if (selectedPrediction.actualPodiumNames!.contains(predictedDriver)) {
+          points += 10;
+        }
+      }
+    }
+
+    return points;
+  }
+
+  int calculatePointsFastestLap() {
+    if (selectedPrediction.fastestLapName ==
+        selectedPrediction.actualFastestLapName) {
+      return 30;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -137,6 +166,10 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
     }
     String winnerNameAI = predictionAI['winnerName'] ?? "";
     String fastestLapNameAI = predictionAI['fastestLapName'] ?? "";
+
+    String winnerPoints = calculatePointsWinner().toString();
+    String podiumPoints = calculatePointsPodium().toString();
+    String fastestLapPoints = calculatePointsFastestLap().toString();
 
     return Container(
       width: double.infinity,
@@ -286,7 +319,8 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         'Podium',
                         selectedPrediction.actualPodiumNames!,
                         selectedPrediction.podiumNames!,
-                        podiumNamesAI),
+                        podiumNamesAI,
+                        podiumPoints),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
@@ -295,7 +329,8 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         'Winner',
                         [selectedPrediction.actualWinnerName!],
                         [selectedPrediction.winnerName!],
-                        [winnerNameAI]),
+                        [winnerNameAI],
+                        winnerPoints),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
@@ -304,7 +339,8 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         'Fastest lap',
                         [selectedPrediction.actualFastestLapName!],
                         [selectedPrediction.fastestLapName!],
-                        [fastestLapNameAI]),
+                        [fastestLapNameAI],
+                        fastestLapPoints),
                     SizedBox(
                       width: MediaQuery.of(context).size.width + 50,
                       child: const Divider(color: Colors.grey, height: 20),
@@ -320,8 +356,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
   }
 
   Widget _buildResultRow(String label, List<String> actualResults,
-      List<String> userResults, List<String> AIResults) {
-    String points = '';
+      List<String> userResults, List<String> AIResults, String points) {
     return Column(
       children: [
         Row(
@@ -335,7 +370,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getLabelColor(label),
+                    color: _getLabelColor(points),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
@@ -350,7 +385,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  points,
+                  '+$points',
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -407,16 +442,14 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
   }
 
   // Helper method to get the label color
-  Color _getLabelColor(String label) {
-    switch (label) {
-      case 'Podium':
+  Color _getLabelColor(String points) {
+    switch (points) {
+      case '30':
         return Colors.green;
-      case 'Winner':
+      case '0':
         return Colors.red;
-      case 'Fastest lap':
-        return Colors.orange;
       default:
-        return Colors.grey;
+        return Colors.orange;
     }
   }
 }
