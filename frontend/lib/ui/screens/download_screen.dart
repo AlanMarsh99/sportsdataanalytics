@@ -43,16 +43,16 @@ class _DownloadScreenState extends State<DownloadScreen> {
   // Function to download files based on format and data type
   Future<void> _downloadFile(String dataType, String format) async {
     if (dataType == 'upcoming_race') {
-      await _handleDOWNLOADUpcomingRace(format);
+      await _handleDownloadUpcomingRace(format);
     } else if (dataType == 'last_race_results') {
-      await _handleDOWNLOADLastRaceResults(format);
+      await _handleDownloadLastRaceResults(format);
     } else if (dataType == 'race_info') {
       await _handleDownloadRaceInfo(format);
     }
   }
 
   // Handle download for Upcoming Race
-  Future<void> _handleDOWNLOADUpcomingRace(String format) async {
+  Future<void> _handleDownloadUpcomingRace(String format) async {
     setState(() {
       _isLoadingUpcomingRace = true;
     });
@@ -82,7 +82,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   }
 
   // Handle download for Last Race Results
-  Future<void> _handleDOWNLOADLastRaceResults(String format) async {
+  Future<void> _handleDownloadLastRaceResults(String format) async {
     setState(() {
       _isLoadingLastRaceResults = true;
     });
@@ -414,7 +414,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
               ),
               const SizedBox(height: 16),
 
-              // DOWNLOAD Upcoming Race
+              // Download Upcoming Race
               Card(
                 color: primary,
                 elevation: 4,
@@ -548,7 +548,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 ),
               ),
 
-              // DOWNLOAD Last Race Results
+              // Download Last Race Results
               Card(
                 color: primary,
                 elevation: 4,
@@ -643,7 +643,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // DOWNLOAD Button
+                      // Download Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -682,7 +682,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 ),
               ),
 
-              // DOWNLOAD Race Information
+              // Download Race Information
               Card(
                 color: primary,
                 elevation: 4,
@@ -814,7 +814,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // DOWNLOAD Button
+                      // Download Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
