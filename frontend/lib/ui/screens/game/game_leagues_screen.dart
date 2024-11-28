@@ -275,8 +275,10 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                         },
                                       );
                                       if (hasCreated) {
-                                        _leaguesFuture =
-                                            _fetchUserLeagues(auth.userApp!.id);
+                                        setState(() {
+                                          _leaguesFuture = _fetchUserLeagues(
+                                              auth.userApp!.id);
+                                        });
                                       }
                                     },
                                     child: Padding(
@@ -317,8 +319,10 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                         },
                                       );
                                       if (hasJoined) {
-                                        _leaguesFuture =
-                                            _fetchUserLeagues(auth.userApp!.id);
+                                        setState(() {
+                                          _leaguesFuture = _fetchUserLeagues(
+                                              auth.userApp!.id);
+                                        });
                                       }
                                     },
                                     child: Padding(
