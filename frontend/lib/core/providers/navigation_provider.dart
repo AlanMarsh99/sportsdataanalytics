@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/game_first_screen.dart';
 import 'package:frontend/ui/screens/home_screen.dart';
+import 'package:frontend/ui/screens/download_screen.dart';
 import 'package:frontend/ui/screens/races/races_screen.dart';
 import 'package:frontend/ui/screens/teams/teams_screen.dart';
 import 'package:frontend/ui/theme.dart';
@@ -19,7 +20,7 @@ class NavigationProvider extends ChangeNotifier {
     const DriversScreen(),
     const TeamsScreen(),
     const GameFirstScreen(),
-    const DriversScreen(),
+    const DownloadScreen(),
   ];
 
   final List<NavigationRailDestination> _destinations = [
@@ -44,8 +45,8 @@ class NavigationProvider extends ChangeNotifier {
       label: Text('GAME'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.help),
-      label: Text('USER MANUAL'),
+      icon: Icon(Icons.download),
+      label: Text('DOWNLOADS'),
     ),
     /*NavigationRailDestination(
       icon: Icon(Icons.insert_drive_file_outlined),
