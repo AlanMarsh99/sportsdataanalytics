@@ -43,16 +43,16 @@ class _DownloadScreenState extends State<DownloadScreen> {
   // Function to download files based on format and data type
   Future<void> _downloadFile(String dataType, String format) async {
     if (dataType == 'upcoming_race') {
-      await _handleDownloadUpcomingRace(format);
+      await _handleDOWNLOADUpcomingRace(format);
     } else if (dataType == 'last_race_results') {
-      await _handleDownloadLastRaceResults(format);
+      await _handleDOWNLOADLastRaceResults(format);
     } else if (dataType == 'race_info') {
       await _handleDownloadRaceInfo(format);
     }
   }
 
   // Handle download for Upcoming Race
-  Future<void> _handleDownloadUpcomingRace(String format) async {
+  Future<void> _handleDOWNLOADUpcomingRace(String format) async {
     setState(() {
       _isLoadingUpcomingRace = true;
     });
@@ -82,7 +82,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   }
 
   // Handle download for Last Race Results
-  Future<void> _handleDownloadLastRaceResults(String format) async {
+  Future<void> _handleDOWNLOADLastRaceResults(String format) async {
     setState(() {
       _isLoadingLastRaceResults = true;
     });
@@ -415,9 +415,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Download Upcoming Race
+              // DOWNLOAD Upcoming Race
               Card(
-                color: Colors.white.withOpacity(0.1),
+                color: primary,
                 elevation: 4,
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 shape: RoundedRectangleBorder(
@@ -510,13 +510,14 @@ class _DownloadScreenState extends State<DownloadScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Download Button
+                      // DOWNLOAD Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.blueAccent, // Button color
+                            foregroundColor: Colors.white, // Button color
+                            backgroundColor: secondary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -532,7 +533,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                                 )
                               : const Icon(Icons.download, size: 20),
                           label: const Text(
-                            'Download',
+                            'DOWNLOAD',
                             style: TextStyle(fontSize: 16),
                           ),
                           onPressed: _isLoadingUpcomingRace
@@ -548,9 +549,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 ),
               ),
 
-              // Download Last Race Results
+              // DOWNLOAD Last Race Results
               Card(
-                color: Colors.white.withOpacity(0.1),
+                color: primary,
                 elevation: 4,
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 shape: RoundedRectangleBorder(
@@ -643,13 +644,14 @@ class _DownloadScreenState extends State<DownloadScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Download Button
+                      // DOWNLOAD Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.blueAccent, // Button color
+                            foregroundColor: Colors.white, // Button color
+                            backgroundColor: secondary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -665,7 +667,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                                 )
                               : const Icon(Icons.download, size: 20),
                           label: const Text(
-                            'Download',
+                            'DOWNLOAD',
                             style: TextStyle(fontSize: 16),
                           ),
                           onPressed: _isLoadingLastRaceResults
@@ -681,9 +683,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 ),
               ),
 
-              // Download Race Information
+              // DOWNLOAD Race Information
               Card(
-                color: Colors.white.withOpacity(0.1),
+                color: primary,
                 elevation: 4,
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 shape: RoundedRectangleBorder(
@@ -708,6 +710,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                       TextField(
                         controller: _yearController,
                         keyboardType: TextInputType.number,
+                        cursorColor: secondary,
                         decoration: const InputDecoration(
                           labelText: 'Year',
                           labelStyle: TextStyle(color: Colors.white),
@@ -725,6 +728,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                       TextField(
                         controller: _roundController,
                         keyboardType: TextInputType.number,
+                        cursorColor: secondary,
                         decoration: const InputDecoration(
                           labelText: 'Round',
                           labelStyle: TextStyle(color: Colors.white),
@@ -811,13 +815,14 @@ class _DownloadScreenState extends State<DownloadScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Download Button
+                      // DOWNLOAD Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.blueAccent, // Button color
+                            foregroundColor: Colors.white, // Button color
+                            backgroundColor: secondary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -833,7 +838,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                                 )
                               : const Icon(Icons.download, size: 20),
                           label: const Text(
-                            'Download',
+                            'DOWNLOAD',
                             style: TextStyle(fontSize: 16),
                           ),
                           onPressed: _isLoadingRaceInfo
