@@ -37,7 +37,10 @@ class _TutorialScreenState extends State<TutorialScreen>
       title: "CREATE AND JOIN LEAGUES",
       description:
           "Show your skills and challenge your peers by creating or joining a league, and race to claim the top spot on the podium at every race.",
-      content: Container(),
+      content: Image.asset(
+        'assets/tutorial/tutorial2.png',
+        //fit: BoxFit.cover,
+      ),
       index: 2,
     ),
     TutorialPage(
