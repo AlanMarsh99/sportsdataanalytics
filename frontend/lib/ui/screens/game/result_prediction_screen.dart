@@ -31,7 +31,8 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
   void initState() {
     super.initState();
     predictions = widget.predictions
-        .where((prediction) => prediction.userId == widget.user.id)
+        .where((prediction) => prediction.userId == widget.user.id &&
+        prediction.actualFastestLapName != null)
         .toList();
 
     selectedPrediction = widget.predictions.firstWhere((element) =>
