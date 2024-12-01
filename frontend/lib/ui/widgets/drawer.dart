@@ -44,7 +44,7 @@ class MyDrawer extends StatelessWidget implements PreferredSizeWidget {
                     const SizedBox(height: 10),
                     _buildDrawerItem(context, 'GAME', 4),
                     const SizedBox(height: 10),
-                    _buildDrawerItem(context, 'USER MANUAL', 5),
+                    _buildDrawerItem(context, 'DOWNLOADS', 5),
                   ],
                 ),
               ),
