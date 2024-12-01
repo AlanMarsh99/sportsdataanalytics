@@ -137,7 +137,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   'GAME',
                   style: TextStyle(
                       fontSize: 24,
@@ -165,7 +165,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
           child: upcomingRaceInfo == null
               ? Container(
                   height: MediaQuery.of(context).size.height * 0.6,
-                  child: Center(
+                  child: const Center(
                     child: CircularProgressIndicator(
                       color: Colors.white,
                     ),
@@ -191,7 +191,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Color.fromARGB(213, 255, 255, 255),
+            color: const Color.fromARGB(213, 255, 255, 255),
             fontSize: isMobile ? 12 : 16,
           ),
         ),
@@ -249,7 +249,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: Text(
                         'FORMULA 1 ${upcomingRaceInfo['race_name']}'
                             .toUpperCase(),
@@ -346,7 +346,8 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                         DateTime editDeadline =
                             raceDate!.subtract(const Duration(days: 3));
                         DateTime now = DateTime.now();
-                        bool canMakePrediction = now.isBefore(editDeadline);
+                        bool canMakePrediction = true;
+                        //now.isBefore(editDeadline);
 
                         // No prediction made
                         return Visibility(
