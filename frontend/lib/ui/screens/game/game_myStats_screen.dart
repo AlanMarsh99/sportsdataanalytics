@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/avatar_selection_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
+import 'package:frontend/ui/widgets/level_progress_bar.dart';
 import 'package:frontend/ui/widgets/log_in_container.dart';
 import 'package:provider/provider.dart';
 
@@ -47,12 +49,33 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-          child: Text(
-            'GAME',
-            style: TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'GAME',
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              Consumer<AuthService>(builder: (context, auth, child) {
+                if (auth.status == Status.Authenticated &&
+                    auth.userApp != null) {
+                  int pontsToNextLevel =
+                      Globals.nextLevelPoints(auth.userApp!.level);
+                  return LevelProgressBar(
+                    currentLevel: auth.userApp!.level,
+                    currentPoints: auth.userApp!.totalPoints,
+                    pointsToNextLevel: pontsToNextLevel,
+                  );
+                } else {
+                  return Container();
+                }
+              }),
+            ],
           ),
         ),
         Consumer<AuthService>(
@@ -63,7 +86,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                        bottom: 16.0, left: 16.0, right: 16.0),
+                        top: 16, bottom: 16.0, left: 16.0, right: 16.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

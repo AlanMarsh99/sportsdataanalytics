@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/models/league.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/ranking_league_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/create_league_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/join_league_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
+import 'package:frontend/ui/widgets/level_progress_bar.dart';
 import 'package:frontend/ui/widgets/log_in_container.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
@@ -84,10 +86,31 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'GAME',
-            style: TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'GAME',
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              Consumer<AuthService>(builder: (context, auth, child) {
+                if (auth.status == Status.Authenticated &&
+                    auth.userApp != null) {
+                  int pontsToNextLevel =
+                      Globals.nextLevelPoints(auth.userApp!.level);
+                  return LevelProgressBar(
+                    currentLevel: auth.userApp!.level,
+                    currentPoints: auth.userApp!.totalPoints,
+                    pointsToNextLevel: pontsToNextLevel,
+                  );
+                } else {
+                  return Container();
+                }
+              }),
+            ],
           ),
           Expanded(
               child: Padding(
