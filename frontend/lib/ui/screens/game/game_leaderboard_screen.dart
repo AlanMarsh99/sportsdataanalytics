@@ -2,11 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user.dart';
 import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/level_progress_bar.dart';
 import 'package:frontend/ui/widgets/tables/global_leaderboard_table.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
+
+import 'package:provider/provider.dart';
 
 class GameLeaderboardScreen extends StatefulWidget {
   const GameLeaderboardScreen({
@@ -58,12 +63,33 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-          child: Text(
-            'GAME',
-            style: TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'GAME',
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              Consumer<AuthService>(builder: (context, auth, child) {
+                if (auth.status == Status.Authenticated &&
+                    auth.userApp != null) {
+                  int pontsToNextLevel =
+                      Globals.nextLevelPoints(auth.userApp!.level);
+                  return LevelProgressBar(
+                    currentLevel: auth.userApp!.level,
+                    currentPoints: auth.userApp!.totalPoints,
+                    pointsToNextLevel: pontsToNextLevel,
+                  );
+                } else {
+                  return Container();
+                }
+              }),
+            ],
           ),
         ),
         Padding(

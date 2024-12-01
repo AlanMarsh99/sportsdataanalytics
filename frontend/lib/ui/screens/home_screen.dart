@@ -688,7 +688,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       DateTime editDeadline =
                           raceDate!.subtract(const Duration(days: 3));
                       DateTime now = DateTime.now();
-                      bool canMakePrediction = now.isBefore(editDeadline);
+                      bool canMakePrediction = true;
+                      //now.isBefore(editDeadline);
 
                       // No prediction made
                       return Visibility(

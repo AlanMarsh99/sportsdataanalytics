@@ -4,11 +4,13 @@ import 'package:frontend/core/models/lap_data.dart';
 import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/view_predictions_dialog.dart';
+import 'package:frontend/ui/widgets/level_progress_bar.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 
@@ -103,7 +105,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
           remainingTime = deadline!.difference(DateTime.now());
           if (remainingTime.isNegative) {
             remainingTime =
-            const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
+                const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
             timer.cancel();
           }
         });
@@ -130,20 +132,40 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-          child: Text(
-            'GAME',
-            style: TextStyle(
-                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ),
+        Padding(
+            padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'GAME',
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                Consumer<AuthService>(builder: (context, auth, child) {
+                  if (auth.status == Status.Authenticated &&
+                      auth.userApp != null) {
+                    int pontsToNextLevel =
+                        Globals.nextLevelPoints(auth.userApp!.level);
+                    return LevelProgressBar(
+                      currentLevel: auth.userApp!.level,
+                      currentPoints: auth.userApp!.totalPoints,
+                      pointsToNextLevel: pontsToNextLevel,
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
+              ],
+            )),
         Padding(
           padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: upcomingRaceInfo == null
               ? Container(
                   height: MediaQuery.of(context).size.height * 0.6,
-                  child: Center(
+                  child: const Center(
                     child: CircularProgressIndicator(
                       color: Colors.white,
                     ),
@@ -169,7 +191,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Color.fromARGB(213, 255, 255, 255),
+            color: const Color.fromARGB(213, 255, 255, 255),
             fontSize: isMobile ? 12 : 16,
           ),
         ),
@@ -227,7 +249,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: Text(
                         'FORMULA 1 ${upcomingRaceInfo['race_name']}'
                             .toUpperCase(),
@@ -324,7 +346,8 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                         DateTime editDeadline =
                             raceDate!.subtract(const Duration(days: 3));
                         DateTime now = DateTime.now();
-                        bool canMakePrediction = now.isBefore(editDeadline);
+                        bool canMakePrediction = true;
+                        //now.isBefore(editDeadline);
 
                         // No prediction made
                         return Visibility(

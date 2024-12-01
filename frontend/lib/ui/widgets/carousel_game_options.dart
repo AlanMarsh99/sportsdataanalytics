@@ -10,6 +10,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:frontend/ui/widgets/app_bar.dart';
 import 'package:frontend/ui/widgets/drawer.dart';
 import 'package:frontend/ui/widgets/end_drawer.dart';
+import 'package:frontend/ui/widgets/level_progress_bar.dart';
 import 'package:provider/provider.dart';
 
 class F1Carousel extends StatefulWidget {
@@ -208,7 +209,9 @@ class _F1CarouselState extends State<F1Carousel> with TickerProviderStateMixin {
                 isMobile: isMobile,
               ),
               endDrawer: const EndDrawer(),
-              body: Row(
+              body: Stack(
+    children: [
+              Row(
                 children: [
                   NavigationRail(
                     selectedIconTheme: IconThemeData(color: secondary),
@@ -334,12 +337,14 @@ class _F1CarouselState extends State<F1Carousel> with TickerProviderStateMixin {
                             child: Image.asset('assets/images/wheel.png',
                                 width: 200),
                           ),
-                        )
+                        ),
+                       
                       ],
                     ),
                   ),
                 ],
               ),
+    ])
             ),
     );
   }

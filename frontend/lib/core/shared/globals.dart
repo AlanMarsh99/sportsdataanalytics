@@ -25,6 +25,53 @@ class Globals {
     Avatar: (data) => Avatar.fromMap(data),
   };
 
+  static int nextLevelPoints(int level) {
+    switch (level) {
+      case 1:
+        return 30;
+      case 2:
+        return 94;
+      case 3:
+        return 195;
+      case 4:
+        return 333;
+      case 5:
+        return 509;
+      case 6:
+        return 724;
+      case 7:
+        return 979;
+      case 8:
+        return 1275;
+      case 9:
+        return 1611;
+      case 10:
+        return 1989;
+      case 11:
+        return 2408;
+      case 12:
+        return 2870;
+      case 13:
+        return 3374;
+      case 14:
+        return 3921;
+      case 15:
+        return 4511;
+      case 16:
+        return 5144;
+      case 17:
+        return 5821;
+      case 18:
+        return 6541;
+      case 19:
+        return 7307;
+      case 20:
+        return 8117;
+      default:
+        return 0;
+    }
+  }
+
   static final Map<String, String> teamLogos = {
     'Alpine F1 Team': 'assets/teams/logos/alpine-logo.png',
     'Aston Martin': 'assets/teams/logos/aston-martin-logo.png',
