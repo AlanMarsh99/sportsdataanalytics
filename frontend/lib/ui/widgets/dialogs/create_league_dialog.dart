@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/core/models/chat.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/core/services/chat_service.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -12,6 +14,7 @@ class CreateLeagueDialog extends StatelessWidget {
   CreateLeagueDialog({Key? key}) : super(key: key);
 
   final _nameController = TextEditingController();
+  ChatService chatService = ChatService();
 
   void createLeague(BuildContext context) async {
     final userId = Provider.of<AuthService>(context, listen: false).userApp!.id;
@@ -41,6 +44,11 @@ class CreateLeagueDialog extends StatelessWidget {
       await FirebaseFirestore.instance
           .collection('userLeagues')
           .add(userLeagueData);
+
+      Chat newChat =
+          Chat(leagueId: id, participantsIds: [userId]);
+
+      await chatService.createChatForLeague(newChat);
 
       print('League created successfully with code: $id');
       ScaffoldMessenger.of(context).showSnackBar(

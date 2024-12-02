@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/chat.dart';
 import 'package:frontend/core/models/league.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
@@ -122,6 +123,17 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
     );
   }
 
+  Future<void> createChatForLeague(Chat chat) async {
+    try {
+      final chatRef =
+          FirebaseFirestore.instance.collection('chats').doc(chat.leagueId);
+      await chatRef.set(chat.toMap());
+      print('Chat created successfully');
+    } catch (e) {
+      print('Error creating chat: $e');
+    }
+  }
+
   Widget _leaguesContainer(bool isMobile) {
     return Container(
       width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
@@ -219,6 +231,7 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                           builder: (context) =>
                                               RankingLeagueScreen(
                                             league: leagues[index],
+                                            user: auth.userApp!,
                                           ),
                                         ),
                                       );

@@ -1,23 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:frontend/core/models/league.dart';
+import 'package:frontend/core/models/message.dart';
 import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/models/race_league.dart';
 import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/services/chat_service.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/chat_widget.dart';
 
 class ResultPredictionScreen extends StatefulWidget {
   const ResultPredictionScreen(
       {Key? key,
       required this.user,
       required this.predictions,
-      required this.race})
+      required this.race,
+      required this.league,
+      required this.currentUser,
+      required this.chatService})
       : super(key: key);
 
   final UserApp user;
   final List<Prediction> predictions;
   final RaceLeague race;
+  final League league;
+  final ChatUser currentUser;
+  final ChatService chatService;
 
   _ResultPredictionScreenState createState() => _ResultPredictionScreenState();
 }
@@ -26,13 +38,15 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
   late Prediction selectedPrediction;
   List<Prediction> predictions = [];
   late Future<Map<String, dynamic>> predictionAIFuture;
+  bool isMobile = true;
 
   @override
   void initState() {
     super.initState();
     predictions = widget.predictions
-        .where((prediction) => prediction.userId == widget.user.id &&
-        prediction.actualFastestLapName != null)
+        .where((prediction) =>
+            prediction.userId == widget.user.id &&
+            prediction.actualFastestLapName != null)
         .toList();
 
     selectedPrediction = widget.predictions.firstWhere((element) =>
@@ -88,6 +102,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    isMobile = Responsive.isMobile(context);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -116,7 +131,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                     },
                   ),
                   Text(
-                    '${widget.user.username} predictions',
+                    '${widget.user.username} Predictions',
                     style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -125,34 +140,174 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              Expanded(
-                child: FutureBuilder<Map<String, dynamic>>(
-                  future: predictionAIFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Error: ${snapshot.error}',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
-                    } else if (!snapshot.hasData) {
-                      return const Center(
-                        child: Text(
-                          'No data available.',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    }
-                    Map<String, dynamic> predictionAI = snapshot.data!;
-                    return _predictionsContainer(predictionAI);
-                  },
-                ),
-              ),
+              !isMobile
+                  ? Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            child: FutureBuilder<Map<String, dynamic>>(
+                              future: predictionAIFuture,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                        color: Colors.white),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text(
+                                      'Error: ${snapshot.error}',
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  );
+                                } else if (!snapshot.hasData) {
+                                  return const Center(
+                                    child: Text(
+                                      'No data available.',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  );
+                                }
+                                Map<String, dynamic> predictionAI =
+                                    snapshot.data!;
+                                return _predictionsContainer(predictionAI);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Flexible(
+                            flex: 2,
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 6.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: StreamBuilder<List<Message>>(
+                                stream: widget.chatService
+                                    .getMessages(widget.league.id),
+                                builder: (context, snapshot) {
+                                  // Check the stream's state
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        child: CircularProgressIndicator(
+                                          color: primary,
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        child: Text(
+                                          'Error: ${snapshot.error}',
+                                          style: const TextStyle(
+                                              color: Colors.black),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  List<Message> listMessages = [];
+
+                                  if (snapshot.hasData &&
+                                      snapshot.data!.isNotEmpty) {
+                                    // Retrieve the list of Message objects
+                                    listMessages = snapshot.data!;
+                                    listMessages.sort((a, b) =>
+                                        b.sentAt!.compareTo(a.sentAt!));
+                                  }
+
+                                  // Use a FutureBuilder to handle async message conversion
+                                  return FutureBuilder<List<ChatMessage>>(
+                                    future: widget.chatService
+                                        .generateChatMessagesList(
+                                            listMessages, widget.currentUser),
+                                    builder: (context, chatSnapshot) {
+                                      if (chatSnapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(
+                                            color: primary,
+                                          ),
+                                        );
+                                      }
+
+                                      if (chatSnapshot.hasError) {
+                                        return Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            child: Text(
+                                              'Error: ${chatSnapshot.error}',
+                                              style: const TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      // Retrieve the list of ChatMessage objects
+                                      List<ChatMessage> messages =
+                                          chatSnapshot.data ?? [];
+
+                                      // Render DashChat with the messages
+                                      return ChatWidget(
+                                        messages: messages,
+                                        league: widget.league,
+                                        chatService: widget.chatService,
+                                        currentUser: widget.currentUser,
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Expanded(
+                      child: FutureBuilder<Map<String, dynamic>>(
+                        future: predictionAIFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                  color: Colors.white),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                'Error: ${snapshot.error}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            );
+                          } else if (!snapshot.hasData) {
+                            return const Center(
+                              child: Text(
+                                'No data available.',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          }
+                          Map<String, dynamic> predictionAI = snapshot.data!;
+                          return _predictionsContainer(predictionAI);
+                        },
+                      ),
+                    ),
             ],
           ),
         ),
@@ -174,6 +329,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
 
     return Container(
       width: double.infinity,
+      height: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primary,
@@ -263,6 +419,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 // Race Results Table
                 Column(
@@ -277,7 +434,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                           fontWeight: FontWeight.bold),
                     ),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width + 50,
+                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
                       child: const Divider(color: Colors.white),
                     ),
                     Padding(
@@ -286,9 +443,9 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 95),
+                            padding: EdgeInsets.only(left: isMobile ? 95 : 130),
                             child: Container(
-                              width: 115,
+                              width: isMobile ? 115 : 130,
                               child: const Text(
                                 'ACTUAL',
                                 style: TextStyle(
@@ -299,7 +456,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                             ),
                           ),
                           Container(
-                            width: 115,
+                            width: isMobile ? 115 : 130,
                             child: Text(
                               widget.user.username.toUpperCase(),
                               style: const TextStyle(
@@ -319,7 +476,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                       ),
                     ),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width + 50,
+                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
                       child: const Divider(color: Colors.grey, height: 20),
                     ),
                     _buildResultRow(
@@ -329,7 +486,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         podiumNamesAI,
                         podiumPoints),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width + 50,
+                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
                       child: const Divider(color: Colors.grey, height: 20),
                     ),
                     _buildResultRow(
@@ -339,7 +496,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         [winnerNameAI],
                         winnerPoints),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width + 50,
+                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
                       child: const Divider(color: Colors.grey, height: 20),
                     ),
                     _buildResultRow(
@@ -349,7 +506,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         [fastestLapNameAI],
                         fastestLapPoints),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width + 50,
+                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
                       child: const Divider(color: Colors.grey, height: 20),
                     ),
                   ],
@@ -370,6 +527,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Label
+            SizedBox(width: isMobile ? 0 : 20),
             Column(
               children: [
                 Container(
@@ -401,7 +559,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
               ],
             ),
 
-            const SizedBox(width: 15),
+            SizedBox(width: isMobile ? 15 : 30),
             // Actual results
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,7 +576,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                   .toList(),
             ),
 
-            const SizedBox(width: 15),
+            SizedBox(width: isMobile ? 15 : 30),
             // User results
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -431,7 +589,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                       )))
                   .toList(),
             ),
-            const SizedBox(width: 15),
+            SizedBox(width: isMobile ? 15 : 30),
             // AI results
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

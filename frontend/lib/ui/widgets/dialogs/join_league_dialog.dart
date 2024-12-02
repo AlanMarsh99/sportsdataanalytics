@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/core/services/chat_service.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -12,6 +13,7 @@ class JoinLeagueDialog extends StatelessWidget {
   JoinLeagueDialog({Key? key}) : super(key: key);
 
   final _codeController = TextEditingController();
+   ChatService chatService = ChatService();
 
   void joinLeague(BuildContext context) async {
     final userId = Provider.of<AuthService>(context, listen: false).userApp!.id;
@@ -75,6 +77,9 @@ class JoinLeagueDialog extends StatelessWidget {
       await FirebaseFirestore.instance
           .collection('userLeagues')
           .add(userLeagueData);
+
+      // Add the user to the chat participants
+      await chatService.addParticipantToChat(leagueId, userId);
 
       print('User joined league successfully');
       ScaffoldMessenger.of(context).showSnackBar(
