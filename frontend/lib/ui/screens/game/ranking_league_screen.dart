@@ -236,8 +236,8 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 6.0),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8.0),
+                                  color: Colors.white.withOpacity(0.8),
+                                  borderRadius: BorderRadius.circular(20.0),
                                 ),
                                 child: StreamBuilder<List<Message>>(
                                   stream:
@@ -247,20 +247,27 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
                                       return const Center(
-                                        child: CircularProgressIndicator(color: primary,),
+                                        child: CircularProgressIndicator(
+                                          color: primary,
+                                        ),
                                       );
                                     }
 
                                     if (snapshot.hasError) {
                                       return Center(
-                                        child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.black),
-                                      ),);
+                                        child: Text(
+                                          'Error: ${snapshot.error}',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      );
                                     }
 
                                     if (!snapshot.hasData ||
                                         snapshot.data!.isEmpty) {
                                       return const Center(
-                                        child: Text('No messages yet.', style: TextStyle(color: Colors.black)),
+                                        child: Text('No messages yet.',
+                                            style:
+                                                TextStyle(color: Colors.black)),
                                       );
                                     }
 
@@ -278,15 +285,20 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                         if (chatSnapshot.connectionState ==
                                             ConnectionState.waiting) {
                                           return const Center(
-                                            child: CircularProgressIndicator(color: primary,),
+                                            child: CircularProgressIndicator(
+                                              color: primary,
+                                            ),
                                           );
                                         }
 
                                         if (chatSnapshot.hasError) {
                                           return Center(
                                             child: Text(
-                                                'Error: ${chatSnapshot.error},', style: TextStyle(color: Colors.black),
-                                          ),);
+                                              'Error: ${chatSnapshot.error},',
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          );
                                         }
 
                                         // Retrieve the list of ChatMessage objects
@@ -296,9 +308,36 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                         // Render DashChat with the messages
                                         return DashChat(
                                           currentUser: currentUser,
-                                          messageOptions: const MessageOptions(
+                                          messageOptions: MessageOptions(
+                                            currentUserContainerColor: primary,
                                             showOtherUsersAvatar: true,
                                             showTime: true,
+                                            avatarBuilder: (ChatUser user,
+                                                Function? onPress,
+                                                Function? onLongPress) {
+                                              return 
+                                              Padding(
+                                                padding: EdgeInsets.only(right: 5),
+                                                child: CircleAvatar(
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    radius: 20,
+                                                    child: Center(
+                                                      child: Image.asset(
+                                                        user.profileImage ??
+                                                            'assets/avatars/default.png',
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                                error,
+                                                                stackTrace) =>
+                                                            Icon(
+                                                          Icons.person,
+                                                          size: 40,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),);
+                                            },
                                           ),
                                           inputOptions: InputOptions(
                                             sendOnEnter: true,
