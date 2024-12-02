@@ -249,7 +249,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                 predictionRaces =
                                     data["races"] as List<RaceLeague>;
 
-                                return _leaguesContainer(users, predictions);
+                                return _leaguesContainer(users, predictions, isMobile);
                               },
                             ),
                           ),
@@ -348,7 +348,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                       },
                                     );
                                   },
-                                )),
+                                ),),
                           ),
                         ],
                       ),
@@ -384,7 +384,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                           predictions = data["predictions"] as List<Prediction>;
                           predictionRaces = data["races"] as List<RaceLeague>;
 
-                          return _leaguesContainer(users, predictions);
+                          return _leaguesContainer(users, predictions, isMobile);
                         },
                       ),
                     ),
@@ -395,7 +395,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     );
   }
 
-  Widget _rankingUserContainer(UserApp user, int index) {
+  Widget _rankingUserContainer(UserApp user, int index, bool isMobile) {
     /*List<Color> indicators = [
       Colors.green,
       Colors.red,
@@ -414,6 +414,10 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     user: user,
                     race: selectedRace!,
                     predictions: predictions,
+                    league: widget.league,
+                    currentUser: currentUser,
+                    chatService: chatService,
+
                   ),
                 ),
               );
@@ -519,7 +523,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     return prediction?.points;
   }
 
-  Widget _leaguesContainer(List<UserApp> users, List<Prediction> predictions) {
+  Widget _leaguesContainer(List<UserApp> users, List<Prediction> predictions, bool isMobile) {
     final List<UserApp> rankedUsers = users.map((user) {
       final points = selectedRace != null
           ? _getUserPointsForRace(
@@ -689,7 +693,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     itemCount: rankedUsers.length,
                     itemBuilder: (context, index) {
                       return _rankingUserContainer(
-                          rankedUsers[index], index + 1);
+                          rankedUsers[index], index + 1, isMobile);
                     },
                   ),
                 )
