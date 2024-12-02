@@ -15,6 +15,7 @@ import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/chat_screen.dart';
 import 'package:frontend/ui/screens/game/result_prediction_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/chat_widget.dart';
 import 'package:provider/provider.dart';
 
 class RankingLeagueScreen extends StatefulWidget {
@@ -151,6 +152,29 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
         ),
       ),
       child: Scaffold(
+        floatingActionButton: isMobile
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 20, right: 20),
+                child: FloatingActionButton(
+                  backgroundColor: secondary,
+                  foregroundColor: Colors.white,
+                  tooltip: 'Open chat',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          league: widget.league,
+                          currentUser: currentUser,
+                          chatService: chatService,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Icon(Icons.chat),
+                ),
+              )
+            : null,
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -176,7 +200,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Text(
@@ -229,14 +253,14 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                               },
                             ),
                           ),
-                          SizedBox(width: 15),
+                          const SizedBox(width: 15),
                           Flexible(
                             flex: 2,
                             child: Container(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 6.0),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.8),
+                                  color: Colors.white.withOpacity(0.9),
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
                                 child: StreamBuilder<List<Message>>(
@@ -247,34 +271,39 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
                                       return const Center(
-                                        child: CircularProgressIndicator(
-                                          color: primary,
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: CircularProgressIndicator(
+                                            color: primary,
+                                          ),
                                         ),
                                       );
                                     }
 
                                     if (snapshot.hasError) {
                                       return Center(
-                                        child: Text(
-                                          'Error: ${snapshot.error}',
-                                          style: TextStyle(color: Colors.black),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20),
+                                          child: Text(
+                                            'Error: ${snapshot.error}',
+                                            style:
+                                                const TextStyle(color: Colors.black),
+                                          ),
                                         ),
                                       );
                                     }
 
-                                    if (!snapshot.hasData ||
-                                        snapshot.data!.isEmpty) {
-                                      return const Center(
-                                        child: Text('No messages yet.',
-                                            style:
-                                                TextStyle(color: Colors.black)),
-                                      );
-                                    }
+                                    List<Message> listMessages = [];
 
-                                    // Retrieve the list of Message objects
-                                    List<Message> listMessages = snapshot.data!;
-                                    listMessages.sort((a, b) =>
-                                        b.sentAt!.compareTo(a.sentAt!));
+                                    if (snapshot.hasData &&
+                                        snapshot.data!.isNotEmpty) {
+                                      // Retrieve the list of Message objects
+                                      listMessages = snapshot.data!;
+                                      listMessages.sort((a, b) =>
+                                          b.sentAt!.compareTo(a.sentAt!));
+                                    }
 
                                     // Use a FutureBuilder to handle async message conversion
                                     return FutureBuilder<List<ChatMessage>>(
@@ -293,10 +322,14 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
 
                                         if (chatSnapshot.hasError) {
                                           return Center(
-                                            child: Text(
-                                              'Error: ${chatSnapshot.error},',
-                                              style: TextStyle(
-                                                  color: Colors.black),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 20),
+                                              child: Text(
+                                                'Error: ${chatSnapshot.error}',
+                                                style: const TextStyle(
+                                                    color: Colors.black),
+                                              ),
                                             ),
                                           );
                                         }
@@ -306,82 +339,55 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                             chatSnapshot.data ?? [];
 
                                         // Render DashChat with the messages
-                                        return DashChat(
-                                          currentUser: currentUser,
-                                          messageOptions: MessageOptions(
-                                            currentUserContainerColor: primary,
-                                            showOtherUsersAvatar: true,
-                                            showTime: true,
-                                            avatarBuilder: (ChatUser user,
-                                                Function? onPress,
-                                                Function? onLongPress) {
-                                              return 
-                                              Padding(
-                                                padding: EdgeInsets.only(right: 5),
-                                                child: CircleAvatar(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    radius: 20,
-                                                    child: Center(
-                                                      child: Image.asset(
-                                                        user.profileImage ??
-                                                            'assets/avatars/default.png',
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder: (context,
-                                                                error,
-                                                                stackTrace) =>
-                                                            Icon(
-                                                          Icons.person,
-                                                          size: 40,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),);
-                                            },
-                                          ),
-                                          inputOptions: InputOptions(
-                                            sendOnEnter: true,
-                                            alwaysShowSend: true,
-                                            inputTextStyle: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          onSend: (message) {
-                                            final newMessage = Message(
-                                              senderId: currentUser.id,
-                                              content: message.text,
-                                              sentAt: Timestamp.now(),
-                                            );
-                                            chatService.sendMessage(
-                                                widget.league.id, newMessage);
-                                          },
+                                        return ChatWidget(
                                           messages: messages,
+                                          league: widget.league,
+                                          chatService: chatService,
+                                          currentUser: currentUser,
                                         );
                                       },
                                     );
                                   },
                                 )),
-                            /*ChatScreen(
-                              chatUser: widget.user,
-                              leagueId: widget.league.id,
-                              messagesStream:
-                                  chatService.getMessages(widget.league.id),
-                              onSendMessage: (content) {
-                                final message = Message(
-                                  senderId: widget.user.id,
-                                  content: content,
-                                  sentAt: Timestamp.now(),
-                                );
-                                chatService.sendMessage(
-                                    widget.league.id, message);
-                              },
-                            ),*/
                           ),
                         ],
                       ),
                     )
-                  : Container()
+                  : Expanded(
+                      child: FutureBuilder<Map<String, dynamic>>(
+                        future: leagueDataFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                  color: Colors.white),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                'Error: ${snapshot.error}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            );
+                          } else if (!snapshot.hasData) {
+                            return const Center(
+                              child: Text(
+                                'No data available.',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          }
+
+                          final data = snapshot.data!;
+                          final users = data["users"] as List<UserApp>;
+                          predictions = data["predictions"] as List<Prediction>;
+                          predictionRaces = data["races"] as List<RaceLeague>;
+
+                          return _leaguesContainer(users, predictions);
+                        },
+                      ),
+                    ),
             ],
           ),
         ),
@@ -446,7 +452,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
               ),
             ),
             // ),
-            Spacer(),
+            const Spacer(),
             Text(
               showTotal
                   ? user.seasonPoints.toString()
@@ -561,9 +567,9 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     border: Border.all(color: secondary, width: 2),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: Text(
+                  child: const Text(
                     "TOTAL",
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: white,
                         fontSize: 14.0,
                         fontWeight: FontWeight.bold),
@@ -604,7 +610,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                                   "",
                                               width: 30.0,
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 8.0,
                                             ),
                                           ],
@@ -687,7 +693,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     },
                   ),
                 )
-              : Center(
+              : const Center(
                   child: Text(
                     'No users available',
                     style: TextStyle(color: Colors.white),
