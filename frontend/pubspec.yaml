@@ -48,6 +48,7 @@ dependencies:
   csv: ^5.0.0
   pdf: ^3.10.1
   printing: ^5.10.0
+  dash_chat_2: ^0.0.21
 
 
 

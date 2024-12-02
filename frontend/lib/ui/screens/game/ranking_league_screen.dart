@@ -1,20 +1,29 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
+import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/models/chat.dart';
 import 'package:frontend/core/models/league.dart';
+import 'package:frontend/core/models/message.dart';
 import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/models/race_league.dart';
 import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/services/chat_service.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/ui/responsive.dart';
+import 'package:frontend/ui/screens/game/chat_screen.dart';
 import 'package:frontend/ui/screens/game/result_prediction_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
 class RankingLeagueScreen extends StatefulWidget {
-  const RankingLeagueScreen({Key? key, required this.league}) : super(key: key);
+  const RankingLeagueScreen(
+      {Key? key, required this.league, required this.user})
+      : super(key: key);
 
   final League league;
+  final UserApp user;
 
   _RankingLeagueScreenState createState() => _RankingLeagueScreenState();
 }
@@ -26,10 +35,17 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
   bool showTotal = false;
   List<Prediction> predictions = [];
   List<UserApp> usersInfo = [];
+  ChatService chatService = ChatService();
+  late ChatUser currentUser;
 
   @override
   void initState() {
     super.initState();
+    currentUser = ChatUser(
+      firstName: widget.user.username,
+      id: widget.user.id,
+      profileImage: 'assets/avatars/${widget.user.avatar}.png',
+    );
     leagueDataFuture = _fetchLeagueData();
   }
 
@@ -125,6 +141,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -169,39 +186,163 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              FutureBuilder<Map<String, dynamic>>(
-                future: leagueDataFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: Colors.white),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        'Error: ${snapshot.error}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    );
-                  } else if (!snapshot.hasData) {
-                    return const Center(
-                      child: Text(
-                        'No data available.',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                  }
+              !isMobile
+                  ? Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            child: FutureBuilder<Map<String, dynamic>>(
+                              future: leagueDataFuture,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                        color: Colors.white),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text(
+                                      'Error: ${snapshot.error}',
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  );
+                                } else if (!snapshot.hasData) {
+                                  return const Center(
+                                    child: Text(
+                                      'No data available.',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  );
+                                }
 
-                  final data = snapshot.data!;
-                  final users = data["users"] as List<UserApp>;
-                  predictions = data["predictions"] as List<Prediction>;
-                  predictionRaces = data["races"] as List<RaceLeague>;
+                                final data = snapshot.data!;
+                                final users = data["users"] as List<UserApp>;
+                                predictions =
+                                    data["predictions"] as List<Prediction>;
+                                predictionRaces =
+                                    data["races"] as List<RaceLeague>;
 
-                  return Expanded(
-                    child: _leaguesContainer(users, predictions),
-                  );
-                },
-              )
+                                return _leaguesContainer(users, predictions);
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 15),
+                          Flexible(
+                            flex: 2,
+                            child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 6.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: StreamBuilder<List<Message>>(
+                                  stream:
+                                      chatService.getMessages(widget.league.id),
+                                  builder: (context, snapshot) {
+                                    // Check the stream's state
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(color: primary,),
+                                      );
+                                    }
+
+                                    if (snapshot.hasError) {
+                                      return Center(
+                                        child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.black),
+                                      ),);
+                                    }
+
+                                    if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return const Center(
+                                        child: Text('No messages yet.', style: TextStyle(color: Colors.black)),
+                                      );
+                                    }
+
+                                    // Retrieve the list of Message objects
+                                    List<Message> listMessages = snapshot.data!;
+                                    listMessages.sort((a, b) =>
+                                        b.sentAt!.compareTo(a.sentAt!));
+
+                                    // Use a FutureBuilder to handle async message conversion
+                                    return FutureBuilder<List<ChatMessage>>(
+                                      future:
+                                          chatService.generateChatMessagesList(
+                                              listMessages, currentUser),
+                                      builder: (context, chatSnapshot) {
+                                        if (chatSnapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(color: primary,),
+                                          );
+                                        }
+
+                                        if (chatSnapshot.hasError) {
+                                          return Center(
+                                            child: Text(
+                                                'Error: ${chatSnapshot.error},', style: TextStyle(color: Colors.black),
+                                          ),);
+                                        }
+
+                                        // Retrieve the list of ChatMessage objects
+                                        List<ChatMessage> messages =
+                                            chatSnapshot.data ?? [];
+
+                                        // Render DashChat with the messages
+                                        return DashChat(
+                                          currentUser: currentUser,
+                                          messageOptions: const MessageOptions(
+                                            showOtherUsersAvatar: true,
+                                            showTime: true,
+                                          ),
+                                          inputOptions: InputOptions(
+                                            sendOnEnter: true,
+                                            alwaysShowSend: true,
+                                            inputTextStyle: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          onSend: (message) {
+                                            final newMessage = Message(
+                                              senderId: currentUser.id,
+                                              content: message.text,
+                                              sentAt: Timestamp.now(),
+                                            );
+                                            chatService.sendMessage(
+                                                widget.league.id, newMessage);
+                                          },
+                                          messages: messages,
+                                        );
+                                      },
+                                    );
+                                  },
+                                )),
+                            /*ChatScreen(
+                              chatUser: widget.user,
+                              leagueId: widget.league.id,
+                              messagesStream:
+                                  chatService.getMessages(widget.league.id),
+                              onSendMessage: (content) {
+                                final message = Message(
+                                  senderId: widget.user.id,
+                                  content: content,
+                                  sentAt: Timestamp.now(),
+                                );
+                                chatService.sendMessage(
+                                    widget.league.id, message);
+                              },
+                            ),*/
+                          ),
+                        ],
+                      ),
+                    )
+                  : Container()
             ],
           ),
         ),
