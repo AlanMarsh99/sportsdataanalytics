@@ -21,20 +21,28 @@ class _DownloadScreenState extends State<DownloadScreen> {
   String _selectedFormatUpcomingRace = 'JSON';
   String _selectedFormatLastRaceResults = 'CSV';
   String _selectedFormatRaceInfo = 'JSON';
+  String _selectedFormatConstructorsStandings = 'JSON';
+  String _selectedFormatDriversStandings = 'JSON';
 
   // Controllers for Year and Round input fields
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _roundController = TextEditingController();
+  final TextEditingController _constructorsYearController = TextEditingController();
+  final TextEditingController _driversYearController = TextEditingController();
 
   // State variables for loading indicators
   bool _isLoadingUpcomingRace = false;
   bool _isLoadingLastRaceResults = false;
   bool _isLoadingRaceInfo = false;
+  bool _isLoadingConstructorsStandings = false;
+  bool _isLoadingDriversStandings = false;
 
   @override
   void dispose() {
     _yearController.dispose();
     _roundController.dispose();
+    _constructorsYearController.dispose(); // Add this line
+    _driversYearController.dispose(); 
     super.dispose();
   }
 
@@ -46,6 +54,10 @@ class _DownloadScreenState extends State<DownloadScreen> {
       await _handleDownloadLastRaceResults(format);
     } else if (dataType == 'race_info') {
       await _handleDownloadRaceInfo(format);
+    } else if (dataType == 'constructors_standings') {
+      await _handleDownloadConstructorsStandings(format);
+    } else if (dataType == 'drivers_standings') {
+      await _handleDownloadDriversStandings(format);
     }
   }
 
@@ -147,6 +159,86 @@ class _DownloadScreenState extends State<DownloadScreen> {
     } finally {
       setState(() {
         _isLoadingRaceInfo = false;
+      });
+    }
+  }
+
+  // Handle download for Constructors Standings
+  Future<void> _handleDownloadConstructorsStandings(String format) async {
+    setState(() {
+      _isLoadingConstructorsStandings = true;
+    });
+    try {
+      if (_constructorsYearController.text.isEmpty) {
+        throw Exception('Year cannot be empty');
+      }
+      int year;
+      try {
+        year = int.parse(_constructorsYearController.text);
+      } catch (e) {
+        throw Exception('Year must be a valid number');
+      }
+
+      Map<String, dynamic> constructorsStandings = await apiService.getConstructorStandings(year);
+
+      switch (format) {
+        case 'JSON':
+          await _downloadJson('constructors_standings', constructorsStandings);
+          break;
+        case 'CSV':
+          await _downloadConstructorsStandingsCsv(constructorsStandings);
+          break;
+        case 'PDF':
+          await _downloadPdf('constructors_standings', constructorsStandings);
+          break;
+        default:
+          throw Exception('Unsupported format: $format');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error downloading Constructors Standings: $e');
+    } finally {
+      setState(() {
+        _isLoadingConstructorsStandings = false;
+      });
+    }
+  }
+
+  // Handle download for Drivers Standings
+  Future<void> _handleDownloadDriversStandings(String format) async {
+    setState(() {
+      _isLoadingDriversStandings = true;
+    });
+    try {
+      if (_driversYearController.text.isEmpty) {
+        throw Exception('Year cannot be empty');
+      }
+      int year;
+      try {
+        year = int.parse(_driversYearController.text);
+      } catch (e) {
+        throw Exception('Year must be a valid number');
+      }
+
+      Map<String, dynamic> driversStandings = await apiService.getDriverStandings(year);
+
+      switch (format) {
+        case 'JSON':
+          await _downloadJson('drivers_standings', driversStandings);
+          break;
+        case 'CSV':
+          await _downloadDriversStandingsCsv(driversStandings);
+          break;
+        case 'PDF':
+          await _downloadPdf('drivers_standings', driversStandings);
+          break;
+        default:
+          throw Exception('Unsupported format: $format');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error downloading Drivers Standings: $e');
+    } finally {
+      setState(() {
+        _isLoadingDriversStandings = false;
       });
     }
   }
@@ -268,6 +360,58 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
+  // Function to download Constructors Standings as CSV
+  Future<void> _downloadConstructorsStandingsCsv(Map<String, dynamic> data) async {
+    try {
+      List<List<dynamic>> rows = [
+        ['Position', 'Points', 'Wins', 'Constructor ID', 'Constructor Name'],
+      ];
+      List<dynamic> standingsList = data['constructors_standings'];
+      for (var standing in standingsList) {
+        rows.add([
+          standing['position'],
+          standing['points'],
+          standing['wins'],
+          standing['constructor_id'],
+          standing['constructor_name'],
+        ]);
+      }
+      String csvData = const ListToCsvConverter().convert(rows);
+      Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
+      await downloadFile('constructors_standings.csv', bytes, 'text/csv');
+      _showSuccessSnackBar('Successfully downloaded constructors_standings.csv');
+    } catch (e) {
+      throw Exception('Failed to download CSV: $e');
+    }
+  }
+
+  // Function to download Drivers Standings as CSV
+  Future<void> _downloadDriversStandingsCsv(Map<String, dynamic> data) async {
+    try {
+      List<List<dynamic>> rows = [
+        ['Position', 'Points', 'Wins', 'Driver ID', 'Driver Name', 'Constructor Name'],
+      ];
+      List<dynamic> standingsList = data['driver_standings'];
+      for (var standing in standingsList) {
+        rows.add([
+          standing['position'],
+          standing['points'],
+          standing['wins'],
+          standing['driver_id'],
+          standing['driver_name'],
+          standing['constructor_name'],
+        ]);
+      }
+      String csvData = const ListToCsvConverter().convert(rows);
+      Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
+      await downloadFile('drivers_standings.csv', bytes, 'text/csv');
+      _showSuccessSnackBar('Successfully downloaded drivers_standings.csv');
+    } catch (e) {
+      throw Exception('Failed to download CSV: $e');
+    }
+  }
+
+
   // Function to download PDF
   Future<void> _downloadPdf(String filename, Map<String, dynamic> data) async {
     try {
@@ -324,17 +468,42 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 },
                 {'Fastest Pit Stop Time': data['fastest_pit_stop_time'].toString()},
               ];
+            } else if (filename == 'constructors_standings') {
+              title = 'Constructors Standings';
+              List<dynamic> standingsList = data['constructors_standings'];
+              dataList = standingsList.map((standing) => {
+                'Position': standing['position'].toString(),
+                'Points': standing['points'].toString(),
+                'Wins': standing['wins'].toString(),
+                'Constructor Name': standing['constructor_name'].toString(),
+              }).toList();
+            } else if (filename == 'drivers_standings') {
+              title = 'Drivers Standings';
+              List<dynamic> standingsList = data['driver_standings'];
+              dataList = standingsList.map((standing) => {
+                'Position': standing['position'].toString(),
+                'Points': standing['points'].toString(),
+                'Wins': standing['wins'].toString(),
+                'Driver Name': standing['driver_name'].toString(),
+                'Constructor Name': standing['constructor_name'].toString(),
+              }).toList();
             }
 
+            // Build the PDF content
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
                   title,
-                  style:
-                      pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+                  style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
                 ),
                 pw.SizedBox(height: 10),
+                if (filename == 'constructors_standings' || filename == 'drivers_standings')
+                  pw.TableHelper.fromTextArray(
+                    headers: dataList.isNotEmpty ? dataList[0].keys.toList() : [],
+                    data: dataList.map((item) => item.values.toList()).toList(),
+                  )
+                else
                 ...dataList.map((item) {
                   final key = item.keys.first;
                   final value = item.values.first;
@@ -842,6 +1011,295 @@ class _DownloadScreenState extends State<DownloadScreen> {
                               ? null
                               : () {
                                   _downloadFile('race_info', _selectedFormatRaceInfo);
+                                },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Download Constructors Standings
+              Card(
+                color: primary,
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Section Title
+                      const Text(
+                        'Constructors Standings',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Input field for Year
+                      TextField(
+                        controller: _constructorsYearController,
+                        keyboardType: TextInputType.number,
+                        cursorColor: secondary,
+                        decoration: const InputDecoration(
+                          labelText: 'Year',
+                          labelStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.white24,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      // "Select Format" Label Container
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: const Text(
+                          'Select Format',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Dropdown for Format Selection
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          isDense: false,
+                          value: _selectedFormatConstructorsStandings,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                          ),
+                          dropdownColor: Colors.white,
+                          isExpanded: true,
+                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                            IconData icon;
+                            switch (value) {
+                              case 'CSV':
+                                icon = Icons.table_chart;
+                                break;
+                              case 'JSON':
+                                icon = Icons.code;
+                                break;
+                              case 'PDF':
+                                icon = Icons.picture_as_pdf;
+                                break;
+                              default:
+                                icon = Icons.download;
+                            }
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Icon(icon, size: 20, color: Colors.black54),
+                                  const SizedBox(width: 10),
+                                  Text(value, style: const TextStyle(color: Colors.black87)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                _selectedFormatConstructorsStandings = newValue;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // DOWNLOAD Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            foregroundColor: Colors.white,
+                            backgroundColor: secondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          icon: _isLoadingConstructorsStandings
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.download, size: 20),
+                          label: const Text(
+                            'DOWNLOAD',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          onPressed: _isLoadingConstructorsStandings
+                              ? null
+                              : () {
+                                  _downloadFile('constructors_standings', _selectedFormatConstructorsStandings);
+                                },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Download Drivers Standings
+              Card(
+                color: primary,
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Section Title
+                      const Text(
+                        'Drivers Standings',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Input field for Year
+                      TextField(
+                        controller: _driversYearController,
+                        keyboardType: TextInputType.number,
+                        cursorColor: secondary,
+                        decoration: const InputDecoration(
+                          labelText: 'Year',
+                          labelStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.white24,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      // "Select Format" Label Container
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: const Text(
+                          'Select Format',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Dropdown for Format Selection
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          isDense: false,
+                          value: _selectedFormatDriversStandings,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                          ),
+                          dropdownColor: Colors.white,
+                          isExpanded: true,
+                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                            IconData icon;
+                            switch (value) {
+                              case 'CSV':
+                                icon = Icons.table_chart;
+                                break;
+                              case 'JSON':
+                                icon = Icons.code;
+                                break;
+                              case 'PDF':
+                                icon = Icons.picture_as_pdf;
+                                break;
+                              default:
+                                icon = Icons.download;
+                            }
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Icon(icon, size: 20, color: Colors.black54),
+                                  const SizedBox(width: 10),
+                                  Text(value, style: const TextStyle(color: Colors.black87)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                _selectedFormatDriversStandings = newValue;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // DOWNLOAD Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            foregroundColor: Colors.white,
+                            backgroundColor: secondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          icon: _isLoadingDriversStandings
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.download, size: 20),
+                          label: const Text(
+                            'DOWNLOAD',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          onPressed: _isLoadingDriversStandings
+                              ? null
+                              : () {
+                                  _downloadFile('drivers_standings', _selectedFormatDriversStandings);
                                 },
                         ),
                       ),
