@@ -90,6 +90,7 @@ class AuthService extends ChangeNotifier {
         numPredictions: 0,
         leaguesFinished: 0,
         leaguesWon: 0,
+        firstTimeTutorial: true
       );
 
       // Store the user's data in Firestore under a 'users' collection with the UID as the document ID

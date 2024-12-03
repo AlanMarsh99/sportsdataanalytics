@@ -24,8 +24,7 @@ class RacesDetailScreen extends StatefulWidget {
   _RacesDetailScreenState createState() => _RacesDetailScreenState();
 }
 
-class _RacesDetailScreenState extends State<RacesDetailScreen>
-    with TickerProviderStateMixin {
+class _RacesDetailScreenState extends State<RacesDetailScreen> {
   late Future<List<dynamic>> raceResults;
   bool resultsError = false;
 
@@ -41,10 +40,6 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
   // Added for race positions
   late Future<RacePositions?> racePositions;
   bool racePositionsError = false;
-  late AnimationController _controller;
-  late Animation<double> _myAnimation;
-  bool _flag = true;
-  late List<NavigationRailDestination> _destinations;
 
   // Added for pit stops
   late Future<PitStopDataResponse?> pitStopData;
@@ -53,12 +48,6 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 200),
-    );
-
-    _myAnimation = CurvedAnimation(curve: Curves.linear, parent: _controller);
     try {
       round = int.parse(widget.race.round.split('/').first);
       year = int.parse(widget.race.date.split('-').first);
@@ -101,29 +90,17 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavigationProvider>(context);
-    _destinations = nav.destinations;
     return DefaultTabController(
       length: 4, // Number of tabs
       child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [darkGradient, lightGradient],
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [darkGradient, lightGradient],
+            ),
           ),
-        ),
-        child: Scaffold(
-          appBar: MyAppBar(
-            nav: nav,
-            isMobile: Responsive.isMobile(context),
-          ),
-          drawer: MyDrawer(
-            nav: nav,
-            isMobile: Responsive.isMobile(context),
-          ),
-          endDrawer: const EndDrawer(),
-          body: Responsive.isMobile(context)
+          child: Responsive.isMobile(context)
               ? Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: SingleChildScrollView(
@@ -442,11 +419,13 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                                             final LapData driver2DataResponse =
                                                 responses[1]!.lapData;
 
-                                            return Expanded(child: LapComparisonTable(
-                                                driver1LapData:
-                                                    driver1DataResponse,
-                                                driver2LapData:
-                                                    driver2DataResponse),);
+                                            return Expanded(
+                                              child: LapComparisonTable(
+                                                  driver1LapData:
+                                                      driver1DataResponse,
+                                                  driver2LapData:
+                                                      driver2DataResponse),
+                                            );
                                           } else {
                                             return Text(
                                               'No lap data available',
@@ -506,564 +485,513 @@ class _RacesDetailScreenState extends State<RacesDetailScreen>
                     ),
                   ),
                 )
-              : Row(
-                  children: [
-                    NavigationRail(
-                      selectedIconTheme: IconThemeData(color: secondary),
-                      unselectedIconTheme:
-                          IconThemeData(color: Colors.white, opacity: 1),
-                      extended: nav.extended,
-                      selectedIndex: nav.selectedIndex,
-                      destinations: _destinations,
-                      onDestinationSelected: (value) {
-                        nav.updateIndex(value);
-                        Navigator.pop(context);
-                      },
-                      leading: IconButton(
-                        icon: AnimatedIcon(
-                          icon: AnimatedIcons.menu_close,
-                          color: Colors.white,
-                          progress: _myAnimation,
-                        ),
-                        onPressed: () {
-                          if (_flag) {
-                            _controller.forward();
-                          } else {
-                            _controller.reverse();
-                          }
-
-                          _flag = !_flag;
-                          if (nav.extended) {
-                            nav.setExtended(false);
-                          } else {
-                            nav.setExtended(true);
-                          }
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+              : Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                      size: 24.0,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    widget.race.raceName,
-                                    style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                  ),
-                                ],
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Flexible(
-                                    flex: 2,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          height: 15,
-                                        ),
-                                        const Text(
-                                          'GENERAL INFO',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(height: 26),
-                                        Row(
-                                          children: [
-                                            Flexible(
-                                              flex: 2,
-                                              fit: FlexFit.tight,
-                                              child: _buildSquareCard(
-                                                'Round',
-                                                widget.race.round,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Flexible(
-                                              flex: 2,
-                                              fit: FlexFit.tight,
-                                              child: _buildSquareCard(
-                                                'Date',
-                                                widget.race.date,
-                                                //Globals.toDateFormat(widget.race.date),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Flexible(
-                                              flex: 2,
-                                              fit: FlexFit.tight,
-                                              child: _buildSquareCard(
-                                                'Location',
-                                                widget.race.location,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Flexible(
-                                              flex: 2,
-                                              fit: FlexFit.tight,
-                                              child: _buildSquareCard('Circuit',
-                                                  widget.race.circuitName),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 12),
-                                        _buildInfoContainer(
-                                            'Winner', widget.race.winner),
-                                        const SizedBox(height: 12),
-                                        _buildInfoContainer('Winning time',
-                                            widget.race.winningTime),
-                                        const SizedBox(height: 12),
-                                        _buildInfoContainer('Pole position',
-                                            widget.race.polePosition),
-                                        const SizedBox(height: 12),
-                                        _buildInfoContainer('Fastest lap',
-                                            widget.race.fastestLap),
-                                        const SizedBox(height: 12),
-                                        _buildInfoContainer('Fastest lap time',
-                                            widget.race.fastestLapTime),
-                                        const SizedBox(height: 12),
-                                        _buildInfoContainer('Fastest pitstop',
-                                            widget.race.fastestPitStopDriver),
-                                        const SizedBox(height: 12),
-                                        _buildInfoContainer(
-                                            'Fastest pitstop time',
-                                            widget.race.fastestPitStopTime),
-                                      ],
-                                    ),
-                                  ),
-
-                                  const SizedBox(width: 30),
-                                  // TabBarView for the content of each tab
-                                  Flexible(
-                                      flex: 3,
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            alignment: Alignment.centerLeft,
-                                            child: const TabBar(
-                                              tabAlignment: TabAlignment.start,
-                                              labelColor: redAccent,
-                                              unselectedLabelColor:
-                                                  Colors.white,
-                                              unselectedLabelStyle: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                              indicatorColor: redAccent,
-                                              dividerHeight: 0,
-                                              isScrollable: true,
-                                              tabs: [
-                                                Tab(text: "Results"),
-                                                Tab(text: "Lap graphs"),
-                                                Tab(text: "Lap times"),
-                                                Tab(text: "Pit stops"),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height -
-                                                100,
-                                            child: TabBarView(
-                                              children: [
-                                                resultsError
-                                                    ? const Text(
-                                                        'Error loading results')
-                                                    : FutureBuilder<
-                                                            List<dynamic>>(
-                                                        future: raceResults,
-                                                        builder: (context,
-                                                            snapshot) {
-                                                          if (snapshot
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .waiting) {
-                                                            return const Center(
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            );
-                                                          } else if (snapshot
-                                                              .hasError) {
-                                                            return const Text(
-                                                              'Error: Failed to load',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            );
-                                                          } else if (snapshot
-                                                              .hasData) {
-                                                            List<dynamic>
-                                                                results =
-                                                                snapshot.data!;
-
-                                                            return RaceResultsTable(
-                                                              data: results,
-                                                            );
-                                                          }
-                                                          return Container();
-                                                        }),
-                                                // Lap graphs Tab (Updated)
-                                                racePositionsError
-                                                    ? const Text(
-                                                        'Error loading race positions',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      )
-                                                    : FutureBuilder<
-                                                        RacePositions?>(
-                                                        future: racePositions,
-                                                        builder: (context,
-                                                            snapshot) {
-                                                          if (snapshot
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .waiting) {
-                                                            return const Center(
-                                                              child: CircularProgressIndicator(
-                                                                  color: Colors
-                                                                      .white),
-                                                            );
-                                                          } else if (snapshot
-                                                              .hasError) {
-                                                            return const Text(
-                                                                'Error: Failed to load',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white));
-                                                          } else if (snapshot
-                                                                  .hasData &&
-                                                              snapshot.data !=
-                                                                  null) {
-                                                            return LapGraphWidget(
-                                                                racePositions:
-                                                                    snapshot
-                                                                        .data!);
-                                                          } else {
-                                                            return const Text(
-                                                                'No data available',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white));
-                                                          }
-                                                        },
-                                                      ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Expanded(
-                                                          child:
-                                                              DropdownButtonFormField<
-                                                                  String>(
-                                                            dropdownColor:
-                                                                primary,
-                                                            value:
-                                                                selectedDriver1Id,
-                                                            items: driversInRace
-                                                                .map((driver) {
-                                                              return DropdownMenuItem(
-                                                                value: driver
-                                                                    .driverId,
-                                                                child: Text(
-                                                                    driver
-                                                                        .driverName,
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white)),
-                                                              );
-                                                            }).toList(),
-                                                            onChanged: (value) {
-                                                              setState(() {
-                                                                selectedDriver1Id =
-                                                                    value;
-                                                                // Fetch lap data for the new driver
-                                                                driver1LapDataFuture =
-                                                                    APIService()
-                                                                        .fetchDriverLapData(
-                                                                            year,
-                                                                            round,
-                                                                            selectedDriver1Id!);
-                                                              });
-                                                            },
-                                                            decoration:
-                                                                InputDecoration(
-                                                              labelText:
-                                                                  'Select Driver 1',
-                                                              labelStyle: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                              enabledBorder:
-                                                                  const UnderlineInputBorder(
-                                                                borderSide: BorderSide(
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              focusedBorder:
-                                                                  const UnderlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(
-                                                                        color:
-                                                                            redAccent),
-                                                              ),
-                                                            ),
-                                                            iconEnabledColor:
-                                                                Colors.red,
-                                                            iconDisabledColor:
-                                                                Colors.white,
-                                                          ),
-                                                        ),
-                                                        SizedBox(width: 16),
-                                                        Expanded(
-                                                          child:
-                                                              DropdownButtonFormField<
-                                                                  String>(
-                                                            dropdownColor:
-                                                                primary,
-                                                            value:
-                                                                selectedDriver2Id,
-                                                            items: driversInRace
-                                                                .map((driver) {
-                                                              return DropdownMenuItem(
-                                                                value: driver
-                                                                    .driverId,
-                                                                child: Text(
-                                                                    driver
-                                                                        .driverName,
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white)),
-                                                              );
-                                                            }).toList(),
-                                                            onChanged: (value) {
-                                                              setState(() {
-                                                                selectedDriver2Id =
-                                                                    value;
-                                                                // Fetch lap data for the new driver
-                                                                driver2LapDataFuture =
-                                                                    APIService()
-                                                                        .fetchDriverLapData(
-                                                                            year,
-                                                                            round,
-                                                                            selectedDriver2Id!);
-                                                              });
-                                                            },
-                                                            decoration:
-                                                                InputDecoration(
-                                                              labelText:
-                                                                  'Select Driver 2',
-                                                              labelStyle: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                              enabledBorder:
-                                                                  const UnderlineInputBorder(
-                                                                borderSide: BorderSide(
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              focusedBorder:
-                                                                  const UnderlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(
-                                                                        color:
-                                                                            redAccent),
-                                                              ),
-                                                            ),
-                                                            iconEnabledColor:
-                                                                Colors.red,
-                                                            iconDisabledColor:
-                                                                Colors.white,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 16),
-                                                    // Display the comparison table or a loading indicator
-                                                    if (driver1LapDataFuture !=
-                                                            null &&
-                                                        driver2LapDataFuture !=
-                                                            null)
-                                                      FutureBuilder<
-                                                          List<
-                                                              LapDataResponse?>>(
-                                                        future: Future.wait([
-                                                          driver1LapDataFuture!,
-                                                          driver2LapDataFuture!,
-                                                        ]),
-                                                        builder: (context,
-                                                            AsyncSnapshot<
-                                                                    List<
-                                                                        LapDataResponse?>>
-                                                                snapshot) {
-                                                          if (snapshot
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .waiting) {
-                                                            return Center(
-                                                              child: CircularProgressIndicator(
-                                                                  color: Colors
-                                                                      .white),
-                                                            );
-                                                          } else if (snapshot
-                                                              .hasError) {
-                                                            return Text(
-                                                              'Error loading lap data',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            );
-                                                          } else if (snapshot
-                                                              .hasData) {
-                                                            // Get the data from the snapshot
-                                                            final List<
-                                                                    LapDataResponse?>
-                                                                responses =
-                                                                snapshot.data!;
-
-                                                            if (responses[0] !=
-                                                                    null &&
-                                                                responses[1] !=
-                                                                    null) {
-                                                              driversInRace =
-                                                                  responses[0]!
-                                                                      .drivers;
-                                                              final LapData
-                                                                  driver1DataResponse =
-                                                                  responses[0]!
-                                                                      .lapData;
-                                                              final LapData
-                                                                  driver2DataResponse =
-                                                                  responses[1]!
-                                                                      .lapData;
-
-                                                              return LapComparisonTable(
-                                                                  driver1LapData:
-                                                                      driver1DataResponse,
-                                                                  driver2LapData:
-                                                                      driver2DataResponse);
-                                                            } else {
-                                                              return Text(
-                                                                'No lap data available',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white),
-                                                              );
-                                                            }
-                                                          } else {
-                                                            // This else block handles any other unexpected state
-                                                            return Text(
-                                                              'No lap data available',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            );
-                                                          }
-                                                        },
-                                                      )
-                                                  ],
-                                                ),
-                                                pitStopError
-                                                    ? const Text(
-                                                        'Error loading pit stops',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      )
-                                                    : FutureBuilder<
-                                                        PitStopDataResponse?>(
-                                                        future: pitStopData,
-                                                        builder: (context,
-                                                            snapshot) {
-                                                          if (snapshot
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .waiting) {
-                                                            return const Center(
-                                                              child: CircularProgressIndicator(
-                                                                  color: Colors
-                                                                      .white),
-                                                            );
-                                                          } else if (snapshot
-                                                              .hasError) {
-                                                            return const Text(
-                                                              'Error: Failed to load',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            );
-                                                          } else if (snapshot
-                                                                  .hasData &&
-                                                              snapshot.data !=
-                                                                  null) {
-                                                            return PitStopsTable(
-                                                                data: snapshot
-                                                                    .data!);
-                                                          } else {
-                                                            return const Text(
-                                                              'No data available',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            );
-                                                          }
-                                                        },
-                                                      ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ))
-                                ],
-                              )
+                              SizedBox(width: 10),
+                              Text(
+                                widget.race.raceName,
+                                style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
                             ],
                           ),
-                        ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                flex: 2,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    const Text(
+                                      'GENERAL INFO',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 26),
+                                    Row(
+                                      children: [
+                                        Flexible(
+                                          flex: 2,
+                                          fit: FlexFit.tight,
+                                          child: _buildSquareCard(
+                                            'Round',
+                                            widget.race.round,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Flexible(
+                                          flex: 2,
+                                          fit: FlexFit.tight,
+                                          child: _buildSquareCard(
+                                            'Date',
+                                            widget.race.date,
+                                            //Globals.toDateFormat(widget.race.date),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Flexible(
+                                          flex: 2,
+                                          fit: FlexFit.tight,
+                                          child: _buildSquareCard(
+                                            'Location',
+                                            widget.race.location,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Flexible(
+                                          flex: 2,
+                                          fit: FlexFit.tight,
+                                          child: _buildSquareCard('Circuit',
+                                              widget.race.circuitName),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    _buildInfoContainer(
+                                        'Winner', widget.race.winner),
+                                    const SizedBox(height: 12),
+                                    _buildInfoContainer('Winning time',
+                                        widget.race.winningTime),
+                                    const SizedBox(height: 12),
+                                    _buildInfoContainer('Pole position',
+                                        widget.race.polePosition),
+                                    const SizedBox(height: 12),
+                                    _buildInfoContainer(
+                                        'Fastest lap', widget.race.fastestLap),
+                                    const SizedBox(height: 12),
+                                    _buildInfoContainer('Fastest lap time',
+                                        widget.race.fastestLapTime),
+                                    const SizedBox(height: 12),
+                                    _buildInfoContainer('Fastest pitstop',
+                                        widget.race.fastestPitStopDriver),
+                                    const SizedBox(height: 12),
+                                    _buildInfoContainer('Fastest pitstop time',
+                                        widget.race.fastestPitStopTime),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(width: 30),
+                              // TabBarView for the content of each tab
+                              Flexible(
+                                  flex: 3,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        child: const TabBar(
+                                          tabAlignment: TabAlignment.start,
+                                          labelColor: redAccent,
+                                          unselectedLabelColor: Colors.white,
+                                          unselectedLabelStyle: TextStyle(
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          labelStyle: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                          indicatorColor: redAccent,
+                                          dividerHeight: 0,
+                                          isScrollable: true,
+                                          tabs: [
+                                            Tab(text: "Results"),
+                                            Tab(text: "Lap graphs"),
+                                            Tab(text: "Lap times"),
+                                            Tab(text: "Pit stops"),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height -
+                                                100,
+                                        child: TabBarView(
+                                          children: [
+                                            resultsError
+                                                ? const Text(
+                                                    'Error loading results')
+                                                : FutureBuilder<List<dynamic>>(
+                                                    future: raceResults,
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return const Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color: Colors.white,
+                                                          ),
+                                                        );
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return const Text(
+                                                          'Error: Failed to load',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        );
+                                                      } else if (snapshot
+                                                          .hasData) {
+                                                        List<dynamic> results =
+                                                            snapshot.data!;
+
+                                                        return RaceResultsTable(
+                                                          data: results,
+                                                        );
+                                                      }
+                                                      return Container();
+                                                    }),
+                                            // Lap graphs Tab (Updated)
+                                            racePositionsError
+                                                ? const Text(
+                                                    'Error loading race positions',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  )
+                                                : FutureBuilder<RacePositions?>(
+                                                    future: racePositions,
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return const Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                                  color: Colors
+                                                                      .white),
+                                                        );
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return const Text(
+                                                            'Error: Failed to load',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white));
+                                                      } else if (snapshot
+                                                              .hasData &&
+                                                          snapshot.data !=
+                                                              null) {
+                                                        return LapGraphWidget(
+                                                            racePositions:
+                                                                snapshot.data!);
+                                                      } else {
+                                                        return const Text(
+                                                            'No data available',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white));
+                                                      }
+                                                    },
+                                                  ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child:
+                                                          DropdownButtonFormField<
+                                                              String>(
+                                                        dropdownColor: primary,
+                                                        value:
+                                                            selectedDriver1Id,
+                                                        items: driversInRace
+                                                            .map((driver) {
+                                                          return DropdownMenuItem(
+                                                            value:
+                                                                driver.driverId,
+                                                            child: Text(
+                                                                driver
+                                                                    .driverName,
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white)),
+                                                          );
+                                                        }).toList(),
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedDriver1Id =
+                                                                value;
+                                                            // Fetch lap data for the new driver
+                                                            driver1LapDataFuture =
+                                                                APIService()
+                                                                    .fetchDriverLapData(
+                                                                        year,
+                                                                        round,
+                                                                        selectedDriver1Id!);
+                                                          });
+                                                        },
+                                                        decoration:
+                                                            InputDecoration(
+                                                          labelText:
+                                                              'Select Driver 1',
+                                                          labelStyle: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                          enabledBorder:
+                                                              const UnderlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .white),
+                                                          ),
+                                                          focusedBorder:
+                                                              const UnderlineInputBorder(
+                                                            borderSide: BorderSide(
+                                                                color:
+                                                                    redAccent),
+                                                          ),
+                                                        ),
+                                                        iconEnabledColor:
+                                                            Colors.red,
+                                                        iconDisabledColor:
+                                                            Colors.white,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 16),
+                                                    Expanded(
+                                                      child:
+                                                          DropdownButtonFormField<
+                                                              String>(
+                                                        dropdownColor: primary,
+                                                        value:
+                                                            selectedDriver2Id,
+                                                        items: driversInRace
+                                                            .map((driver) {
+                                                          return DropdownMenuItem(
+                                                            value:
+                                                                driver.driverId,
+                                                            child: Text(
+                                                                driver
+                                                                    .driverName,
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white)),
+                                                          );
+                                                        }).toList(),
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            selectedDriver2Id =
+                                                                value;
+                                                            // Fetch lap data for the new driver
+                                                            driver2LapDataFuture =
+                                                                APIService()
+                                                                    .fetchDriverLapData(
+                                                                        year,
+                                                                        round,
+                                                                        selectedDriver2Id!);
+                                                          });
+                                                        },
+                                                        decoration:
+                                                            InputDecoration(
+                                                          labelText:
+                                                              'Select Driver 2',
+                                                          labelStyle: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                          enabledBorder:
+                                                              const UnderlineInputBorder(
+                                                            borderSide:
+                                                                BorderSide(
+                                                                    color: Colors
+                                                                        .white),
+                                                          ),
+                                                          focusedBorder:
+                                                              const UnderlineInputBorder(
+                                                            borderSide: BorderSide(
+                                                                color:
+                                                                    redAccent),
+                                                          ),
+                                                        ),
+                                                        iconEnabledColor:
+                                                            Colors.red,
+                                                        iconDisabledColor:
+                                                            Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 16),
+                                                // Display the comparison table or a loading indicator
+                                                if (driver1LapDataFuture !=
+                                                        null &&
+                                                    driver2LapDataFuture !=
+                                                        null)
+                                                  FutureBuilder<
+                                                      List<LapDataResponse?>>(
+                                                    future: Future.wait([
+                                                      driver1LapDataFuture!,
+                                                      driver2LapDataFuture!,
+                                                    ]),
+                                                    builder: (context,
+                                                        AsyncSnapshot<
+                                                                List<
+                                                                    LapDataResponse?>>
+                                                            snapshot) {
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                                  color: Colors
+                                                                      .white),
+                                                        );
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return Text(
+                                                          'Error loading lap data',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        );
+                                                      } else if (snapshot
+                                                          .hasData) {
+                                                        // Get the data from the snapshot
+                                                        final List<
+                                                                LapDataResponse?>
+                                                            responses =
+                                                            snapshot.data!;
+
+                                                        if (responses[0] !=
+                                                                null &&
+                                                            responses[1] !=
+                                                                null) {
+                                                          driversInRace =
+                                                              responses[0]!
+                                                                  .drivers;
+                                                          final LapData
+                                                              driver1DataResponse =
+                                                              responses[0]!
+                                                                  .lapData;
+                                                          final LapData
+                                                              driver2DataResponse =
+                                                              responses[1]!
+                                                                  .lapData;
+
+                                                          return LapComparisonTable(
+                                                              driver1LapData:
+                                                                  driver1DataResponse,
+                                                              driver2LapData:
+                                                                  driver2DataResponse);
+                                                        } else {
+                                                          return Text(
+                                                            'No lap data available',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          );
+                                                        }
+                                                      } else {
+                                                        // This else block handles any other unexpected state
+                                                        return Text(
+                                                          'No lap data available',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        );
+                                                      }
+                                                    },
+                                                  )
+                                              ],
+                                            ),
+                                            pitStopError
+                                                ? const Text(
+                                                    'Error loading pit stops',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  )
+                                                : FutureBuilder<
+                                                    PitStopDataResponse?>(
+                                                    future: pitStopData,
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return const Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                                  color: Colors
+                                                                      .white),
+                                                        );
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return const Text(
+                                                          'Error: Failed to load',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        );
+                                                      } else if (snapshot
+                                                              .hasData &&
+                                                          snapshot.data !=
+                                                              null) {
+                                                        return PitStopsTable(
+                                                            data:
+                                                                snapshot.data!);
+                                                      } else {
+                                                        return const Text(
+                                                          'No data available',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ))
+                            ],
+                          )
+                        ],
                       ),
-                    )
-                  ],
-                ),
-        ),
-      ),
+                    ),
+                  ),
+                )),
     );
   }
 

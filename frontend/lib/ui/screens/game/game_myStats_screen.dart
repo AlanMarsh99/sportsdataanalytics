@@ -41,7 +41,8 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
       level: 1,
       leaguesWon: 2,
       leaguesFinished: 5,
-      numPredictions: 15);
+      numPredictions: 15,
+      firstTimeTutorial: false);
 
   @override
   Widget build(BuildContext context) {

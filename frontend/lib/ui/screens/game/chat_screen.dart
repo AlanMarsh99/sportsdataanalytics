@@ -62,7 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             const SizedBox(height: 16),
             Container(
-              height: MediaQuery.of(context).size.height - 100,
+              height: MediaQuery.of(context).size.height - 150,
               width: MediaQuery.of(context).size.width,
                 padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 decoration: BoxDecoration(

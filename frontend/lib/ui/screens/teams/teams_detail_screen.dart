@@ -22,13 +22,8 @@ class TeamsDetailScreen extends StatefulWidget {
   _TeamsDetailScreenState createState() => _TeamsDetailScreenState();
 }
 
-class _TeamsDetailScreenState extends State<TeamsDetailScreen>
-    with TickerProviderStateMixin {
+class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
   late Future<Map<String, dynamic>> _teamStatsFuture;
-  late AnimationController _controller;
-  late Animation<double> _myAnimation;
-  bool _flag = true;
-  late List<NavigationRailDestination> _destinations;
 
   String getMappedTeamName(String apiTeamName) {
     return Globals.teamNameMapping[apiTeamName] ?? apiTeamName;
@@ -48,18 +43,10 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen>
     // Get the team info by the id and current year
     _teamStatsFuture =
         APIService().getTeamStats(widget.teamId, DateTime.now().year);
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 200),
-    );
-
-    _myAnimation = CurvedAnimation(curve: Curves.linear, parent: _controller);
   }
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavigationProvider>(context);
-    _destinations = nav.destinations;
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Container(
@@ -70,383 +57,323 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen>
             colors: [darkGradient, lightGradient],
           ),
         ),
-        child: Scaffold(
-          appBar: MyAppBar(
-            nav: nav,
-            isMobile: Responsive.isMobile(context),
-          ),
-          drawer: MyDrawer(
-            nav: nav,
-            isMobile: Responsive.isMobile(context),
-          ),
-          endDrawer: const EndDrawer(),
-          body: Responsive.isMobile(context)
-              ? Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.arrow_back,
-                                  color: Colors.white,
-                                  size: 24.0,
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              const SizedBox(width: 10),
-                              // Added the logo display here
-
-                              Text(
-                                widget.teamName.toUpperCase(),
-                                style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
-                              const SizedBox(width: 10),
-                              Image.asset(
-                                getLogoPath(),
-                                width: 100,
-                              ),
-                            ],
-                          ),
-                        ),
-                        //const SizedBox(height: 16),
-                        //_buildTeamDropdown(),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'STATISTICS',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: const TabBar(
-                            labelColor: redAccent,
-                            unselectedLabelColor: Colors.white,
-                            unselectedLabelStyle: TextStyle(
-                              fontWeight: FontWeight.normal,
-                            ),
-                            labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                            indicatorColor: redAccent,
-                            dividerHeight: 0,
-                            isScrollable: true,
-                            tabs: [
-                              Tab(text: "All time"),
-                              Tab(text: "Current season"),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // TabBarView for the content of each tab
-                        FutureBuilder<Map<String, dynamic>>(
-                          future: _teamStatsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              ); // Show loading while fetching
-                            } else if (snapshot.hasError) {
-                              return const Text(
-                                'Error: Failed to load team stats',
-                                style: TextStyle(color: Colors.white),
-                              ); // Error handling
-                            } else if (snapshot.hasData) {
-                              Map<String, dynamic> data = snapshot.data!;
-
-                              return Container(
-                                height: 250,
-                                child: TabBarView(
-                                  children: [
-                                    _buildCareerStats(true, data),
-                                    _buildCareerStats(false, data),
-                                  ],
-                                ),
-                              );
-                            }
-                            return Container();
-                          },
-                        ),
-                        const SizedBox(height: 5),
-                        const Text(
-                          'SEASONS',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-
-                        const SizedBox(height: 10),
-                        FutureBuilder<Map<String, dynamic>>(
-                          future: _teamStatsFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              ); // Show loading while fetching
-                            } else if (snapshot.hasError) {
-                              return const Text(
-                                'Error: Failed to load team stats',
-                                style: TextStyle(color: Colors.white),
-                              ); // Error handling
-                            } else if (snapshot.hasData) {
-                              Map<String, dynamic> data = snapshot.data!;
-
-                              return Center(
-                                child: TeamSeasonsTable(
-                                    seasonsData: data['season_results']),
-                              );
-                            }
-                            return Container();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : Row(
-                  children: [
-                    NavigationRail(
-                      selectedIconTheme: IconThemeData(color: secondary),
-                      unselectedIconTheme:
-                          IconThemeData(color: Colors.white, opacity: 1),
-                      extended: nav.extended,
-                      selectedIndex: nav.selectedIndex,
-                      destinations: _destinations,
-                      onDestinationSelected: (value) {
-                        nav.updateIndex(value);
-                        Navigator.pop(context);
-                      },
-                      leading: IconButton(
-                        icon: AnimatedIcon(
-                          icon: AnimatedIcons.menu_close,
-                          color: Colors.white,
-                          progress: _myAnimation,
-                        ),
-                        onPressed: () {
-                          if (_flag) {
-                            _controller.forward();
-                          } else {
-                            _controller.reverse();
-                          }
-
-                          _flag = !_flag;
-                          if (nav.extended) {
-                            nav.setExtended(false);
-                          } else {
-                            nav.setExtended(true);
-                          }
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Responsive.isMobile(context)
+            ? Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 25, bottom: 10),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                      size: 24.0,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  const SizedBox(width: 10),
-                                  // Added the logo display here
-
-                                  Text(
-                                    widget.teamName.toUpperCase(),
-                                    style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                  ),
-                                ],
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 24.0,
                               ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
                             ),
-                            //const SizedBox(height: 16),
-                            //_buildTeamDropdown(),
-                            const SizedBox(height: 20),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Flexible(
-                                  flex: 2,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'STATISTICS',
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          Container(
-                                            alignment: Alignment.centerLeft,
-                                            child: const TabBar(
-                                              tabAlignment: TabAlignment.start,
-                                              labelColor: redAccent,
-                                              unselectedLabelColor:
-                                                  Colors.white,
-                                              unselectedLabelStyle: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                              ),
-                                              labelStyle: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                              indicatorColor: redAccent,
-                                              dividerHeight: 0,
-                                              isScrollable: true,
-                                              tabs: [
-                                                Tab(text: "All time"),
-                                                Tab(text: "Current season"),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          // TabBarView for the content of each tab
-                                          FutureBuilder<Map<String, dynamic>>(
-                                            future: _teamStatsFuture,
-                                            builder: (context, snapshot) {
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    color: Colors.white,
-                                                  ),
-                                                ); // Show loading while fetching
-                                              } else if (snapshot.hasError) {
-                                                return const Text(
-                                                  'Error: Failed to load team stats',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ); // Error handling
-                                              } else if (snapshot.hasData) {
-                                                Map<String, dynamic> data =
-                                                    snapshot.data!;
+                            const SizedBox(width: 10),
+                            // Added the logo display here
 
-                                                return Container(
-                                                  height: 220,
-                                                  child: TabBarView(
-                                                    children: [
-                                                      _buildCareerStats(
-                                                          true, data),
-                                                      _buildCareerStats(
-                                                          false, data),
-                                                    ],
-                                                  ),
-                                                );
-                                              }
-                                              return Container();
-                                            },
-                                          )
-                                        ],
-                                      ),
-                                      const SizedBox(height: 30),
-                                      Center(
-                                        child: Image.asset(
-                                          getLogoPath(),
-                                          width: 250,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 30),
-                                Flexible(
-                                  flex: 3,
-                                  child: SizedBox(
-                                    height: MediaQuery.of(context).size.height -
-                                        151,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'SEASONS',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(height: 30),
-                                        Expanded(
-                                          child: FutureBuilder<
-                                              Map<String, dynamic>>(
-                                            future: _teamStatsFuture,
-                                            builder: (context, snapshot) {
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    color: Colors.white,
-                                                  ),
-                                                ); // Show loading while fetching
-                                              } else if (snapshot.hasError) {
-                                                return const Text(
-                                                  'Error: Failed to load team stats',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ); // Error handling
-                                              } else if (snapshot.hasData) {
-                                                Map<String, dynamic> data =
-                                                    snapshot.data!;
-
-                                                return TeamSeasonsTable(
-                                                  seasonsData:
-                                                      data['season_results'],
-                                                );
-                                              }
-                                              return Container();
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              widget.teamName.toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                            const SizedBox(width: 10),
+                            Image.asset(
+                              getLogoPath(),
+                              width: 100,
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      //const SizedBox(height: 16),
+                      //_buildTeamDropdown(),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'STATISTICS',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        child: const TabBar(
+                          labelColor: redAccent,
+                          unselectedLabelColor: Colors.white,
+                          unselectedLabelStyle: TextStyle(
+                            fontWeight: FontWeight.normal,
+                          ),
+                          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                          indicatorColor: redAccent,
+                          dividerHeight: 0,
+                          isScrollable: true,
+                          tabs: [
+                            Tab(text: "All time"),
+                            Tab(text: "Current season"),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // TabBarView for the content of each tab
+                      FutureBuilder<Map<String, dynamic>>(
+                        future: _teamStatsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ); // Show loading while fetching
+                          } else if (snapshot.hasError) {
+                            return const Text(
+                              'Error: Failed to load team stats',
+                              style: TextStyle(color: Colors.white),
+                            ); // Error handling
+                          } else if (snapshot.hasData) {
+                            Map<String, dynamic> data = snapshot.data!;
+
+                            return Container(
+                              height: 250,
+                              child: TabBarView(
+                                children: [
+                                  _buildCareerStats(true, data),
+                                  _buildCareerStats(false, data),
+                                ],
+                              ),
+                            );
+                          }
+                          return Container();
+                        },
+                      ),
+                      const SizedBox(height: 5),
+                      const Text(
+                        'SEASONS',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+
+                      const SizedBox(height: 10),
+                      FutureBuilder<Map<String, dynamic>>(
+                        future: _teamStatsFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ); // Show loading while fetching
+                          } else if (snapshot.hasError) {
+                            return const Text(
+                              'Error: Failed to load team stats',
+                              style: TextStyle(color: Colors.white),
+                            ); // Error handling
+                          } else if (snapshot.hasData) {
+                            Map<String, dynamic> data = snapshot.data!;
+
+                            return Center(
+                              child: TeamSeasonsTable(
+                                  seasonsData: data['season_results']),
+                            );
+                          }
+                          return Container();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-        ),
+              )
+            : Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 25, bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 24.0,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            const SizedBox(width: 10),
+                            // Added the logo display here
+
+                            Text(
+                              widget.teamName.toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //const SizedBox(height: 16),
+                      //_buildTeamDropdown(),
+                      const SizedBox(height: 20),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'STATISTICS',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      child: const TabBar(
+                                        tabAlignment: TabAlignment.start,
+                                        labelColor: redAccent,
+                                        unselectedLabelColor: Colors.white,
+                                        unselectedLabelStyle: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                        labelStyle: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                        indicatorColor: redAccent,
+                                        dividerHeight: 0,
+                                        isScrollable: true,
+                                        tabs: [
+                                          Tab(text: "All time"),
+                                          Tab(text: "Current season"),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    // TabBarView for the content of each tab
+                                    FutureBuilder<Map<String, dynamic>>(
+                                      future: _teamStatsFuture,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          ); // Show loading while fetching
+                                        } else if (snapshot.hasError) {
+                                          return const Text(
+                                            'Error: Failed to load team stats',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ); // Error handling
+                                        } else if (snapshot.hasData) {
+                                          Map<String, dynamic> data =
+                                              snapshot.data!;
+
+                                          return Container(
+                                            height: 220,
+                                            child: TabBarView(
+                                              children: [
+                                                _buildCareerStats(true, data),
+                                                _buildCareerStats(false, data),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                        return Container();
+                                      },
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 30),
+                                Center(
+                                  child: Image.asset(
+                                    getLogoPath(),
+                                    width: 250,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 30),
+                          Flexible(
+                            flex: 3,
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height - 151,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'SEASONS',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 30),
+                                  Expanded(
+                                    child: FutureBuilder<Map<String, dynamic>>(
+                                      future: _teamStatsFuture,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          ); // Show loading while fetching
+                                        } else if (snapshot.hasError) {
+                                          return const Text(
+                                            'Error: Failed to load team stats',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ); // Error handling
+                                        } else if (snapshot.hasData) {
+                                          Map<String, dynamic> data =
+                                              snapshot.data!;
+
+                                          return TeamSeasonsTable(
+                                            seasonsData: data['season_results'],
+                                          );
+                                        }
+                                        return Container();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
       ),
     );
   }
