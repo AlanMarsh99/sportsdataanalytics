@@ -5,7 +5,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 BASE_URL = 'https://sportsdataanalytics.onrender.com'
 
 def fetch_url(url):
-    """Helper function to fetch a URL and handle errors."""
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -18,16 +17,6 @@ def fetch_url(url):
         return None
 
 def fetch_all(urls, max_workers=4):
-    """
-    Helper function to fetch multiple URLs concurrently.
-    
-    Args:
-        urls (list): List of URLs to fetch.
-        max_workers (int): Maximum number of threads to use.
-        
-    Returns:
-        dict: Mapping of URL to its response.
-    """
     responses = {}
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_url = {executor.submit(fetch_url, url): url for url in urls}
