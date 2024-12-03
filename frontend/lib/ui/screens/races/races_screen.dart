@@ -26,21 +26,16 @@ class _RacesScreenState extends State<RacesScreen> {
     super.initState();
     // Generate a list with the years from 1950 to the current year
     int currentYear = DateTime.now().year;
+    selectedSeason = currentYear.toString();
+    _racesSeasonFuture =
+        APIService().getAllRacesInYear(int.parse(selectedSeason));
     for (int i = currentYear; i >= 1950; i--) {
       seasons.add(i.toString());
     }
-    selectedSeason = currentYear.toString();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    // Access the provider
-    final dataProvider = Provider.of<DataProvider>(context);
-
-    // Extract data from provider
-    racesSeason = dataProvider.racesSeason;
-
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -78,39 +73,27 @@ class _RacesScreenState extends State<RacesScreen> {
               ),
               const SizedBox(height: 15),
               Expanded(
-                child: seasonChanged
-                      ? FutureBuilder<void>(
-                          future: _racesSeasonFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                              ); // Show loading while fetching
-                            } else if (snapshot.hasError) {
-                              return const Text(
-                                'Error: Failed to load races',
-                                style: TextStyle(color: Colors.white),
-                              ); // Error handling
-                            } else if (snapshot.hasData) {
-                              List<dynamic> races =
-                                  snapshot.data as List<dynamic>;
-                              return RacesSeasonTable(races: races);
-                            }
-                            return Container();
-                          },
-                        )
-                      : racesSeason == null
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            )
-                          : RacesSeasonTable(races: racesSeason!),
-                
-              ),
+                  child: FutureBuilder<void>(
+                future: _racesSeasonFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    ); // Show loading while fetching
+                  } else if (snapshot.hasError) {
+                    return const Text(
+                      'Error: Failed to load races',
+                      style: TextStyle(color: Colors.white),
+                    ); // Error handling
+                  } else if (snapshot.hasData) {
+                    List<dynamic> races = snapshot.data as List<dynamic>;
+                    return RacesSeasonTable(races: races);
+                  }
+                  return Container();
+                },
+              )),
             ],
           ),
         ),

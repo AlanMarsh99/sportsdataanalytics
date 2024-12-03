@@ -36,31 +36,28 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> loadInitialData() async {
     getHomeScreenInfo();
-    await Future.wait([
+    /*await Future.wait([
       getRacesYear(DateTime.now().year),
       getDriversList(),
       getTeamsYear(DateTime.now().year),
-    ]);
+    ]);*/
   }
 
   Future<void> getHomeScreenInfo() async {
     try {
-      // Wait for both API calls to complete before notifying listeners
-      final results = await Future.wait([
-        apiService.getUpcomingRace(),
-        apiService.getDriverStandings(DateTime.now().year),
-        apiService.getConstructorStandings(DateTime.now().year),
-      ]);
+      _upcomingRaceInfo = await apiService.getUpcomingRace();
 
-      _upcomingRaceInfo = results[0];
-      _driversStandings = results[1]['driver_standings'];
-      _constructorsStandings = results[2]['constructors_standings'];
-
-      notifyListeners();
+      Map<String, dynamic>? data =
+          await apiService.getDriverStandings(DateTime.now().year);
+      if (data.isNotEmpty) {
+        _driversStandings = data['driver_standings'];
+      } else {
+        _driversStandings = [];
+      }
 
       _lastRaceResults = await apiService.getLastRaceResults().timeout(
-        const Duration(seconds: 10),
-      );
+            const Duration(seconds: 10),
+          );
       if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
         int lastRaceYear = int.parse(_lastRaceResults!['year']);
         int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
@@ -70,13 +67,21 @@ class DataProvider extends ChangeNotifier {
         _lastRaceInfo = Race.fromJson(raceInfo);
       }
 
+      Map<String, dynamic>? data2 =
+          await apiService.getConstructorStandings(DateTime.now().year);
+      if (data2.isNotEmpty) {
+        _constructorsStandings = data2['constructors_standings'];
+      } else {
+        _constructorsStandings = [];
+      }
+
       notifyListeners();
     } catch (error) {
       print("Error fetching home screen info: $error");
     }
   }
 
-  Future<void> getDriversList() async {
+  /*Future<void> getDriversList() async {
     try {
       int currentSeason = DateTime.now().year;
       _driversList = await apiService.getDriversInYear(currentSeason);
@@ -90,11 +95,12 @@ class DataProvider extends ChangeNotifier {
         }
       }
     } catch (error) {
+      _driversList = [];
       print("Error fetching _driversList: $error");
     }
-  }
+  }*/
 
-  Future<void> getDriverStats(String driverId, int year) async {
+  /*Future<void> getDriverStats(String driverId, int year) async {
     try {
       _driverStats = await apiService.getDriverStats(driverId, year);
 
@@ -102,7 +108,7 @@ class DataProvider extends ChangeNotifier {
     } catch (error) {
       print("Error fetching _driverStats: $error");
     }
-  }
+  }*/
 
   /*Future<void> getDriverRaceStats(String driverId, int year) async {
     try {
@@ -115,7 +121,7 @@ class DataProvider extends ChangeNotifier {
     }
   }*/
 
-  Future<void> getTeamsYear(int year) async {
+  /*Future<void> getTeamsYear(int year) async {
     try {
       _teamsSeason = await apiService.getTeamsByYear(year);
 
@@ -123,9 +129,9 @@ class DataProvider extends ChangeNotifier {
     } catch (error) {
       print("Error fetching _teamsSeason: $error");
     }
-  }
+  }*/
 
-  Future<void> getRacesYear(int year) async {
+  /*Future<void> getRacesYear(int year) async {
     try {
       _racesSeason = await apiService.getAllRacesInYear(year);
 
@@ -133,5 +139,5 @@ class DataProvider extends ChangeNotifier {
     } catch (error) {
       print("Error fetching _racesSeason: $error");
     }
-  }
+  }*/
 }
