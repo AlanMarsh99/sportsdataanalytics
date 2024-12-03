@@ -24,11 +24,13 @@ class APIService {
         print('Failed to load upcoming race');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load upcoming race');
+        //throw Exception('Failed to load upcoming race');
+        return {};
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return {};
     }
   }
 
@@ -69,11 +71,13 @@ class APIService {
         print('Failed to load last race results');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load last race results');
+        //throw Exception('Failed to load last race results');
+        return {};
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return {};
     }
   }
 
@@ -91,11 +95,13 @@ class APIService {
         print('Failed to load drivers standings');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load driver standings');
+        //throw Exception('Failed to load driver standings');
+        return {};
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return {};
     }
   }
 
@@ -113,11 +119,13 @@ class APIService {
         print('Failed to load constructors standings');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load constructor standings');
+        return {};
+        //throw Exception('Failed to load constructor standings');
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      return {};
+      //rethrow;
     }
   }
 
@@ -149,11 +157,14 @@ class APIService {
         print('Failed to load races for year $year');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load races for year $year');
+        //throw Exception('Failed to load races for year $year');
+        return [];
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return [];
+
     }
   }
 
@@ -171,11 +182,13 @@ class APIService {
         print('Failed to load race info');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load race ingo');
+        //throw Exception('Failed to load race ingo');
+        return {};
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return {};
     }
   }
 
@@ -192,11 +205,13 @@ class APIService {
         print('Failed to load results for race $year round $round');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load results for race $year round $round');
+        //throw Exception('Failed to load results for race $year round $round');
+        return [];
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return [];
     }
   }
 
@@ -213,11 +228,13 @@ class APIService {
         print('Failed to load pit stop data');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load pit stop data');
+        //throw Exception('Failed to load pit stop data');
+        return [];
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return [];
     }
   }
 
@@ -235,11 +252,13 @@ class APIService {
         print('Failed to load drivers for year $year');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load drivers for year $year');
+        //throw Exception('Failed to load drivers for year $year');
+        return [];
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      return [];
+      //rethrow;
     }
   }
 
@@ -256,11 +275,13 @@ class APIService {
         print('Failed to load stats for driver $driverId');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load stats for driver $driverId');
+        //throw Exception('Failed to load stats for driver $driverId');
+        return {};
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return {};
     }
   }
 
@@ -279,11 +300,13 @@ class APIService {
         print('Failed to load race stats for driver $driverId');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load race stats: ${response.statusCode}');
+        //throw Exception('Failed to load race stats: ${response.statusCode}');
+        return [];
       }
     } catch (e) {
       print('Error fetching driver race stats: $e');
-      rethrow;
+      //rethrow;
+      return [];
     }
   }
 
@@ -304,11 +327,13 @@ class APIService {
         print('Failed to load teams for the season $year');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load teams: ${response.statusCode}');
+        //throw Exception('Failed to load teams: ${response.statusCode}');
+        return [];
       }
     } catch (e) {
       print('Error fetching teams: $e');
-      rethrow;
+      //rethrow;
+      return [];
     }
   }
 
@@ -325,11 +350,13 @@ class APIService {
         print('Failed to load team stats for team $teamId');
         print('Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
-        throw Exception('Failed to load team stats for team $teamId');
+        //throw Exception('Failed to load team stats for team $teamId');
+        return {};
       }
     } catch (e) {
       print('Exception caught: $e');
-      rethrow;
+      //rethrow;
+      return {};
     }
   }
 

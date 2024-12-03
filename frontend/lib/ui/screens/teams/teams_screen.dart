@@ -25,22 +25,18 @@ class _TeamsScreenState extends State<TeamsScreen> {
     super.initState();
     // Generate a list with the years from 1950 to the current year
     int currentYear = DateTime.now().year;
+    selectedSeason = currentYear.toString();
+    _teamsListFuture = APIService().getTeamsByYear(int.parse(selectedSeason));
+
     for (int i = currentYear; i >= 1950; i--) {
       seasons.add(i.toString());
     }
-    selectedSeason = currentYear.toString();
 
     //teamsSeason.sort((a, b) => b.yearWins.compareTo(a.yearWins));
   }
 
   @override
   Widget build(BuildContext context) {
-    // Access the provider
-    final dataProvider = Provider.of<DataProvider>(context);
-
-    // Extract data from provider
-    List<dynamic>? teamsList = dataProvider.teamsSeason;
-
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -91,37 +87,27 @@ class _TeamsScreenState extends State<TeamsScreen> {
               ),
               const SizedBox(height: 15),
               Expanded(
-                child: seasonChanged
-                    ? FutureBuilder<List<dynamic>>(
-                        future: _teamsListFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ); // Show loading while fetching
-                          } else if (snapshot.hasError) {
-                            return const Text(
-                              'Error: Failed to load teams',
-                              style: TextStyle(color: Colors.white),
-                            ); // Error handling
-                          } else if (snapshot.hasData) {
-                            List<dynamic> data = snapshot.data!;
-                            return TeamsSeasonTable(data: data);
-                          }
-                          return Container();
-                        },
-                      )
-                    : teamsList == null
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                          )
-                        : TeamsSeasonTable(data: teamsList),
-              ),
+                  child: FutureBuilder<List<dynamic>>(
+                future: _teamsListFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    ); // Show loading while fetching
+                  } else if (snapshot.hasError) {
+                    return const Text(
+                      'Error: Failed to load teams',
+                      style: TextStyle(color: Colors.white),
+                    ); // Error handling
+                  } else if (snapshot.hasData) {
+                    List<dynamic> data = snapshot.data!;
+                    return TeamsSeasonTable(data: data);
+                  }
+                  return Container();
+                },
+              )),
             ],
           ),
         ),
