@@ -16,6 +16,7 @@ import 'package:frontend/ui/screens/game/chat_screen.dart';
 import 'package:frontend/ui/screens/game/result_prediction_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/chat_widget.dart';
+import 'package:frontend/ui/widgets/dialogs/leave_league_dialog.dart';
 import 'package:provider/provider.dart';
 
 class RankingLeagueScreen extends StatefulWidget {
@@ -140,6 +141,48 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     return sortedRaces;
   }
 
+  Widget leaveLeagueButton(bool isMobile) {
+    return Container(
+      width: isMobile ? 130 : 150,
+      child: ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all<Color>(secondary),
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(35.0),
+            ),
+          ),
+        ),
+        onPressed: () async {
+          bool wantsToLeave = await showDialog(
+            context: context,
+            builder: (context) {
+              return LeaveLeagueDialog(
+                  league: widget.league, user: widget.user);
+            },
+          );
+
+          if (wantsToLeave) {
+            Navigator.pop(context);
+
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: Text(
+            'LEAVE LEAGUE',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: isMobile ? 12 : 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
@@ -249,7 +292,8 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                                 predictionRaces =
                                     data["races"] as List<RaceLeague>;
 
-                                return _leaguesContainer(users, predictions, isMobile);
+                                return _leaguesContainer(
+                                    users, predictions, isMobile);
                               },
                             ),
                           ),
@@ -257,98 +301,99 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                           Flexible(
                             flex: 2,
                             child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 6.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(20.0),
-                                ),
-                                child: StreamBuilder<List<Message>>(
-                                  stream:
-                                      chatService.getMessages(widget.league.id),
-                                  builder: (context, snapshot) {
-                                    // Check the stream's state
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const Center(
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 6.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: StreamBuilder<List<Message>>(
+                                stream:
+                                    chatService.getMessages(widget.league.id),
+                                builder: (context, snapshot) {
+                                  // Check the stream's state
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        child: CircularProgressIndicator(
+                                          color: primary,
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        child: Text(
+                                          'Error: ${snapshot.error}',
+                                          style: const TextStyle(
+                                              color: Colors.black),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  List<Message> listMessages = [];
+
+                                  if (snapshot.hasData &&
+                                      snapshot.data!.isNotEmpty) {
+                                    // Retrieve the list of Message objects
+                                    listMessages = snapshot.data!;
+                                    listMessages.sort((a, b) =>
+                                        b.sentAt!.compareTo(a.sentAt!));
+                                  }
+
+                                  // Use a FutureBuilder to handle async message conversion
+                                  return FutureBuilder<List<ChatMessage>>(
+                                    future:
+                                        chatService.generateChatMessagesList(
+                                            listMessages, currentUser),
+                                    builder: (context, chatSnapshot) {
+                                      if (chatSnapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Center(
                                           child: CircularProgressIndicator(
                                             color: primary,
                                           ),
-                                        ),
-                                      );
-                                    }
-
-                                    if (snapshot.hasError) {
-                                      return Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          child: Text(
-                                            'Error: ${snapshot.error}',
-                                            style:
-                                                const TextStyle(color: Colors.black),
-                                          ),
-                                        ),
-                                      );
-                                    }
-
-                                    List<Message> listMessages = [];
-
-                                    if (snapshot.hasData &&
-                                        snapshot.data!.isNotEmpty) {
-                                      // Retrieve the list of Message objects
-                                      listMessages = snapshot.data!;
-                                      listMessages.sort((a, b) =>
-                                          b.sentAt!.compareTo(a.sentAt!));
-                                    }
-
-                                    // Use a FutureBuilder to handle async message conversion
-                                    return FutureBuilder<List<ChatMessage>>(
-                                      future:
-                                          chatService.generateChatMessagesList(
-                                              listMessages, currentUser),
-                                      builder: (context, chatSnapshot) {
-                                        if (chatSnapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const Center(
-                                            child: CircularProgressIndicator(
-                                              color: primary,
-                                            ),
-                                          );
-                                        }
-
-                                        if (chatSnapshot.hasError) {
-                                          return Center(
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 20),
-                                              child: Text(
-                                                'Error: ${chatSnapshot.error}',
-                                                style: const TextStyle(
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                          );
-                                        }
-
-                                        // Retrieve the list of ChatMessage objects
-                                        List<ChatMessage> messages =
-                                            chatSnapshot.data ?? [];
-
-                                        // Render DashChat with the messages
-                                        return ChatWidget(
-                                          messages: messages,
-                                          league: widget.league,
-                                          chatService: chatService,
-                                          currentUser: currentUser,
                                         );
-                                      },
-                                    );
-                                  },
-                                ),),
+                                      }
+
+                                      if (chatSnapshot.hasError) {
+                                        return Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            child: Text(
+                                              'Error: ${chatSnapshot.error}',
+                                              style: const TextStyle(
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        );
+                                      }
+
+                                      // Retrieve the list of ChatMessage objects
+                                      List<ChatMessage> messages =
+                                          chatSnapshot.data ?? [];
+
+                                      // Render DashChat with the messages
+                                      return ChatWidget(
+                                        messages: messages,
+                                        league: widget.league,
+                                        chatService: chatService,
+                                        currentUser: currentUser,
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -384,7 +429,8 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                           predictions = data["predictions"] as List<Prediction>;
                           predictionRaces = data["races"] as List<RaceLeague>;
 
-                          return _leaguesContainer(users, predictions, isMobile);
+                          return _leaguesContainer(
+                              users, predictions, isMobile);
                         },
                       ),
                     ),
@@ -417,7 +463,6 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     league: widget.league,
                     currentUser: currentUser,
                     chatService: chatService,
-
                   ),
                 ),
               );
@@ -523,7 +568,8 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
     return prediction?.points;
   }
 
-  Widget _leaguesContainer(List<UserApp> users, List<Prediction> predictions, bool isMobile) {
+  Widget _leaguesContainer(
+      List<UserApp> users, List<Prediction> predictions, bool isMobile) {
     final List<UserApp> rankedUsers = users.map((user) {
       final points = selectedRace != null
           ? _getUserPointsForRace(
@@ -703,6 +749,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
+          leaveLeagueButton(isMobile),
         ],
       ),
     );

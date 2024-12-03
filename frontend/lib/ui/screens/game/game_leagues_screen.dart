@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/chat.dart';
 import 'package:frontend/core/models/league.dart';
-import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
@@ -10,10 +9,8 @@ import 'package:frontend/ui/screens/game/ranking_league_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/create_league_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/join_league_dialog.dart';
-import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:frontend/ui/widgets/level_progress_bar.dart';
 import 'package:frontend/ui/widgets/log_in_container.dart';
-import 'package:intl/intl.dart';
 import 'dart:async';
 
 import 'package:provider/provider.dart';
@@ -224,8 +221,8 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                 itemCount: leagues.length,
                                 itemBuilder: (context, index) {
                                   return InkWell(
-                                    onTap: () {
-                                      Navigator.push(
+                                    onTap: () async {
+                                      bool? hasLeft = await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
@@ -235,6 +232,11 @@ class _GameLeaguesScreenState extends State<GameLeaguesScreen> {
                                           ),
                                         ),
                                       );
+
+                                      setState(() {
+                                        _leaguesFuture =
+                                            _fetchUserLeagues(auth.userApp!.id);
+                                      });
                                     },
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(
