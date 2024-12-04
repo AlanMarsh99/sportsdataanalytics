@@ -89,119 +89,129 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
                   return Container();
                 }
               }),
+              
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Center(
-            child: FutureBuilder<List<UserApp>>(
-              future: _fetchUsersFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Show a loading indicator while waiting for data
-                  return const CircularProgressIndicator(
-                    color: Colors.white,
-                  );
-                } else if (snapshot.hasError) {
-                  // Show an error message if something goes wrong
-                  return const Text(
-                    'Error loading leaderboard.',
-                    style: TextStyle(color: Colors.white),
-                  );
-                } else if (snapshot.hasData) {
-                  if (snapshot.data!.isEmpty) {
-                    // Show a message if there are no users
-                    return const Text(
-                      'No users found.',
-                      style: TextStyle(color: Colors.white),
-                    );
-                  } else {
-                    // Render the leaderboard container with the fetched users
-                    List<UserApp> users = snapshot.data!;
-                    return _leaderboardContainer(users, isMobile);
-                  }
-                }
-                return Container();
-              },
-            ),
-          ),
-        ),
+        _leaderboardContainer(isMobile),
       ],
     );
   }
 
-  Widget _leaderboardContainer(List<UserApp> users, bool isMobile) {
-    return Container(
-      width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
-      height: MediaQuery.of(context).size.height * 0.61,
-      decoration: BoxDecoration(
-        color: primary,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Stack(
-        alignment: AlignmentDirectional.center,
-        children: [
-          // Background Image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Image.asset(
-              'assets/images/image5_f1.jpg',
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-            ),
-          ),
-          // Semi-transparent overlay to make text readable
-          Container(
-            decoration: BoxDecoration(
+  Widget _leaderboardContainer(bool isMobile) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        width: double.infinity, //MediaQuery.of(context).size.width * 0.8,
+        height: MediaQuery.of(context).size.height * 0.61,
+        decoration: BoxDecoration(
+          color: primary,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Stack(
+          alignment: AlignmentDirectional.center,
+          children: [
+            // Background Image
+            ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              color: Colors.black.withOpacity(0.5),
+              child: Image.asset(
+                'assets/images/image5_f1.jpg',
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+              ),
             ),
-          ),
-          // Content overlaid on top of the image
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: primary.withAlpha(100),
-                    border: Border.all(
-                      color: secondary,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Text(
-                      'GLOBAL LEADERBOARD 2024 SEASON',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isMobile ? 14 : 18,
+            // Semi-transparent overlay to make text readable
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.black.withOpacity(0.5),
+              ),
+            ),
+            // Content overlaid on top of the image
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: 
+              Center(
+                    child: 
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: primary.withAlpha(100),
+                      border: Border.all(
+                        color: secondary,
+                        width: 2,
                       ),
-                      textAlign: TextAlign.center,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Text(
+                        'GLOBAL LEADERBOARD 2024 SEASON',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: isMobile ? 14 : 18,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 25),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: GlobalLeaderboardTable(
-                      users: users,
-                    ),
+                  const SizedBox(height: 25),
+                  FutureBuilder<List<UserApp>>(
+                      future: _fetchUsersFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          // Show a loading indicator while waiting for data
+                          return Container(
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          // Show an error message if something goes wrong
+                          return const Text(
+                            'Error loading leaderboard.',
+                            style: TextStyle(color: Colors.white),
+                          );
+                        } else if (snapshot.hasData) {
+                          if (snapshot.data!.isEmpty) {
+                            // Show a message if there are no users
+                            return const Text(
+                              'No users found.',
+                              style: TextStyle(color: Colors.white),
+                            );
+                          } else {
+                            // Render the leaderboard container with the fetched users
+                            List<UserApp> users = snapshot.data!;
+                            return Expanded(
+                              child: Align(
+                                alignment: Alignment.topCenter,
+                                child: GlobalLeaderboardTable(
+                                  users: users,
+                                ),
+                              ),
+                            );
+                          }
+                        }
+                        return Container();
+                      },
+                    
+                
                   ),
-                )
-              ],
+                ],
+              ),),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

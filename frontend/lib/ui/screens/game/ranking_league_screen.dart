@@ -3,21 +3,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/chat.dart';
 import 'package:frontend/core/models/league.dart';
 import 'package:frontend/core/models/message.dart';
 import 'package:frontend/core/models/prediction.dart';
+import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/models/race_league.dart';
 import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/core/services/chat_service.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/chat_screen.dart';
 import 'package:frontend/ui/screens/game/result_prediction_screen.dart';
+import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/chat_widget.dart';
 import 'package:frontend/ui/widgets/dialogs/leave_league_dialog.dart';
-import 'package:provider/provider.dart';
 
 class RankingLeagueScreen extends StatefulWidget {
   const RankingLeagueScreen(
@@ -164,7 +165,6 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
 
           if (wantsToLeave) {
             Navigator.pop(context);
-
           }
         },
         child: Padding(
@@ -690,7 +690,51 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                   : Container(),
             ],
           ),
+
           const SizedBox(height: 30),
+          // Race Title
+          InkWell(
+            onTap: selectedRace != null
+                ? () async {
+                    Map<String, dynamic> json = await APIService()
+                        .getRaceInfo(selectedRace!.year, selectedRace!.round);
+                    Race race = Race.fromJson(json);
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RacesDetailScreen(race: race),
+                      ),
+                    );
+                  }
+                : null,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                //color: secondary,
+                border: Border.all(
+                  color: secondary,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(5),
+                child: Text(
+                  selectedRace != null
+                      ? selectedRace!.raceName
+                      : "Ranking Season ${DateTime.now().year}",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -749,6 +793,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
+          SizedBox(height: 15),
           leaveLeagueButton(isMobile),
         ],
       ),
