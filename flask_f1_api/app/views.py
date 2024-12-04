@@ -120,7 +120,7 @@ def get_last_race_results():
 
     # Extract details for the top 3 finishers and fastest lap
     last_race_results = {
-        "race_id": last_race,
+        "race_id": str(last_race),
         "year": year,
         "first_position": {
             "driver_name": f"{results[0]['Driver']['givenName']} {results[0]['Driver']['familyName']}",
