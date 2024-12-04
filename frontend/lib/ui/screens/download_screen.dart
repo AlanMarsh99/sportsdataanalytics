@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:frontend/utils/download_utils.dart';
 import 'package:csv/csv.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart'; 
 import 'package:frontend/ui/theme.dart';
 
 class DownloadScreen extends StatefulWidget {
@@ -23,12 +24,14 @@ class _DownloadScreenState extends State<DownloadScreen> {
   String _selectedFormatRaceInfo = 'JSON';
   String _selectedFormatConstructorsStandings = 'JSON';
   String _selectedFormatDriversStandings = 'JSON';
+  String _selectedFormatAllRaces = 'JSON';
 
   // Controllers for Year and Round input fields
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _roundController = TextEditingController();
   final TextEditingController _constructorsYearController = TextEditingController();
   final TextEditingController _driversYearController = TextEditingController();
+  final TextEditingController _allRacesYearController = TextEditingController();
 
   // State variables for loading indicators
   bool _isLoadingUpcomingRace = false;
@@ -36,13 +39,15 @@ class _DownloadScreenState extends State<DownloadScreen> {
   bool _isLoadingRaceInfo = false;
   bool _isLoadingConstructorsStandings = false;
   bool _isLoadingDriversStandings = false;
+  bool _isLoadingAllRaces = false;
 
   @override
   void dispose() {
     _yearController.dispose();
     _roundController.dispose();
-    _constructorsYearController.dispose(); // Add this line
+    _constructorsYearController.dispose();
     _driversYearController.dispose(); 
+    _allRacesYearController.dispose();
     super.dispose();
   }
 
@@ -58,6 +63,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
       await _handleDownloadConstructorsStandings(format);
     } else if (dataType == 'drivers_standings') {
       await _handleDownloadDriversStandings(format);
+    } else if (dataType == 'all_races') {
+      await _handleDownloadAllRaces(format);
     }
   }
 
@@ -243,6 +250,52 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
+  // Handle download for All Races in a Year
+  Future<void> _handleDownloadAllRaces(String format) async {
+    setState(() {
+      _isLoadingAllRaces = true;
+    });
+    try {
+      if (_allRacesYearController.text.isEmpty) {
+        throw Exception('Year cannot be empty');
+      }
+      int year;
+      try {
+        year = int.parse(_allRacesYearController.text);
+      } catch (e) {
+        throw Exception('Year must be a valid number');
+      }
+
+      List<dynamic> allRaces = await apiService.getAllRacesInYear(year);
+
+      if (allRaces.isEmpty) {
+        throw Exception('No races found for the year $year');
+      }
+
+      Map<String, dynamic> data = {'races': allRaces};
+
+      switch (format) {
+        case 'JSON':
+          await _downloadJson('all_races_$year', data);
+          break;
+        case 'CSV':
+          await _downloadAllRacesCsv(data, year);
+          break;
+        case 'PDF':
+          await _downloadPdf('all_races_$year', data);
+          break;
+        default:
+          throw Exception('Unsupported format: $format');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error downloading All Races: $e');
+    } finally {
+      setState(() {
+        _isLoadingAllRaces = false;
+      });
+    }
+  }
+
   // Function to download JSON
   Future<void> _downloadJson(String filename, Map<String, dynamic> data) async {
     try {
@@ -411,17 +464,73 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
+  // Function to download All Races as CSV
+  Future<void> _downloadAllRacesCsv(Map<String, dynamic> data, int year) async {
+    try {
+      List<List<dynamic>> rows = [
+        [
+          'Date',
+          'Race Name',
+          'Race ID',
+          'Circuit Name',
+          'Round',
+          'Location',
+          'Winner',
+          'Winner Driver ID',
+          'Winning Time',
+          'Fastest Lap',
+          'Fastest Lap Driver ID',
+          'Fastest Lap Time',
+          'Pole Position',
+          'Pole Position Driver ID',
+          'Fastest Pit Stop',
+          'Fastest Pit Stop Driver ID',
+          'Fastest Pit Stop Time'
+        ],
+      ];
+      List<dynamic> racesList = data['races'];
+      for (var race in racesList) {
+        rows.add([
+          race['date'],
+          race['race_name'],
+          race['race_id'],
+          race['circuit_name'],
+          race['round'],
+          race['location'],
+          race['winner'],
+          race['winner_driver_id'],
+          race['winning_time'],
+          race['fastest_lap'],
+          race['fastest_lap_driver_id'],
+          race['fastest_lap_time'],
+          race['pole_position'],
+          race['pole_position_driver_id'],
+          race['fastest_pit_stop'],
+          race['fastest_pit_stop_driver_id'],
+          race['fastest_pit_stop_time'],
+        ]);
+      }
+      String csvData = const ListToCsvConverter().convert(rows);
+      Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
+      await downloadFile('all_races_$year.csv', bytes, 'text/csv');
+      _showSuccessSnackBar('Successfully downloaded all_races_$year.csv');
+    } catch (e) {
+      throw Exception('Failed to download CSV: $e');
+    }
+  }
 
   // Function to download PDF
   Future<void> _downloadPdf(String filename, Map<String, dynamic> data) async {
     try {
       final pdf = pw.Document();
       pdf.addPage(
-        pw.Page(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4.landscape,
           build: (pw.Context context) {
-            // Customize PDF content based on dataType
+            // Initialize title and dataList based on filename
             String title = '';
             List<Map<String, String>> dataList = [];
+
             if (filename == 'upcoming_race') {
               title = 'Upcoming Race Data';
               dataList = [
@@ -471,40 +580,92 @@ class _DownloadScreenState extends State<DownloadScreen> {
             } else if (filename == 'constructors_standings') {
               title = 'Constructors Standings';
               List<dynamic> standingsList = data['constructors_standings'];
-              dataList = standingsList.map((standing) => {
-                'Position': standing['position'].toString(),
-                'Points': standing['points'].toString(),
-                'Wins': standing['wins'].toString(),
-                'Constructor Name': standing['constructor_name'].toString(),
-              }).toList();
+              dataList = standingsList.map<Map<String, String>>((standing) => {
+                    'Position': standing['position'].toString(),
+                    'Points': standing['points'].toString(),
+                    'Wins': standing['wins'].toString(),
+                    'Constructor Name': standing['constructor_name'].toString(),
+                  }).toList();
             } else if (filename == 'drivers_standings') {
               title = 'Drivers Standings';
               List<dynamic> standingsList = data['driver_standings'];
-              dataList = standingsList.map((standing) => {
-                'Position': standing['position'].toString(),
-                'Points': standing['points'].toString(),
-                'Wins': standing['wins'].toString(),
-                'Driver Name': standing['driver_name'].toString(),
-                'Constructor Name': standing['constructor_name'].toString(),
-              }).toList();
+              dataList = standingsList.map<Map<String, String>>((standing) => {
+                    'Position': standing['position'].toString(),
+                    'Points': standing['points'].toString(),
+                    'Wins': standing['wins'].toString(),
+                    'Driver Name': standing['driver_name'].toString(),
+                    'Constructor Name': standing['constructor_name'].toString(),
+                  }).toList();
+            } else if (filename.startsWith('all_races_')) {
+              String year = filename.split('_').last;
+              title = 'All Races in Year $year';
+              List<dynamic> racesList = data['races'];
+              dataList = racesList.map<Map<String, String>>((race) => {
+                    'Date': race['date']?.toString() ?? 'N/A',
+                    'Race Name': race['race_name']?.toString() ?? 'N/A',
+                    'Race ID': race['race_id']?.toString() ?? 'N/A',
+                    'Circuit Name': race['circuit_name']?.toString() ?? 'N/A',
+                    'Round': race['round']?.toString() ?? 'N/A',
+                    'Location': race['location']?.toString() ?? 'N/A',
+                    'Winner': race['winner']?.toString() ?? 'N/A',
+                    'Winner Driver ID': race['winner_driver_id']?.toString() ?? 'N/A',
+                    'Winning Time': race['winning_time']?.toString() ?? 'N/A',
+                    'Fastest Lap': race['fastest_lap']?.toString() ?? 'N/A',
+                    'Fastest Lap Driver ID': race['fastest_lap_driver_id']?.toString() ?? 'N/A',
+                    'Fastest Lap Time': race['fastest_lap_time']?.toString() ?? 'N/A',
+                    'Pole Position': race['pole_position']?.toString() ?? 'N/A',
+                    'Pole Position Driver ID': race['pole_position_driver_id']?.toString() ?? 'N/A',
+                    'Fastest Pit Stop': race['fastest_pit_stop']?.toString() ?? 'N/A',
+                    'Fastest Pit Stop Driver ID': race['fastest_pit_stop_driver_id']?.toString() ?? 'N/A',
+                    'Fastest Pit Stop Time': race['fastest_pit_stop_time']?.toString() ?? 'N/A',
+                  }).toList();
             }
 
-            // Build the PDF content
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text(
-                  title,
-                  style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+            // Initialize a list to hold all widgets
+            List<pw.Widget> widgets = [];
+
+            // Add Title
+            widgets.add(
+              pw.Text(
+                title,
+                style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+              ),
+            );
+
+            widgets.add(pw.SizedBox(height: 10));
+
+            if (filename.startsWith('all_races_')) {
+              // Add Table for All Races
+              widgets.add(
+                pw.Table.fromTextArray(
+                  headers: dataList.isNotEmpty ? dataList[0].keys.toList() : [],
+                  data: dataList.map((item) => item.values.toList()).toList(),
+                  headerStyle: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  cellStyle: pw.TextStyle(fontSize: 8),
+                  border: pw.TableBorder.all(width: 0.5),
+                  headerDecoration: pw.BoxDecoration(),
+                  cellAlignment: pw.Alignment.centerLeft,
+                  cellHeight: 20,
                 ),
-                pw.SizedBox(height: 10),
-                if (filename == 'constructors_standings' || filename == 'drivers_standings')
-                  pw.TableHelper.fromTextArray(
-                    headers: dataList.isNotEmpty ? dataList[0].keys.toList() : [],
-                    data: dataList.map((item) => item.values.toList()).toList(),
-                  )
-                else
-                ...dataList.map((item) {
+              );
+            } else if (filename == 'constructors_standings' || filename == 'drivers_standings') {
+              // Add Table for Standings
+              widgets.add(
+                pw.Table.fromTextArray(
+                  headers: dataList.isNotEmpty ? dataList[0].keys.toList() : [],
+                  data: dataList.map((item) => item.values.toList()).toList(),
+                  headerStyle: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  cellStyle: pw.TextStyle(fontSize: 8),
+                  border: pw.TableBorder.all(width: 0.5),
+                  headerDecoration: pw.BoxDecoration(),
+                  cellAlignment: pw.Alignment.centerLeft,
+                  cellHeight: 20,
+                ),
+              );
+            } else {
+              // Add Key-Value Texts for Other Data Types
+              widgets.addAll(
+                dataList.map((item) {
                   final key = item.keys.first;
                   final value = item.values.first;
                   return pw.Padding(
@@ -512,8 +673,10 @@ class _DownloadScreenState extends State<DownloadScreen> {
                     child: pw.Text('$key: $value', style: pw.TextStyle(fontSize: 14)),
                   );
                 }).toList(),
-              ],
-            );
+              );
+            }
+
+            return widgets;
           },
         ),
       );
@@ -521,7 +684,10 @@ class _DownloadScreenState extends State<DownloadScreen> {
       Uint8List pdfBytes = await pdf.save();
       await downloadFile('$filename.pdf', pdfBytes, 'application/pdf');
       _showSuccessSnackBar('Successfully downloaded $filename.pdf');
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('PDF Generation Error: $e');
+      print('Stack Trace: $stackTrace');
+      _showErrorSnackBar('Failed to download PDF: $e');
       throw Exception('Failed to download PDF: $e');
     }
   }
@@ -1300,6 +1466,151 @@ class _DownloadScreenState extends State<DownloadScreen> {
                               ? null
                               : () {
                                   _downloadFile('drivers_standings', _selectedFormatDriversStandings);
+                                },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Download All Races in a Year
+              Card(
+                color: primary,
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Section Title
+                      const Text(
+                        'All Races in a Year',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Input field for Year
+                      TextField(
+                        controller: _allRacesYearController,
+                        keyboardType: TextInputType.number,
+                        cursorColor: secondary,
+                        decoration: const InputDecoration(
+                          labelText: 'Year',
+                          labelStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.white24,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      // "Select Format" Label Container
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: const Text(
+                          'Select Format',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Dropdown for Format Selection
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          isDense: false,
+                          value: _selectedFormatAllRaces,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                          ),
+                          dropdownColor: Colors.white,
+                          isExpanded: true,
+                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                            IconData icon;
+                            switch (value) {
+                              case 'CSV':
+                                icon = Icons.table_chart;
+                                break;
+                              case 'JSON':
+                                icon = Icons.code;
+                                break;
+                              case 'PDF':
+                                icon = Icons.picture_as_pdf;
+                                break;
+                              default:
+                                icon = Icons.download;
+                            }
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Icon(icon, size: 20, color: Colors.black54),
+                                  const SizedBox(width: 10),
+                                  Text(value, style: const TextStyle(color: Colors.black87)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                _selectedFormatAllRaces = newValue;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // DOWNLOAD Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            foregroundColor: Colors.white,
+                            backgroundColor: secondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          icon: _isLoadingAllRaces
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.download, size: 20),
+                          label: const Text(
+                            'DOWNLOAD',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          onPressed: _isLoadingAllRaces
+                              ? null
+                              : () {
+                                  _downloadFile('all_races', _selectedFormatAllRaces);
                                 },
                         ),
                       ),
