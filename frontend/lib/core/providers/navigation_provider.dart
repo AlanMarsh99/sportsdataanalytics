@@ -29,27 +29,27 @@ class NavigationProvider extends ChangeNotifier {
 
   final List<NavigationRailDestination> _destinations = [
     const NavigationRailDestination(
-      icon: Icon(Icons.home),
+      icon: Icon(Icons.home_rounded),
       label: Text('HOME'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.flag),
+      icon: Icon(Icons.sports_score_rounded),
       label: Text('RACES'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.drive_eta_outlined),
+      icon: Icon(Icons.sports_motorsports_rounded),
       label: Text('DRIVERS'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.group),
+      icon: Icon(Icons.group_rounded),
       label: Text('TEAMS'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.play_arrow),
+      icon: Icon(Icons.sports_esports_rounded),
       label: Text('GAME'),
     ),
     const NavigationRailDestination(
-      icon: Icon(Icons.download),
+      icon: Icon(Icons.download_rounded),
       label: Text('DOWNLOADS'),
     ),
   ];
