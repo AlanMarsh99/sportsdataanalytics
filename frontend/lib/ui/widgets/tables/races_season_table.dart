@@ -15,7 +15,8 @@ class RacesSeasonTable extends StatefulWidget {
 class _RacesSeasonTableState extends State<RacesSeasonTable> {
   List<Race> racesList = [];
   List<Race> filteredRacesList = [];
-  String filter = '';
+  bool isAscending = true; // Tracks sorting order
+  int? sortColumnIndex;
 
   List<Race> parseRaces(List<dynamic> jsonList) {
     return jsonList.map((json) => Race.fromJson(json)).toList();
@@ -30,7 +31,7 @@ class _RacesSeasonTableState extends State<RacesSeasonTable> {
 
   void updateFilter(String value) {
     setState(() {
-      filter = value.toLowerCase();
+      final filter = value.toLowerCase();
       filteredRacesList = racesList
           .where((race) =>
               race.raceName.toLowerCase().contains(filter) ||
@@ -39,6 +40,21 @@ class _RacesSeasonTableState extends State<RacesSeasonTable> {
               race.winner.toLowerCase().contains(filter) ||
               race.polePosition.toLowerCase().contains(filter))
           .toList();
+    });
+  }
+
+  void onSort(int columnIndex, bool ascending) {
+    setState(() {
+      sortColumnIndex = columnIndex;
+      isAscending = ascending;
+      if (columnIndex == 0) {
+        // Sort by Date
+        filteredRacesList.sort((a, b) {
+          final dateA = DateTime.parse(a.date);
+          final dateB = DateTime.parse(b.date);
+          return ascending ? dateA.compareTo(dateB) : dateB.compareTo(dateA);
+        });
+      }
     });
   }
 
@@ -52,14 +68,17 @@ class _RacesSeasonTableState extends State<RacesSeasonTable> {
             cursorColor: Colors.white,
             decoration: InputDecoration(
               hintText: 'Enter a driver, race, or circuit',
-              hintStyle: TextStyle(color: Colors.white70),
+              hintStyle: const TextStyle(color: Colors.white70),
               labelText: 'Filter races',
               labelStyle: const TextStyle(color: Colors.white),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
                 borderSide: const BorderSide(color: Colors.white),
               ),
-              prefixIcon: const Icon(Icons.search, color: Colors.white,),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
             ),
             onChanged: updateFilter,
           ),
@@ -79,16 +98,37 @@ class _RacesSeasonTableState extends State<RacesSeasonTable> {
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: DataTable(
-                      columns: const [
+                      showCheckboxColumn:
+                          false, // Disable default checkbox and sort indicators
+                      sortColumnIndex: 0, // Index of the column being sorted
+                      sortAscending:
+                          isAscending, // Reflect the current sort order
+                      columns: [
                         DataColumn(
-                          label: Text(
-                            'Date',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
+                          label: InkWell(
+                            onTap: () => onSort(
+                                0, !isAscending),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  'Date',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Icon(
+                                  isAscending
+                                      ? Icons.arrow_upward
+                                      : Icons.arrow_downward,
+                                  color: Colors.black,
+                                  size: 16,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        DataColumn(
+                        const DataColumn(
                           label: Text(
                             'Race',
                             style: TextStyle(
@@ -96,7 +136,7 @@ class _RacesSeasonTableState extends State<RacesSeasonTable> {
                                 color: Colors.black),
                           ),
                         ),
-                        DataColumn(
+                        const DataColumn(
                           label: Text(
                             'Circuit',
                             style: TextStyle(
@@ -104,7 +144,7 @@ class _RacesSeasonTableState extends State<RacesSeasonTable> {
                                 color: Colors.black),
                           ),
                         ),
-                        DataColumn(
+                        const DataColumn(
                           label: Text(
                             'Winner',
                             style: TextStyle(
@@ -112,7 +152,7 @@ class _RacesSeasonTableState extends State<RacesSeasonTable> {
                                 color: Colors.black),
                           ),
                         ),
-                        DataColumn(
+                        const DataColumn(
                           label: Text(
                             'Pole position',
                             style: TextStyle(
