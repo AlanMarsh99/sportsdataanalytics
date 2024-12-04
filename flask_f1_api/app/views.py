@@ -74,20 +74,33 @@ def get_last_race_results():
     response = requests.get(schedule_url)
     
     if response.status_code != 200:
-        return jsonify({"error": "Failed to retrieve last race info"}), response.status_code
+        return jsonify({"error": "Failed to retrieve season schedule"}), response.status_code
 
-    races = response.json()['MRData']['RaceTable']['Races']
+    race_table = response.json()['MRData']['RaceTable']['Races']
+    
+    if not race_table:
+        return jsonify({"error": "No races found for the current season"}), 404
+
+    # Ensure races are sorted by round number
+    races_sorted = sorted(race_table, key=lambda x: int(x['round']))
+    
+    # Total number of races scheduled for the season
+    total_races = int(races_sorted[-1]['round'])
+    
     last_race = None
 
     # Find the most recent past race
-    for race in reversed(races):
+    for race in reversed(races_sorted):
         race_date = datetime.strptime(race['date'], "%Y-%m-%d")
         if race_date < datetime.now():
-            last_race = race['round']
+            last_race = int(race['round'])
             break
 
     if not last_race:
         return jsonify({"error": "No past races found"}), 404
+
+    # Determine if the last race is the final race of the season
+    is_last_race_of_season = (last_race == total_races)
 
     # Fetch results for the last completed race
     results_url = f"{BASE_ERGAST_URL}/current/{last_race}/results.json"
@@ -98,6 +111,9 @@ def get_last_race_results():
 
     race_data = results_response.json()['MRData']['RaceTable']['Races'][0]
     results = race_data['Results']
+
+    if not results:
+        return jsonify({"error": "No results found for the last race"}), 404
 
     # Extract the year from the race data
     year = race_data['season']
@@ -133,6 +149,9 @@ def get_last_race_results():
                 "driver_id": result['Driver']['driverId']
             }
             break
+
+    # Add the is_last_race_of_season boolean to the response
+    last_race_results["is_last_race_of_season"] = is_last_race_of_season
 
     return jsonify(last_race_results)
 
