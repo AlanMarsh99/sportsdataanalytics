@@ -1,4 +1,3 @@
-import 'package:frontend/core/shared/globals.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/race_positions.dart';

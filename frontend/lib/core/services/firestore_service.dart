@@ -2,7 +2,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/core/models/avatar.dart';
-import 'package:frontend/core/models/user_app.dart';
 
 class Document<T> {
   Document({required this.path}) {

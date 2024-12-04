@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';

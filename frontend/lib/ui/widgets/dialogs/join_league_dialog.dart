@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +5,6 @@ import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/services/chat_service.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 
 class JoinLeagueDialog extends StatelessWidget {
   JoinLeagueDialog({Key? key}) : super(key: key);

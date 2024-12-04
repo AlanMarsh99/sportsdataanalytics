@@ -7,7 +7,6 @@ import 'package:frontend/ui/screens/home_screen.dart';
 import 'package:frontend/ui/screens/download_screen.dart';
 import 'package:frontend/ui/screens/races/races_screen.dart';
 import 'package:frontend/ui/screens/teams/teams_screen.dart';
-import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/carousel_game_options.dart';
 import 'package:provider/provider.dart';
 

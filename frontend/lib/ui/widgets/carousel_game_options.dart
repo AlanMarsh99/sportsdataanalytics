@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/game/game_leaderboard_screen.dart';
 import 'package:frontend/ui/screens/game/game_leagues_screen.dart';
@@ -7,11 +6,6 @@ import 'package:frontend/ui/screens/game/game_myStats_screen.dart';
 import 'package:frontend/ui/screens/game/game_predict_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:frontend/ui/widgets/app_bar.dart';
-import 'package:frontend/ui/widgets/drawer.dart';
-import 'package:frontend/ui/widgets/end_drawer.dart';
-import 'package:frontend/ui/widgets/level_progress_bar.dart';
-import 'package:provider/provider.dart';
 
 class F1Carousel extends StatefulWidget {
   @override

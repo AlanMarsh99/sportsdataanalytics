@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
-import 'package:frontend/core/services/auth_services.dart';
-import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/theme.dart';
-import 'package:provider/provider.dart';
 
 class MyDrawer extends StatelessWidget implements PreferredSizeWidget {
   const MyDrawer({Key? key, required this.nav, required this.isMobile}) : super(key: key);

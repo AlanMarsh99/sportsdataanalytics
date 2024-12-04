@@ -4,7 +4,6 @@ import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/core/shared/validators.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/authentication/forgot_password_screen.dart';
-import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';

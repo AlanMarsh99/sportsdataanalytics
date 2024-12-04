@@ -1,14 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
-import 'package:frontend/core/providers/user_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/firebase_options.dart';
 import 'package:frontend/ui/screens/navigation/navigation_screen.dart';
-import 'package:frontend/ui/screens/splash_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 

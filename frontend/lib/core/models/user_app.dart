@@ -11,6 +11,7 @@ class UserApp {
   int numPredictions;
   int? predictionPoints;
   bool firstTimeTutorial;
+  int? globalLeaderboardWins;
 
   UserApp({
     required this.id,
@@ -24,7 +25,8 @@ class UserApp {
     required this.leaguesFinished,
     required this.numPredictions,
     this.predictionPoints,
-    required this.firstTimeTutorial
+    required this.firstTimeTutorial,
+    this.globalLeaderboardWins
   });
 
   Map<String, dynamic> toMap() {
@@ -40,6 +42,7 @@ class UserApp {
       'leaguesFinished': leaguesFinished,
       'numPredictions': numPredictions,
       'firstTimeTutorial': firstTimeTutorial,
+      'globalLeaderboardWins': globalLeaderboardWins
     };
   }
 
@@ -56,6 +59,7 @@ class UserApp {
       leaguesFinished: map['leaguesFinished'],
       numPredictions: map['numPredictions'],
       firstTimeTutorial: map['firstTimeTutorial'] ?? true,
+      globalLeaderboardWins: map['globalLeaderboardWins'] ?? 0
     );
   }
 

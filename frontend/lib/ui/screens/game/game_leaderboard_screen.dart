@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/user.dart';
 import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
@@ -8,7 +7,6 @@ import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/level_progress_bar.dart';
 import 'package:frontend/ui/widgets/tables/global_leaderboard_table.dart';
-import 'package:intl/intl.dart';
 import 'dart:async';
 
 import 'package:provider/provider.dart';
@@ -22,7 +20,6 @@ class GameLeaderboardScreen extends StatefulWidget {
 }
 
 class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
-  List<User> _users = [];
   late Future<List<UserApp>> _fetchUsersFuture;
 
   @override

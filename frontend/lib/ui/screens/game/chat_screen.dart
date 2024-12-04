@@ -2,7 +2,6 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/league.dart';
 import 'package:frontend/core/models/message.dart';
-import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/core/services/chat_service.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/chat_widget.dart';

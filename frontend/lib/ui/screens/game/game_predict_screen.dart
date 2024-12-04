@@ -11,7 +11,6 @@ import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/view_predictions_dialog.dart';
 import 'package:frontend/ui/widgets/level_progress_bar.dart';
-import 'package:intl/intl.dart';
 import 'dart:async';
 
 import 'package:provider/provider.dart';
