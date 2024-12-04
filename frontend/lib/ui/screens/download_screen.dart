@@ -26,6 +26,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   String _selectedFormatDriversStandings = 'JSON';
   String _selectedFormatAllRaces = 'JSON';
   String _selectedFormatRaceResults = 'JSON';
+  String _selectedFormatPitStops = 'JSON';
 
   // Controllers for Year and Round input fields
   final TextEditingController _yearController = TextEditingController();
@@ -35,6 +36,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
   final TextEditingController _allRacesYearController = TextEditingController();
   final TextEditingController _raceResultsYearController = TextEditingController();
   final TextEditingController _raceResultsRoundController = TextEditingController();
+  final TextEditingController _pitStopsYearController = TextEditingController();
+  final TextEditingController _pitStopsRoundController = TextEditingController();
 
   // State variables for loading indicators
   bool _isLoadingUpcomingRace = false;
@@ -44,6 +47,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   bool _isLoadingDriversStandings = false;
   bool _isLoadingAllRaces = false;
   bool _isLoadingRaceResults = false;
+  bool _isLoadingPitStops = false;
 
   @override
   void dispose() {
@@ -52,8 +56,10 @@ class _DownloadScreenState extends State<DownloadScreen> {
     _constructorsYearController.dispose();
     _driversYearController.dispose(); 
     _allRacesYearController.dispose();
-     _raceResultsYearController.dispose();
+    _raceResultsYearController.dispose();
     _raceResultsRoundController.dispose();
+    _pitStopsYearController.dispose();
+    _pitStopsRoundController.dispose();
     super.dispose();
   }
 
@@ -73,7 +79,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
       await _handleDownloadAllRaces(format);
     } else if (dataType == 'race_results') {
       await _handleDownloadRaceResults(format);
-  }
+    } else if (dataType == 'pit_stops') {
+      await _handleDownloadPitStops(format);
+    }
   }
 
   // Handle download for Upcoming Race
@@ -352,6 +360,48 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
+  // Handle download for Pit Stop Data
+  Future<void> _handleDownloadPitStops(String format) async {
+    setState(() {
+      _isLoadingPitStops = true;
+    });
+    try {
+      if (_pitStopsYearController.text.isEmpty || _pitStopsRoundController.text.isEmpty) {
+        throw Exception('Year and Round cannot be empty');
+      }
+      int year = int.parse(_pitStopsYearController.text);
+      int round = int.parse(_pitStopsRoundController.text);
+
+      List<dynamic> pitStops = await apiService.getPitStops(year, round);
+
+      if (pitStops.isEmpty) {
+        throw Exception('No pit stop data found for the race in year $year, round $round');
+      }
+
+      Map<String, dynamic> data = {'pit_stops': pitStops};
+
+      switch (format) {
+        case 'JSON':
+          await _downloadJson('pit_stops_${year}_$round', data);
+          break;
+        case 'CSV':
+          await _downloadPitStopsCsv(data, year, round);
+          break;
+        case 'PDF':
+          await _downloadPdf('pit_stops_${year}_$round', data);
+          break;
+        default:
+          throw Exception('Unsupported format: $format');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error downloading Pit Stop Data: $e');
+    } finally {
+      setState(() {
+        _isLoadingPitStops = false;
+      });
+    }
+  }
+
   // Function to download JSON
   Future<void> _downloadJson(String filename, Map<String, dynamic> data) async {
     try {
@@ -575,6 +625,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
+  // Function to download Detailed Race Results
   Future<void> _downloadRaceResultsCsv(Map<String, dynamic> data, int year, int round) async {
     try {
       List<List<dynamic>> rows = [
@@ -603,6 +654,42 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
+  // Function to download Pit Stops as CSV
+  Future<void> _downloadPitStopsCsv(Map<String, dynamic> data, int year, int round) async {
+    try {
+      List<List<dynamic>> rows = [
+        ['Driver', 'Team', 'Team ID', 'Total Duration', 'Lap', 'Time of Day', 'Duration'],
+      ];
+
+      List<dynamic> pitStopsList = data['pit_stops'];
+      for (var driverPitStops in pitStopsList) {
+        String driver = driverPitStops['driver'];
+        String team = driverPitStops['team'];
+        String teamId = driverPitStops['team_id'];
+        String totalDuration = driverPitStops['total_duration'].toStringAsFixed(3);
+        List<dynamic> stops = driverPitStops['stops'];
+
+        for (var stop in stops) {
+          rows.add([
+            driver,
+            team,
+            teamId,
+            totalDuration,
+            stop['lap'],
+            stop['time_of_day'],
+            stop['duration'].toStringAsFixed(3),
+          ]);
+        }
+      }
+
+      String csvData = const ListToCsvConverter().convert(rows);
+      Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
+      await downloadFile('pit_stops_${year}_$round.csv', bytes, 'text/csv');
+      _showSuccessSnackBar('Successfully downloaded pit_stops_${year}_$round.csv');
+    } catch (e) {
+      throw Exception('Failed to download CSV: $e');
+    }
+  }
 
   // Function to download PDF
   Future<void> _downloadPdf(String filename, Map<String, dynamic> data) async {
@@ -721,6 +808,33 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 'Laps': result['laps'].toString(),
                 'Points': result['points'].toString(),
               }).toList();
+            } else if (filename.startsWith('pit_stops_')) {
+              List<String> filenameParts = filename.split('_');
+              String year = filenameParts[2];
+              String round = filenameParts[3];
+              title = 'Pit Stop Data for Year $year, Round $round';
+
+              List<dynamic> pitStopsList = data['pit_stops'];
+              dataList = [];
+              for (var driverPitStops in pitStopsList) {
+                String driver = driverPitStops['driver'];
+                String team = driverPitStops['team'];
+                String teamId = driverPitStops['team_id'];
+                String totalDuration = driverPitStops['total_duration'].toStringAsFixed(3);
+                List<dynamic> stops = driverPitStops['stops'];
+
+                for (var stop in stops) {
+                  dataList.add({
+                    'Driver': driver,
+                    'Team': team,
+                    'Team ID': teamId,
+                    'Total Duration': totalDuration,
+                    'Lap': stop['lap'].toString(),
+                    'Time of Day': stop['time_of_day'].toString(),
+                    'Duration': stop['duration'].toStringAsFixed(3),
+                  });
+                }
+              }
             }
 
             // Initialize a list to hold all widgets
@@ -736,7 +850,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
 
             widgets.add(pw.SizedBox(height: 10));
 
-            if (filename.startsWith('all_races_') || filename.startsWith('race_results_')) {
+            if (filename.startsWith('all_races_') || filename.startsWith('race_results_') || filename.startsWith('pit_stops_')) {
               // Add Table for All Races
               widgets.add(
                 pw.Table.fromTextArray(
@@ -1875,6 +1989,168 @@ class _DownloadScreenState extends State<DownloadScreen> {
                               ? null
                               : () {
                                   _downloadFile('race_results', _selectedFormatRaceResults);
+                                },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Download Pit Stop Data
+              Card(
+                color: primary,
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Section Title
+                      const Text(
+                        'Pit Stop Data',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Input fields for Year and Round
+                      TextField(
+                        controller: _pitStopsYearController,
+                        keyboardType: TextInputType.number,
+                        cursorColor: secondary,
+                        decoration: const InputDecoration(
+                          labelText: 'Year',
+                          labelStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.white24,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _pitStopsRoundController,
+                        keyboardType: TextInputType.number,
+                        cursorColor: secondary,
+                        decoration: const InputDecoration(
+                          labelText: 'Round',
+                          labelStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.white24,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      // "Select Format" Label Container
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: const Text(
+                          'Select Format',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Dropdown for Format Selection
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          isDense: false, // Ensures adequate vertical space
+                          value: _selectedFormatPitStops,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                          ),
+                          dropdownColor: Colors.white,
+                          isExpanded: true,
+                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                            IconData icon;
+                            switch (value) {
+                              case 'CSV':
+                                icon = Icons.table_chart;
+                                break;
+                              case 'JSON':
+                                icon = Icons.code;
+                                break;
+                              case 'PDF':
+                                icon = Icons.picture_as_pdf;
+                                break;
+                              default:
+                                icon = Icons.download;
+                            }
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Icon(icon, size: 20, color: Colors.black54),
+                                  const SizedBox(width: 10),
+                                  Text(value, style: const TextStyle(color: Colors.black87)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                _selectedFormatPitStops = newValue;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Download Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            foregroundColor: Colors.white, // Button color
+                            backgroundColor: secondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          icon: _isLoadingPitStops
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.download, size: 20),
+                          label: const Text(
+                            'DOWNLOAD',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          onPressed: _isLoadingPitStops
+                              ? null
+                              : () {
+                                  _downloadFile('pit_stops', _selectedFormatPitStops);
                                 },
                         ),
                       ),
