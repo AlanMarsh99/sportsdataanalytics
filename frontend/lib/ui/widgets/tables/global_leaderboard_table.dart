@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/user.dart';
 import 'package:frontend/core/models/user_app.dart';
-import 'package:frontend/ui/theme.dart';
 
 class GlobalLeaderboardTable extends StatelessWidget {
   const GlobalLeaderboardTable({Key? key, required this.users})

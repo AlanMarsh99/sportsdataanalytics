@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/team.dart';
-import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
-import 'package:frontend/ui/widgets/app_bar.dart';
-import 'package:frontend/ui/widgets/drawer.dart';
-import 'package:frontend/ui/widgets/end_drawer.dart';
 import 'package:frontend/ui/widgets/tables/team_seasons_table.dart';
-import 'package:provider/provider.dart';
 
 class TeamsDetailScreen extends StatefulWidget {
   const TeamsDetailScreen(

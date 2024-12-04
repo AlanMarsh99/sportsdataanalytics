@@ -2,11 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user_app.dart';
-import 'package:frontend/core/providers/user_provider.dart';
 import 'package:frontend/core/services/firestore_service.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/widgets/dialogs/warning_error_dialog.dart';
-import 'package:provider/provider.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 

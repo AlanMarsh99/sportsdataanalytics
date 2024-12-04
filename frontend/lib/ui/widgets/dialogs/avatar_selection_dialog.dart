@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/avatar.dart';
 import 'package:frontend/core/models/user_app.dart';
@@ -6,7 +5,6 @@ import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/services/firestore_service.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class AvatarSelectionDialog extends StatefulWidget {

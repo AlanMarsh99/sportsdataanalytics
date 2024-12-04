@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/theme.dart';
 
 class DriverSeasonsTable extends StatelessWidget {
   const DriverSeasonsTable({Key? key, required this.data}) : super(key: key);

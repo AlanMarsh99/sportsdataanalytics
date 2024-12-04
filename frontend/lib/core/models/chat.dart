@@ -1,5 +1,3 @@
-import 'package:frontend/core/models/message.dart';
-
 class Chat {
   String? leagueId;
   List<String>? participantsIds;

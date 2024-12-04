@@ -213,38 +213,109 @@ exports.processRaceResults = functions
             // Wait for all async operations to finish
             await Promise.all(updatePromises);
 
-
-            // Step 5: Call the API to get upcoming race details
-            /*const apiResponse2 = await axios.get(`https://sportsdataanalytics.onrender.com/home/upcoming_race/`).catch(error => {
-                console.error("Error fetching upcoming race details:", error.message);
-                return null;
-            });
-
-            if (!apiResponse2 || !apiResponse2.data) {
-                console.log(`No upcoming race found`);
-                return null;
-            }
-
-            const upcomingRace = apiResponse2.data;
-
-            // Extract year and round from the API response and convert them to integers
-            const nextRaceYear = parseInt(upcomingRace.year, 10); // Convert year to integer
-            if (isNaN(nextRaceYear)) {
-                console.error("Invalid next race year:", upcomingRace.year);
-                return null;
-            }
-
-            const nextRaceRound = parseInt(upcomingRace.race_id, 10); // Convert race_id to integer
-            if (isNaN(nextRaceRound)) {
-                console.error("Invalid next race round:", upcomingRace.race_id);
-                return null;
-            }*/
-
             // Step 5: Mark the race as processed
             batch.update(db.collection("config").doc("lastProcessedRace"), {
                 year: raceYear,
                 round: raceRound,
             });
+
+            // Step 6: Check if it's the last race of the season
+            if (raceResults.is_last_race_of_season === true) {
+                console.log(`Last race of the season!`);
+
+                // Step 7: Find the user with the most points this season
+                const usersQuerySnapshot = await db
+                    .collection('users')
+                    .orderBy('seasonPoints', 'desc')
+                    .limit(1)
+                    .get();
+
+                if (usersQuerySnapshot.empty) {
+                    throw new Error('No users found to calculate global leaderboard.');
+                } else {
+                    const topUser = usersQuerySnapshot.docs[0];
+                    const topUserId = topUser.id;
+                    const topUserData = topUser.data();
+
+                    // Step 8: Update the globalLeaderboardWins field for the top user
+                    const globalLeaderboardWins = (topUserData.globalLeaderboardWins || 0) + 1;
+
+                    await db.collection('users').doc(topUserId).update({
+                        globalLeaderboardWins,
+                    });
+
+                    console.log(`Updated global leaderboard wins for user: ${topUserId}`);
+
+                    // Step 9: Process each league to find the user with the most seasonPoints
+                    const leaguesQuerySnapshot = await db.collection('leagues').get();
+
+                    for (const leagueDoc of leaguesQuerySnapshot.docs) {
+                        const leagueData = leagueDoc.data();
+                        const { userIds, id: leagueId } = leagueData;
+
+                        if (!userIds || userIds.length === 0) {
+                            console.log(`League ${leagueId} has no users.`);
+                            continue;
+                        }
+
+                        // Helper function to split userIds into chunks of 10
+                        function chunkArray(array, size) {
+                            const result = [];
+                            for (let i = 0; i < array.length; i += size) {
+                                result.push(array.slice(i, i + size));
+                            }
+                            return result;
+                        }
+
+                        // Fetch users in chunks to handle Firestore limitations
+                        const userChunks = chunkArray(userIds, 10);
+                        let allLeagueUsers = [];
+
+                        for (const chunk of userChunks) {
+                            const snapshot = await db
+                                .collection('users')
+                                .where(admin.firestore.FieldPath.documentId(), 'in', chunk)
+                                .orderBy('seasonPoints', 'desc')
+                                .get();
+
+                            if (!snapshot.empty) {
+                                allLeagueUsers = allLeagueUsers.concat(
+                                    snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                                );
+                            }
+                        }
+
+                        if (allLeagueUsers.length === 0) {
+                            console.log(`No users found in league ${leagueId}.`);
+                            continue;
+                        }
+
+                        // Sort users locally after fetching all chunks
+                        allLeagueUsers.sort((a, b) => b.seasonPoints - a.seasonPoints);
+
+                        const leagueWinner = allLeagueUsers[0];
+                        const leagueWinnerId = leagueWinner.id;
+
+                        // Step 10: Update the leaguesWon field for the league winner
+                        const leagueWinnerRef = db.collection('users').doc(leagueWinnerId);
+                        const leaguesWon = (leagueWinner.leaguesWon || 0) + 1;
+                        batch.update(leagueWinnerRef, { leaguesWon });
+
+                        // Step 10 (cont.): Update leaguesFinished field for all users in the league
+                        allLeagueUsers.forEach(user => {
+                            const leaguesFinished = (user.leaguesFinished || 0) + 1;
+                            batch.update(db.collection('users').doc(user.id), { leaguesFinished });
+                        });
+
+                        console.log(
+                            `Updated leaguesWon for user ${leagueWinnerId} and leaguesFinished for league ${leagueId}.`
+                        );
+                    }
+                }
+            } else {
+                console.log('Race is not the last of the season. Season-long challenge continues.');
+            }
+
 
             // Commit the batch
             await batch.commit();

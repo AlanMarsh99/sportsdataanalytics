@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:frontend/core/models/league.dart';
 import 'package:frontend/core/models/user_app.dart';
 import 'package:frontend/ui/theme.dart';

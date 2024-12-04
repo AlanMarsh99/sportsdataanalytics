@@ -20,7 +20,7 @@ class ViewPredictionsDialog extends StatelessWidget {
           Flexible(
             child: Text(
               "Your predictions for ${raceName}",
-              style: TextStyle(color: primary, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: primary, fontWeight: FontWeight.bold),
             ),
           ),
           Align(
@@ -54,9 +54,9 @@ class ViewPredictionsDialog extends StatelessWidget {
           const Divider(color: primary),
           Text(
             prediction.winnerName!,
-            style: TextStyle(fontSize: 14, color: Colors.black),
+            style: const TextStyle(fontSize: 14, color: Colors.black),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           const Align(
@@ -70,9 +70,9 @@ class ViewPredictionsDialog extends StatelessWidget {
           const Divider(color: primary),
           Text(
             prediction.podiumNames!.join(", "),
-            style: TextStyle(fontSize: 14, color: Colors.black),
+            style: const TextStyle(fontSize: 14, color: Colors.black),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           const Align(
@@ -86,7 +86,7 @@ class ViewPredictionsDialog extends StatelessWidget {
           const Divider(color: primary),
           Text(
             prediction.fastestLapName!,
-            style: TextStyle(fontSize: 14, color: Colors.black),
+            style: const TextStyle(fontSize: 14, color: Colors.black),
           ),
         ],
       ),

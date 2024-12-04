@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/race.dart';
-import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
-import 'package:frontend/ui/widgets/app_bar.dart';
-import 'package:frontend/ui/widgets/drawer.dart';
 import 'package:frontend/ui/widgets/tables/race_results_table.dart';
 import 'package:fl_chart/fl_chart.dart'; // Added for charting
-import 'package:provider/provider.dart';
-import '../../widgets/end_drawer.dart'; // Added for race positions
 import 'package:frontend/core/models/race_positions.dart'; // Added for race positions
 import 'package:frontend/core/models/pit_stops.dart';
 import 'package:frontend/ui/widgets/tables/pit_stop_table.dart';

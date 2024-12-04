@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/models/driver.dart';
 import 'package:frontend/core/models/lap_data.dart';
 import 'package:frontend/core/models/prediction.dart';
 import 'package:frontend/core/models/user_app.dart';
