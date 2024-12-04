@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:frontend/core/models/driver.dart';
 import 'package:frontend/core/models/lap_data.dart';
 import 'package:frontend/core/models/prediction.dart';
+import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/carousel_game_options.dart';
+import 'package:provider/provider.dart';
 
 class PredictFastestLapScreen extends StatefulWidget {
   const PredictFastestLapScreen({
@@ -179,6 +182,16 @@ class _PredictFastestLapScreenState extends State<PredictFastestLapScreen> {
                         .collection('predictions')
                         .doc(newPrediction.id)
                         .set(predictionData);
+
+                    UserApp user =
+                        Provider.of<AuthService>(context, listen: false)
+                            .userApp!;
+                    user.numPredictions += 1;
+
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.id)
+                        .set(user.toMap());
 
                     Navigator.pushReplacement(
                       context,

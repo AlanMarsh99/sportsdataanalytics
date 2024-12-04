@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/game_first_screen.dart';
+import 'package:frontend/ui/screens/game/tutorial_screen.dart';
 import 'package:frontend/ui/screens/home_screen.dart';
 import 'package:frontend/ui/screens/download_screen.dart';
 import 'package:frontend/ui/screens/races/races_screen.dart';
 import 'package:frontend/ui/screens/teams/teams_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/carousel_game_options.dart';
+import 'package:provider/provider.dart';
 
 class NavigationProvider extends ChangeNotifier {
   NavigationProvider() {}
   int _selectedIndex = 0;
   bool _extended = false;
   String _screenTitle = "DRIVERS";
-  bool _userAuthenticated = false;
+  String _currentRoute = 'home';
+  Widget _selectedScreen = const HomeScreen();
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -48,32 +53,50 @@ class NavigationProvider extends ChangeNotifier {
       icon: Icon(Icons.download),
       label: Text('DOWNLOADS'),
     ),
-    /*NavigationRailDestination(
-      icon: Icon(Icons.insert_drive_file_outlined),
-      selectedIcon: Icon(Icons.insert_drive_file),
-      label: Text('HEX Files'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.qr_code_scanner_outlined),
-      selectedIcon: Icon(Icons.qr_code_scanner),
-      label: Text('QR Reader'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.group_outlined),
-      selectedIcon: Icon(Icons.group),
-      label: Text('Users'),
-    ),*/
   ];
 
-  bool get userAuthenticated => _userAuthenticated;
-  void authenticateUser() {
-    _userAuthenticated = true;
-    notifyListeners();
-  }
-
   int get selectedIndex => _selectedIndex;
-  void updateIndex(int value) {
-    _selectedIndex = value;
+  String get currentRoute => _currentRoute;
+
+  void updateIndex(int index) {
+    _selectedIndex = index;
+    switch (index) {
+      case 0:
+        _selectedScreen = HomeScreen();
+        _currentRoute = 'home';
+        break;
+      case 1:
+        _selectedScreen = RacesScreen();
+        _currentRoute = 'races';
+        break;
+      case 2:
+        _selectedScreen = DriversScreen();
+        _currentRoute = 'drivers';
+        break;
+      case 3:
+        _selectedScreen = TeamsScreen();
+        _currentRoute = 'teams';
+        break;
+      case 4:
+        _selectedScreen =
+            Consumer<AuthService>(builder: (context, auth, child) {
+          if (auth.status == Status.Authenticated && auth.userApp != null) {
+            if (auth.userApp!.firstTimeTutorial) {
+              return TutorialScreen();
+            } else {
+              return F1Carousel();
+            }
+          } else {
+            return TutorialScreen();
+          }
+        });
+        _currentRoute = 'game';
+        break;
+      case 5:
+        _selectedScreen = DownloadScreen();
+        _currentRoute = 'download';
+        break;
+    }
     notifyListeners();
   }
 

@@ -415,7 +415,13 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 15),
+          Text('+${selectedPrediction.points} points',
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold)),  
+                   const SizedBox(height: 30),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -553,7 +559,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                   '+$points',
                   style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 12,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold),
                 ),
               ],

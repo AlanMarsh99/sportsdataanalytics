@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/responsive.dart';
+import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/ui/screens/game/tutorial_screen.dart';
-import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/carousel_game_options.dart';
+import 'package:provider/provider.dart';
 
-class GameFirstScreen extends StatefulWidget {
+class GameFirstScreen extends StatelessWidget {
   const GameFirstScreen({
     Key? key,
   }) : super(key: key);
 
-  _GameFirstScreenState createState() => _GameFirstScreenState();
-}
-
-class _GameFirstScreenState extends State<GameFirstScreen> {
   @override
   Widget build(BuildContext context) {
-    bool isMobile = Responsive.isMobile(context);
-    return Container(
+    return Consumer<AuthService>(builder: (context, auth, child) {
+      if (auth.status == Status.Authenticated && auth.userApp != null) {
+        if (auth.userApp!.firstTimeTutorial) {
+          return TutorialScreen();
+        } else {
+          return F1Carousel();
+        }
+      } else {
+        return TutorialScreen();
+      }
+    });
+  }
+
+  /*return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -83,10 +91,10 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
           ),
         ),
       ),
-    );
-  }
+    );*/
+}
 
-  Widget _buildTutorialButton() {
+  /*Widget _buildTutorialButton() {
     return Container(
       padding: const EdgeInsets.only(top: 25.0),
       width: 200,
@@ -142,4 +150,4 @@ class _GameFirstScreenState extends State<GameFirstScreen> {
       ),
     );
   }
-}
+}*/

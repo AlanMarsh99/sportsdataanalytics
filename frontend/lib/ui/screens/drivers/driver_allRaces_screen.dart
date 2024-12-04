@@ -27,8 +27,7 @@ class DriverAllRacesScreen extends StatefulWidget {
   _DriverAllRacesScreenState createState() => _DriverAllRacesScreenState();
 }
 
-class _DriverAllRacesScreenState extends State<DriverAllRacesScreen>
-    with TickerProviderStateMixin {
+class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
   List<String> seasons = [];
   String selectedSeason = '2024';
   String selectedDriver = '';
@@ -36,10 +35,6 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen>
   late Future<Map<String, dynamic>> _driversStatsFuture;
   bool driverChanged = false;
   bool seasonChanged = false;
-  late AnimationController _controller;
-  late Animation<double> _myAnimation;
-  bool _flag = true;
-  late List<NavigationRailDestination> _destinations;
 
   @override
   void initState() {
@@ -49,12 +44,6 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen>
         widget.driversMap[widget.selectedDriver], currentYear);
     selectedDriver = widget.selectedDriver;
     selectedSeason = currentYear.toString();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 200),
-    );
-
-    _myAnimation = CurvedAnimation(curve: Curves.linear, parent: _controller);
   }
 
   /// Helper function to extract last name and retrieve image path
@@ -71,8 +60,6 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final nav = Provider.of<NavigationProvider>(context);
-    _destinations = nav.destinations;
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -81,18 +68,137 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen>
           colors: [darkGradient, lightGradient],
         ),
       ),
-      child: Scaffold(
-        appBar: MyAppBar(
-          nav: nav,
-          isMobile: Responsive.isMobile(context),
-        ),
-        drawer: MyDrawer(
-          nav: nav,
-          isMobile: Responsive.isMobile(context),
-        ),
-        endDrawer: const EndDrawer(),
-        body: Responsive.isMobile(context)
-            ? Padding(
+      child: Responsive.isMobile(context)
+          ? Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 24.0,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'DRIVERS',
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          )
+                        ],
+                      ),
+                    ),
+                    _buildDriverDropdown(true),
+                    const SizedBox(height: 40),
+                    driverChanged || seasonChanged
+                        ? FutureBuilder<Map<String, dynamic>>(
+                            future: _driversStatsFuture,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                /*return const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ); // Show loading while fetching*/
+                                return Container();
+                              } else if (snapshot.hasError) {
+                                return const Text(
+                                  'Error: Failed to load driver race stats',
+                                  style: TextStyle(color: Colors.white),
+                                ); // Error handling
+                              } else if (snapshot.hasData) {
+                                Map<String, dynamic> data = snapshot.data!;
+
+                                return Column(children: [
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'RACES OVERVIEW',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                      const SizedBox(width: 29),
+                                      _buildYearDropdown(data),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  _buildRacesOverviewContainers(data),
+                                ]);
+                              }
+                              return Container();
+                            },
+                          )
+                        : Column(
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    'RACES OVERVIEW',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                  const SizedBox(width: 29),
+                                  _buildYearDropdown(widget.driversStats),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              _buildRacesOverviewContainers(
+                                  widget.driversStats),
+                            ],
+                          ),
+                    const SizedBox(height: 30),
+                    FutureBuilder<List<dynamic>>(
+                      future: _driverRaceStats,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ); // Show loading while fetching*/
+                        } else if (snapshot.hasError) {
+                          return const Text(
+                            'Error: Failed to load driver race stats',
+                            style: TextStyle(color: Colors.white),
+                          ); // Error handling
+                        } else if (snapshot.hasData) {
+                          List<dynamic> data = snapshot.data!;
+
+                          return Container(
+                            height: 500,
+                            child: Center(
+                              child: DriverAllRacesTableScreen(data: data),
+                            ),
+                          );
+                        }
+                        return Container();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : Expanded(
+              child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
                   child: Column(
@@ -124,308 +230,134 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen>
                           ],
                         ),
                       ),
-                      _buildDriverDropdown(true),
+                      _buildDriverDropdown(false),
                       const SizedBox(height: 40),
-                      driverChanged || seasonChanged
-                          ? FutureBuilder<Map<String, dynamic>>(
-                              future: _driversStatsFuture,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  /*return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ); // Show loading while fetching*/
-                                  return Container();
-                                } else if (snapshot.hasError) {
-                                  return const Text(
-                                    'Error: Failed to load driver race stats',
-                                    style: TextStyle(color: Colors.white),
-                                  ); // Error handling
-                                } else if (snapshot.hasData) {
-                                  Map<String, dynamic> data = snapshot.data!;
-
-                                  return Column(children: [
-                                    Row(
-                                      children: [
-                                        const Text(
-                                          'RACES OVERVIEW',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white),
-                                        ),
-                                        const SizedBox(width: 29),
-                                        _buildYearDropdown(data),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 20),
-                                    _buildRacesOverviewContainers(data),
-                                  ]);
-                                }
-                                return Container();
-                              },
-                            )
-                          : Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    const Text(
-                                      'RACES OVERVIEW',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                    const SizedBox(width: 29),
-                                    _buildYearDropdown(widget.driversStats),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                _buildRacesOverviewContainers(
-                                    widget.driversStats),
-                              ],
-                            ),
-                      const SizedBox(height: 30),
-                      FutureBuilder<List<dynamic>>(
-                        future: _driverRaceStats,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ); // Show loading while fetching*/
-                          } else if (snapshot.hasError) {
-                            return const Text(
-                              'Error: Failed to load driver race stats',
-                              style: TextStyle(color: Colors.white),
-                            ); // Error handling
-                          } else if (snapshot.hasData) {
-                            List<dynamic> data = snapshot.data!;
-
-                            return Container(
-                              height: 500,
-                              child: Center(
-                                child: DriverAllRacesTableScreen(data: data),
-                              ),
-                            );
-                          }
-                          return Container();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            : Row(
-                children: [
-                  NavigationRail(
-                    selectedIconTheme: IconThemeData(color: secondary),
-                    unselectedIconTheme:
-                        IconThemeData(color: Colors.white, opacity: 1),
-                    extended: nav.extended,
-                    selectedIndex: nav.selectedIndex,
-                    destinations: _destinations,
-                    onDestinationSelected: (value) {
-                      nav.updateIndex(value);
-                      Navigator.pop(context);
-                    },
-                    leading: IconButton(
-                      icon: AnimatedIcon(
-                        icon: AnimatedIcons.menu_close,
-                        color: Colors.white,
-                        progress: _myAnimation,
-                      ),
-                      onPressed: () {
-                        if (_flag) {
-                          _controller.forward();
-                        } else {
-                          _controller.reverse();
-                        }
-
-                        _flag = !_flag;
-                        if (nav.extended) {
-                          nav.setExtended(false);
-                        } else {
-                          nav.setExtended(true);
-                        }
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: 10),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.arrow_back,
-                                      color: Colors.white,
-                                      size: 24.0,
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                  const SizedBox(width: 10),
-                                  const Text(
-                                    'DRIVERS',
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                  )
-                                ],
-                              ),
-                            ),
-                            _buildDriverDropdown(false),
-                            const SizedBox(height: 40),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Flexible(
-                                  flex: 1,
-                                  child: driverChanged || seasonChanged
-                                      ? FutureBuilder<Map<String, dynamic>>(
-                                          future: _driversStatsFuture,
-                                          builder: (context, snapshot) {
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.waiting) {
-                                              /*return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ); // Show loading while fetching*/
-                                              return Container();
-                                            } else if (snapshot.hasError) {
-                                              return const Text(
-                                                'Error: Failed to load driver race stats',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ); // Error handling
-                                            } else if (snapshot.hasData) {
-                                              Map<String, dynamic> data =
-                                                  snapshot.data!;
-
-                                              return Column(children: [
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      'RACES OVERVIEW',
-                                                      style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.white),
-                                                    ),
-                                                    const SizedBox(width: 29),
-                                                    _buildYearDropdown(data),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 20),
-                                                _buildRacesOverviewContainers(
-                                                    data),
-                                                const SizedBox(height: 40),
-                                                Center(
-                                                  child: CircleAvatar(
-                                                    radius: 120,
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    backgroundImage: AssetImage(
-                                                      getDriverImagePath(
-                                                          selectedDriver!),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ]);
-                                            }
-                                            return Container();
-                                          },
-                                        )
-                                      : Column(
-                                          children: [
-                                            Row(
-                                              children: [
-                                                const Text(
-                                                  'RACES OVERVIEW',
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.white),
-                                                ),
-                                                const SizedBox(width: 29),
-                                                _buildYearDropdown(
-                                                    widget.driversStats),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 20),
-                                            _buildRacesOverviewContainers(
-                                                widget.driversStats),
-                                            const SizedBox(height: 40),
-                                            Center(
-                                              child: CircleAvatar(
-                                                radius: 120,
-                                                backgroundColor: Colors.white,
-                                                backgroundImage: AssetImage(
-                                                  getDriverImagePath(
-                                                      selectedDriver!),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                ),
-                                const SizedBox(width: 30),
-                                Expanded(
-                                  child: FutureBuilder<List<dynamic>>(
-                                    future: _driverRaceStats,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            flex: 1,
+                            child: driverChanged || seasonChanged
+                                ? FutureBuilder<Map<String, dynamic>>(
+                                    future: _driversStatsFuture,
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
-                                        ); // Show loading while fetching*/
+                                        /*return const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ); // Show loading while fetching*/
+                                        return Container();
                                       } else if (snapshot.hasError) {
                                         return const Text(
                                           'Error: Failed to load driver race stats',
                                           style: TextStyle(color: Colors.white),
                                         ); // Error handling
                                       } else if (snapshot.hasData) {
-                                        List<dynamic> data = snapshot.data!;
+                                        Map<String, dynamic> data =
+                                            snapshot.data!;
 
-                                        return Center(
-                                          child: DriverAllRacesTableScreen(
-                                              data: data),
-                                        );
+                                        return Column(children: [
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'RACES OVERVIEW',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white),
+                                              ),
+                                              const SizedBox(width: 29),
+                                              _buildYearDropdown(data),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 20),
+                                          _buildRacesOverviewContainers(data),
+                                          const SizedBox(height: 40),
+                                          Center(
+                                            child: CircleAvatar(
+                                              radius: 120,
+                                              backgroundColor: Colors.white,
+                                              backgroundImage: AssetImage(
+                                                getDriverImagePath(
+                                                    selectedDriver!),
+                                              ),
+                                            ),
+                                          ),
+                                        ]);
                                       }
                                       return Container();
                                     },
+                                  )
+                                : Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            'RACES OVERVIEW',
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white),
+                                          ),
+                                          const SizedBox(width: 29),
+                                          _buildYearDropdown(
+                                              widget.driversStats),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 20),
+                                      _buildRacesOverviewContainers(
+                                          widget.driversStats),
+                                      const SizedBox(height: 40),
+                                      Center(
+                                        child: CircleAvatar(
+                                          radius: 120,
+                                          backgroundColor: Colors.white,
+                                          backgroundImage: AssetImage(
+                                            getDriverImagePath(selectedDriver!),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                )
-                              ],
+                          ),
+                          const SizedBox(width: 30),
+                          Expanded(
+                            child: FutureBuilder<List<dynamic>>(
+                              future: _driverRaceStats,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  ); // Show loading while fetching*/
+                                } else if (snapshot.hasError) {
+                                  return const Text(
+                                    'Error: Failed to load driver race stats',
+                                    style: TextStyle(color: Colors.white),
+                                  ); // Error handling
+                                } else if (snapshot.hasData) {
+                                  List<dynamic> data = snapshot.data!;
+
+                                  return Center(
+                                    child:
+                                        DriverAllRacesTableScreen(data: data),
+                                  );
+                                }
+                                return Container();
+                              },
                             ),
-                          ],
-                        ),
+                          )
+                        ],
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-      ),
+            ),
     );
   }
 
