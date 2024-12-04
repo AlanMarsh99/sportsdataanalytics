@@ -84,7 +84,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
 
     // Convert date and time strings to DateTime object
     raceDate = DateTime.parse("$date $hour:00");
-    DateTime deadline = raceDate!.subtract(const Duration(days: 3));
+    DateTime deadline = raceDate!.subtract(const Duration(days: 1));
 
     remainingTime = deadline!.difference(DateTime.now());
 
@@ -319,7 +319,30 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                           isMobile),
                     ],
                   ),
-                  SizedBox(height: isMobile ? 25 : 35),
+                  SizedBox(height: isMobile ? 15 : 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.info,
+                        color: Colors.white,
+                        size: isMobile ? 18 : 22,
+                      ),
+                      SizedBox(width: 10),
+                      Flexible(
+                        child: Text(
+                          'Predictions close 1 day before the race (before qualifying)',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: isMobile ? 14 : 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: isMobile ? 15 : 35),
                   FutureBuilder<Prediction?>(
                     future: userPredictionFuture,
                     builder: (context, snapshot) {

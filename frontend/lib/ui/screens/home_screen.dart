@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Convert date and time strings to DateTime object
     DateTime raceDate = DateTime.parse("$date $hour:00");
 
-    DateTime deadline = raceDate!.subtract(const Duration(days: 3));
+    DateTime deadline = raceDate!.subtract(const Duration(days: 1));
     remainingTime = deadline!.difference(DateTime.now());
 
     if (remainingTime.isNegative) {
@@ -547,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String formattedDate = DateFormat('EEEE MMMM d').format(raceDate);
     return Container(
       width: double.infinity,
-      height: isMobile ? 350 : 487,
+      height: isMobile ? 370 : 487,
       decoration: BoxDecoration(
         color: primary,
         borderRadius: BorderRadius.circular(20),
@@ -661,7 +661,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         isMobile),
                   ],
                 ),
-                SizedBox(height: isMobile ? 25 : 35),
+                SizedBox(height: isMobile ? 15 : 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.info,
+                      color: Colors.white,
+                      size: isMobile ? 18 : 22,
+                    ),
+                    SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        'Predictions close 1 day before the race (before qualifying)',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: isMobile ? 12 : 14,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: isMobile ? 15 : 35),
                 FutureBuilder<Prediction?>(
                   future: userPredictionFuture,
                   builder: (context, snapshot) {
@@ -782,7 +805,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     } else {
                       return Container(
                         width: isMobile ? 270 : 350,
-                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        padding:  EdgeInsets.symmetric(vertical: isMobile ? 15 : 20),
                         //width: isMobile ? 270 : 350,
                         child: ElevatedButton(
                           style: ButtonStyle(
