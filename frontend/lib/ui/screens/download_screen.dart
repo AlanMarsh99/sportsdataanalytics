@@ -25,6 +25,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   String _selectedFormatConstructorsStandings = 'JSON';
   String _selectedFormatDriversStandings = 'JSON';
   String _selectedFormatAllRaces = 'JSON';
+  String _selectedFormatRaceResults = 'JSON';
 
   // Controllers for Year and Round input fields
   final TextEditingController _yearController = TextEditingController();
@@ -32,6 +33,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
   final TextEditingController _constructorsYearController = TextEditingController();
   final TextEditingController _driversYearController = TextEditingController();
   final TextEditingController _allRacesYearController = TextEditingController();
+  final TextEditingController _raceResultsYearController = TextEditingController();
+  final TextEditingController _raceResultsRoundController = TextEditingController();
 
   // State variables for loading indicators
   bool _isLoadingUpcomingRace = false;
@@ -40,6 +43,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   bool _isLoadingConstructorsStandings = false;
   bool _isLoadingDriversStandings = false;
   bool _isLoadingAllRaces = false;
+  bool _isLoadingRaceResults = false;
 
   @override
   void dispose() {
@@ -48,6 +52,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
     _constructorsYearController.dispose();
     _driversYearController.dispose(); 
     _allRacesYearController.dispose();
+     _raceResultsYearController.dispose();
+    _raceResultsRoundController.dispose();
     super.dispose();
   }
 
@@ -65,7 +71,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
       await _handleDownloadDriversStandings(format);
     } else if (dataType == 'all_races') {
       await _handleDownloadAllRaces(format);
-    }
+    } else if (dataType == 'race_results') {
+      await _handleDownloadRaceResults(format);
+  }
   }
 
   // Handle download for Upcoming Race
@@ -296,6 +304,54 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
+  // Handle download for detailed race results
+  Future<void> _handleDownloadRaceResults(String format) async {
+    setState(() {
+      _isLoadingRaceResults = true;
+    });
+    try {
+      if (_raceResultsYearController.text.isEmpty || _raceResultsRoundController.text.isEmpty) {
+        throw Exception('Year and Round cannot be empty');
+      }
+      int year;
+      int round;
+      try {
+        year = int.parse(_raceResultsYearController.text);
+        round = int.parse(_raceResultsRoundController.text);
+      } catch (e) {
+        throw Exception('Year and Round must be valid numbers');
+      }
+
+      List<dynamic> raceResults = await apiService.getRaceResults(year, round);
+
+      if (raceResults.isEmpty) {
+        throw Exception('No results found for the race in year $year, round $round');
+      }
+
+      Map<String, dynamic> data = {'results': raceResults};
+
+      switch (format) {
+        case 'JSON':
+          await _downloadJson('race_results_${year}_$round', data);
+          break;
+        case 'CSV':
+          await _downloadRaceResultsCsv(data, year, round);
+          break;
+        case 'PDF':
+          await _downloadPdf('race_results_${year}_$round', data);
+          break;
+        default:
+          throw Exception('Unsupported format: $format');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error downloading Race Results: $e');
+    } finally {
+      setState(() {
+        _isLoadingRaceResults = false;
+      });
+    }
+  }
+
   // Function to download JSON
   Future<void> _downloadJson(String filename, Map<String, dynamic> data) async {
     try {
@@ -519,6 +575,35 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
+  Future<void> _downloadRaceResultsCsv(Map<String, dynamic> data, int year, int round) async {
+    try {
+      List<List<dynamic>> rows = [
+        ['Position', 'Driver', 'Driver ID', 'Team', 'Team ID', 'Time', 'Grid', 'Laps', 'Points'],
+      ];
+      List<dynamic> resultsList = data['results'];
+      for (var result in resultsList) {
+        rows.add([
+          result['position'],
+          result['driver'],
+          result['driver_id'],
+          result['team'],
+          result['team_id'],
+          result['time'],
+          result['grid'],
+          result['laps'],
+          result['points'],
+        ]);
+      }
+      String csvData = const ListToCsvConverter().convert(rows);
+      Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
+      await downloadFile('race_results_${year}_$round.csv', bytes, 'text/csv');
+      _showSuccessSnackBar('Successfully downloaded race_results_${year}_$round.csv');
+    } catch (e) {
+      throw Exception('Failed to download CSV: $e');
+    }
+  }
+
+
   // Function to download PDF
   Future<void> _downloadPdf(String filename, Map<String, dynamic> data) async {
     try {
@@ -619,6 +704,23 @@ class _DownloadScreenState extends State<DownloadScreen> {
                     'Fastest Pit Stop Driver ID': race['fastest_pit_stop_driver_id']?.toString() ?? 'N/A',
                     'Fastest Pit Stop Time': race['fastest_pit_stop_time']?.toString() ?? 'N/A',
                   }).toList();
+            } else if (filename.startsWith('race_results_')) {
+              List<String> filenameParts = filename.split('_');
+              String year = filenameParts[2];
+              String round = filenameParts[3];
+              title = 'Race Results for Year $year, Round $round';
+              List<dynamic> resultsList = data['results'];
+              dataList = resultsList.map<Map<String, String>>((result) => {
+                'Position': result['position'].toString(),
+                'Driver': result['driver'],
+                'Driver ID': result['driver_id'],
+                'Team': result['team'],
+                'Team ID': result['team_id'],
+                'Time': result['time'],
+                'Grid': result['grid'].toString(),
+                'Laps': result['laps'].toString(),
+                'Points': result['points'].toString(),
+              }).toList();
             }
 
             // Initialize a list to hold all widgets
@@ -634,7 +736,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
 
             widgets.add(pw.SizedBox(height: 10));
 
-            if (filename.startsWith('all_races_')) {
+            if (filename.startsWith('all_races_') || filename.startsWith('race_results_')) {
               // Add Table for All Races
               widgets.add(
                 pw.Table.fromTextArray(
@@ -1611,6 +1713,168 @@ class _DownloadScreenState extends State<DownloadScreen> {
                               ? null
                               : () {
                                   _downloadFile('all_races', _selectedFormatAllRaces);
+                                },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Download Detailed Race Results
+              Card(
+                color: primary,
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Section Title
+                      const Text(
+                        'Detailed Race Results',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Input fields for Year and Round
+                      TextField(
+                        controller: _raceResultsYearController,
+                        keyboardType: TextInputType.number,
+                        cursorColor: secondary,
+                        decoration: const InputDecoration(
+                          labelText: 'Year',
+                          labelStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.white24,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _raceResultsRoundController,
+                        keyboardType: TextInputType.number,
+                        cursorColor: secondary,
+                        decoration: const InputDecoration(
+                          labelText: 'Round',
+                          labelStyle: TextStyle(color: Colors.white),
+                          filled: true,
+                          fillColor: Colors.white24,
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      // "Select Format" Label Container
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: const Text(
+                          'Select Format',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Dropdown for Format Selection
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          isDense: false, // Ensures adequate vertical space
+                          value: _selectedFormatRaceResults,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                          ),
+                          dropdownColor: Colors.white,
+                          isExpanded: true,
+                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                            IconData icon;
+                            switch (value) {
+                              case 'CSV':
+                                icon = Icons.table_chart;
+                                break;
+                              case 'JSON':
+                                icon = Icons.code;
+                                break;
+                              case 'PDF':
+                                icon = Icons.picture_as_pdf;
+                                break;
+                              default:
+                                icon = Icons.download;
+                            }
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Row(
+                                children: [
+                                  Icon(icon, size: 20, color: Colors.black54),
+                                  const SizedBox(width: 10),
+                                  Text(value, style: const TextStyle(color: Colors.black87)),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                _selectedFormatRaceResults = newValue;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Download Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            foregroundColor: Colors.white, // Button color
+                            backgroundColor: secondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          icon: _isLoadingRaceResults
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.download, size: 20),
+                          label: const Text(
+                            'DOWNLOAD',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          onPressed: _isLoadingRaceResults
+                              ? null
+                              : () {
+                                  _downloadFile('race_results', _selectedFormatRaceResults);
                                 },
                         ),
                       ),
