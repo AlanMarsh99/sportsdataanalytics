@@ -80,6 +80,7 @@ When you run the Flask development server using the command `python run.py`, you
 
   ```json
   {
+    "is_last_race_of_season": false,
     "race_id": "13",
     "first_position": {
       "driver_name": "Max Verstappen",
