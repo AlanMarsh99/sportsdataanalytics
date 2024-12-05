@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/lap_data.dart';
 import 'package:frontend/core/models/prediction.dart';
@@ -12,6 +13,7 @@ import 'package:frontend/ui/screens/game/predict_podium_screen.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/screens/teams/teams_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/widgets/dialogs/congratulations_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/log_in_dialog.dart';
 import 'package:frontend/ui/widgets/dialogs/view_predictions_dialog.dart';
 import 'package:intl/intl.dart';
@@ -39,6 +41,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   final ScrollController _scrollControllerDrivers = ScrollController();
   final ScrollController _scrollControllerConstructors = ScrollController();
+  bool firstTimeLeaderboard = true;
+  bool firstTimeLeague = true;
+  final _confettiController =
+      ConfettiController(duration: const Duration(seconds: 5));
 
   @override
   void initState() {
@@ -54,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController.dispose();
     _scrollControllerDrivers.dispose();
     _scrollControllerConstructors.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -144,6 +151,41 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // Access the provider
     final dataProvider = Provider.of<DataProvider>(context);
+    final authProvider = Provider.of<AuthService>(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (authProvider.status == Status.Authenticated &&
+          authProvider.userApp != null) {
+        if (authProvider.userApp!.notifyLeaderboardWin! &&
+            firstTimeLeaderboard) {
+          _confettiController.play();
+          showDialog(
+            context: context,
+            builder: (context) {
+              return CongratulationsDialog(
+                  message: "You've done it! You've claimed the top spot on the Global Leaderboard of RaceVision this season!");
+            },
+          );
+          firstTimeLeaderboard = false;
+        }
+        /*if (authProvider.userApp!.notifyLeagueWin!) {
+          if (authProvider.userApp!.leagueNameWin!.isNotEmpty &&
+              firstTimeLeague) {
+            for (var league in authProvider.userApp!.leagueNameWin!) {
+              _confettiController.play();
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return CongratulationsDialog(
+                      message:
+                          "You've done it! You've won the league ${league} for this season!"");
+                },
+              );
+            }
+            firstTimeLeague = false;
+          }
+        }*/
+      }
+    });
 
     // Extract data from provider
     final upcomingRaceInfo = dataProvider.upcomingRaceInfo;
@@ -161,140 +203,151 @@ class _HomeScreenState extends State<HomeScreen> {
     driversStandings = dataProvider.driversStandings;
     constructorsStandings = dataProvider.constructorsStandings;
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [darkGradient, lightGradient],
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor:
-            Colors.transparent, // Make scaffold background transparent
-        body: Scrollbar(
-          trackVisibility: true,
-          controller: _scrollController,
-          thumbVisibility: true,
-          child: SingleChildScrollView(
-            controller: _scrollController,
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-              child: Responsive.isMobile(context)
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'HOME',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [darkGradient, lightGradient],
+            ),
+          ),
+          child: Scaffold(
+            backgroundColor:
+                Colors.transparent, // Make scaffold background transparent
+            body: Scrollbar(
+              trackVisibility: true,
+              controller: _scrollController,
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                  child: Responsive.isMobile(context)
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Flexible(
-                              child: Text(
-                                'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white),
-                              ),
+                            const Text(
+                              'HOME',
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
                             ),
-                            const SizedBox(width: 8),
-                            Image.asset('assets/logo/formula-1-logo.png',
-                                width: 50, fit: BoxFit.cover),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Column(
-                          children: [
-                            upcomingRaceInfo != null
-                                ? upcomingRaceInfo.isNotEmpty
-                                    ? _countdownContainer(
-                                        upcomingRaceInfo, true)
-                                    : const SizedBox()
-                                : const SizedBox(),
                             const SizedBox(height: 16),
-                            lastRaceResults != null
-                                ? _lastRaceResultsContainer(
-                                    lastRaceResults, true)
-                                : const SizedBox(),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        _driversStandingsContainer(true),
-                        const SizedBox(height: 16),
-                        _constructorsStandingsContainer(true),
-                        const SizedBox(height: 16),
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'HOME',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Flexible(
-                              child: Text(
-                                'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                              ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Flexible(
+                                  child: Text(
+                                    'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Image.asset('assets/logo/formula-1-logo.png',
+                                    width: 50, fit: BoxFit.cover),
+                              ],
                             ),
-                            const SizedBox(width: 20),
-                            Image.asset('assets/logo/formula-1-logo.png',
-                                width: 50, fit: BoxFit.cover),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            upcomingRaceInfo != null
-                                ? upcomingRaceInfo.isNotEmpty
-                                    ? Flexible(
-                                        child: _countdownContainer(
-                                            upcomingRaceInfo, false),
-                                      )
-                                    : const SizedBox()
-                                : const SizedBox(),
-                            const SizedBox(width: 16),
-                            lastRaceResults != null
-                                ? Flexible(
-                                    child: _lastRaceResultsContainer(
-                                        lastRaceResults, false),
-                                  )
-                                : const SizedBox(),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Flexible(
-                              child: _driversStandingsContainer(false),
+                            const SizedBox(height: 20),
+                            Column(
+                              children: [
+                                upcomingRaceInfo != null
+                                    ? upcomingRaceInfo.isNotEmpty
+                                        ? _countdownContainer(
+                                            upcomingRaceInfo, true)
+                                        : const SizedBox()
+                                    : const SizedBox(),
+                                const SizedBox(height: 16),
+                                lastRaceResults != null
+                                    ? _lastRaceResultsContainer(
+                                        lastRaceResults, true)
+                                    : const SizedBox(),
+                              ],
                             ),
-                            const SizedBox(width: 16),
-                            Flexible(
-                              child: _constructorsStandingsContainer(false),
-                            ),
+                            const SizedBox(height: 16),
+                            _driversStandingsContainer(true),
+                            const SizedBox(height: 16),
+                            _constructorsStandingsContainer(true),
+                            const SizedBox(height: 16),
                           ],
                         )
-                      ],
-                    ),
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'HOME',
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Flexible(
+                                  child: Text(
+                                    'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.white),
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Image.asset('assets/logo/formula-1-logo.png',
+                                    width: 50, fit: BoxFit.cover),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                upcomingRaceInfo != null
+                                    ? upcomingRaceInfo.isNotEmpty
+                                        ? Flexible(
+                                            child: _countdownContainer(
+                                                upcomingRaceInfo, false),
+                                          )
+                                        : const SizedBox()
+                                    : const SizedBox(),
+                                const SizedBox(width: 16),
+                                lastRaceResults != null
+                                    ? Flexible(
+                                        child: _lastRaceResultsContainer(
+                                            lastRaceResults, false),
+                                      )
+                                    : const SizedBox(),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: _driversStandingsContainer(false),
+                                ),
+                                const SizedBox(width: 16),
+                                Flexible(
+                                  child: _constructorsStandingsContainer(false),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                ),
+              ),
             ),
           ),
         ),
-      ),
+        ConfettiWidget(
+          confettiController: _confettiController,
+          blastDirection:  3.1416 / 2,
+          emissionFrequency: 0.1,
+          gravity: 0.1,
+        ),
+      ],
     );
   }
 
