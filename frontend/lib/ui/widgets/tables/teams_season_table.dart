@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart'; // Ensure this is added to your pubspec.yaml
+import 'package:fl_chart/fl_chart.dart';
 import 'package:frontend/core/models/team.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/screens/teams/teams_detail_screen.dart';
@@ -127,7 +127,7 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
 
       return BarChartGroupData(
         x: index,
-        barsSpace: 11, // Adjust spacing between bars
+        barsSpace: 11,
         barRods: [
           BarChartRodData(
             toY: animatedWins,
@@ -139,7 +139,7 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
             ), // Rounded top edges only
             borderSide: const BorderSide(
               color: Colors.black, // Black outline
-              width: 1.0, // Slightly thinner outline
+              width: 1.0,
             ),
           ),
           BarChartRodData(
@@ -152,7 +152,7 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
             ), // Rounded top edges only
             borderSide: const BorderSide(
               color: Colors.black, // Black outline
-              width: 0.7, // Slightly thinner outline
+              width: 0.7,
             ),
           ),
         ],
@@ -312,13 +312,12 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              // Apply the same decoration as the table
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(16.0), // Adjust as needed
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -326,7 +325,7 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
                     const Text(
                       'Season Performance',
                       style: TextStyle(
-                        fontSize: 18, // Adjust font size as needed
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -455,7 +454,7 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
           filteredTeamsList[index].name,
           style: const TextStyle(
             color: Colors.black,
-            fontSize: 12, // Increased font size from 10 to 12
+            fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         ),
