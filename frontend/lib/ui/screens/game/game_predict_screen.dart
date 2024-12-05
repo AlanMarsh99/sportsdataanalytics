@@ -123,9 +123,11 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     final upcomingRaceInfo = dataProvider.upcomingRaceInfo;
 
     if (upcomingRaceInfo != null && firstTime) {
-      firstTime = false;
-      startCountdown(upcomingRaceInfo);
-      userPredictionFuture = _checkUserPrediction(upcomingRaceInfo);
+      if (upcomingRaceInfo.isNotEmpty) {
+        firstTime = false;
+        startCountdown(upcomingRaceInfo);
+        userPredictionFuture = _checkUserPrediction(upcomingRaceInfo);
+      }
     }
 
     return Column(
@@ -160,7 +162,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
               ],
             )),
         Padding(
-          padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+          padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: upcomingRaceInfo == null
               ? Container(
                   height: MediaQuery.of(context).size.height * 0.6,
@@ -170,8 +172,48 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                     ),
                   ),
                 )
-              : _countdownContainer(upcomingRaceInfo, isMobile),
-        ),
+              : upcomingRaceInfo.isNotEmpty
+                  ? _countdownContainer(upcomingRaceInfo, isMobile)
+                  : Container(
+                      width: double.infinity,
+                      height: isMobile
+                          ? MediaQuery.of(context).size.height * 0.6
+                          : MediaQuery.of(context).size.height * 0.6,
+                      decoration: BoxDecoration(
+                        color: primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Stack(
+                        alignment: AlignmentDirectional.center,
+                        children: [
+                          // Background Image
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              'assets/images/image4_f1.jpg',
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                          // Semi-transparent overlay to make text readable
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.black.withOpacity(0.5),
+                            ),
+                          ),
+                          // Content overlaid on top of the image
+                          Center(
+                              child: Text(
+                            'No data available about the upcoming race at the moment. Try again later.',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                            textAlign: TextAlign.center,
+                          ))
+                        ],
+                      ),
+                    ),
+        )
       ],
     );
   }

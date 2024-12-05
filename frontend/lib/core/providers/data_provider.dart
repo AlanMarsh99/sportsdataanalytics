@@ -46,6 +46,31 @@ class DataProvider extends ChangeNotifier {
   Future<void> getHomeScreenInfo() async {
     try {
       _upcomingRaceInfo = await apiService.getUpcomingRace();
+       notifyListeners();
+
+       _lastRaceResults = await apiService.getLastRaceResults();
+      if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
+        int lastRaceYear = int.parse(_lastRaceResults!['year']);
+        int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
+
+        Map<String, dynamic> raceInfo = await apiService
+            .getRaceInfo(lastRaceYear, lastRaceRound)
+            .timeout(
+              const Duration(seconds: 10),
+            )
+            .onError((error, stackTrace) {
+          return {};
+        });
+        
+
+        if (raceInfo.isEmpty) {
+          _lastRaceInfo = null;
+        } else {
+          _lastRaceInfo = Race.fromJson(raceInfo);
+        }
+      }
+
+      notifyListeners();
 
       Map<String, dynamic>? data =
           await apiService.getDriverStandings(DateTime.now().year);
@@ -55,20 +80,9 @@ class DataProvider extends ChangeNotifier {
         _driversStandings = [];
       }
 
-      _lastRaceResults = await apiService.getLastRaceResults().timeout(
-            const Duration(seconds: 10),
-          );
-      if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
-        int lastRaceYear = int.parse(_lastRaceResults!['year']);
-        int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
-
-        Map<String, dynamic> raceInfo =
-            await apiService.getRaceInfo(lastRaceYear, lastRaceRound);
-        _lastRaceInfo = Race.fromJson(raceInfo);
-      }
-
       Map<String, dynamic>? data2 =
           await apiService.getConstructorStandings(DateTime.now().year);
+
       if (data2.isNotEmpty) {
         _constructorsStandings = data2['constructors_standings'];
       } else {

@@ -11,8 +11,9 @@ class APIService {
   // Fetch upcoming race information
   Future<Map<String, dynamic>> getUpcomingRace() async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/home/upcoming_race/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/home/upcoming_race/'))
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         print('Response status: ${response.statusCode}');
@@ -39,7 +40,7 @@ class APIService {
         Uri.parse('$baseUrl/race/$year/$round/driver/$driverId/lap_data');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -60,8 +61,9 @@ class APIService {
   // Fetch last race results
   Future<Map<String, dynamic>> getLastRaceResults() async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/home/last_race_results/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/home/last_race_results/'))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         print('Response status: ${response.statusCode}');
         print('Response body: ${response.body}');
@@ -84,7 +86,7 @@ class APIService {
   Future<Map<String, dynamic>> getDriverStandings(int year) async {
     final url = Uri.parse('$baseUrl/drivers/$year/standings/');
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
@@ -108,7 +110,7 @@ class APIService {
   Future<Map<String, dynamic>> getConstructorStandings(int year) async {
     final url = Uri.parse('$baseUrl/constructors/$year/standings/');
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
@@ -131,7 +133,7 @@ class APIService {
   // Fetch lap by lap race positions
   Future<RacePositions?> fetchRacePositions(int year, int round) async {
     final url = Uri.parse('$baseUrl/race/$year/$round/positions/');
-    final response = await http.get(url);
+    final response = await http.get(url).timeout(const Duration(seconds: 10));
 
     if (response.statusCode == 200) {
       return RacePositions.fromJson(json.decode(response.body));
@@ -147,7 +149,9 @@ class APIService {
   // Fetch all races in a given year
   Future<List<dynamic>> getAllRacesInYear(int year) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/races/$year/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/races/$year/'))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -163,14 +167,15 @@ class APIService {
       print('Exception caught: $e');
       //rethrow;
       return [];
-
     }
   }
 
   // Fetch race information
   Future<Map<String, dynamic>> getRaceInfo(int year, int round) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/race/$year/$round/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/race/$year/$round/'))
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
@@ -194,8 +199,9 @@ class APIService {
   // Fetch detailed results for a specific race
   Future<List<dynamic>> getRaceResults(int year, int round) async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/race/$year/$round/results/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/race/$year/$round/results/'))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -217,8 +223,9 @@ class APIService {
   // Fetch pit stop data for a race
   Future<List<dynamic>> getPitStops(int year, int round) async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/race/$year/$round/pitstops/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/race/$year/$round/pitstops/'))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -242,7 +249,9 @@ class APIService {
   // Fetch all drivers in a given year
   Future<List<dynamic>> getDriversInYear(int year) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/drivers/$year/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/drivers/$year/'))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -264,8 +273,9 @@ class APIService {
   // Fetch driver career and season stats
   Future<Map<String, dynamic>> getDriverStats(String driverId, int year) async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/driver/$driverId/$year/stats/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/driver/$driverId/$year/stats/'))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -289,7 +299,7 @@ class APIService {
     final url = Uri.parse('$baseUrl/driver/$driverId/$year/races/');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
@@ -316,7 +326,7 @@ class APIService {
     final url = Uri.parse('$baseUrl/teams/$year/');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
@@ -339,8 +349,9 @@ class APIService {
   // Fetch team stats for a specific year
   Future<Map<String, dynamic>> getTeamStats(String teamId, int year) async {
     try {
-      final response =
-          await http.get(Uri.parse('$baseUrl/team/$teamId/$year/stats/'));
+      final response = await http
+          .get(Uri.parse('$baseUrl/team/$teamId/$year/stats/'))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');

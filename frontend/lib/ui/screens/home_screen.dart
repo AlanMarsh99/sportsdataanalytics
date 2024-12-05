@@ -36,6 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic>? driversStandings;
   List<dynamic>? constructorsStandings;
   late Future<Prediction?> userPredictionFuture;
+  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollControllerDrivers = ScrollController();
+  final ScrollController _scrollControllerConstructors = ScrollController();
 
   @override
   void initState() {
@@ -48,6 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (timer != null) {
       timer!.cancel();
     }
+    _scrollController.dispose();
+    _scrollControllerDrivers.dispose();
+    _scrollControllerConstructors.dispose();
     super.dispose();
   }
 
@@ -143,9 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final upcomingRaceInfo = dataProvider.upcomingRaceInfo;
 
     if (upcomingRaceInfo != null && firstTime) {
-      firstTime = false;
-      startCountdown(upcomingRaceInfo);
-      userPredictionFuture = _checkUserPrediction(upcomingRaceInfo);
+      if (upcomingRaceInfo.isNotEmpty) {
+        firstTime = false;
+        startCountdown(upcomingRaceInfo);
+        userPredictionFuture = _checkUserPrediction(upcomingRaceInfo);
+      }
     }
 
     final lastRaceResults = dataProvider.lastRaceResults;
@@ -164,113 +172,126 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         backgroundColor:
             Colors.transparent, // Make scaffold background transparent
-        body: Padding(
-          padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+        body: Scrollbar(
+          trackVisibility: true,
+          controller: _scrollController,
+          thumbVisibility: true,
           child: SingleChildScrollView(
-            child: Responsive.isMobile(context)
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'HOME',
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Flexible(
-                            child: Text(
-                              'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                              style:
-                                  TextStyle(fontSize: 14, color: Colors.white),
+            controller: _scrollController,
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+              child: Responsive.isMobile(context)
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'HOME',
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Flexible(
+                              child: Text(
+                                'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Image.asset('assets/logo/formula-1-logo.png',
-                              width: 50, fit: BoxFit.cover),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Column(
-                        children: [
-                          upcomingRaceInfo != null
-                              ? _countdownContainer(upcomingRaceInfo, true)
-                              : const SizedBox(),
-                          const SizedBox(height: 16),
-                          lastRaceResults != null
-                              ? _lastRaceResultsContainer(lastRaceResults, true)
-                              : const SizedBox(),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _driversStandingsContainer(true),
-                      const SizedBox(height: 16),
-                      _constructorsStandingsContainer(true),
-                      const SizedBox(height: 16),
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'HOME',
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Flexible(
-                            child: Text(
-                              'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Image.asset('assets/logo/formula-1-logo.png',
+                                width: 50, fit: BoxFit.cover),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Column(
+                          children: [
+                            upcomingRaceInfo != null
+                                ? upcomingRaceInfo.isNotEmpty
+                                    ? _countdownContainer(
+                                        upcomingRaceInfo, true)
+                                    : const SizedBox()
+                                : const SizedBox(),
+                            const SizedBox(height: 16),
+                            lastRaceResults != null
+                                ? _lastRaceResultsContainer(
+                                    lastRaceResults, true)
+                                : const SizedBox(),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _driversStandingsContainer(true),
+                        const SizedBox(height: 16),
+                        _constructorsStandingsContainer(true),
+                        const SizedBox(height: 16),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'HOME',
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Flexible(
+                              child: Text(
+                                'Welcome to RaceVision - your go-to platform for F1 stats, predictions, and interactive analytics!',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 20),
-                          Image.asset('assets/logo/formula-1-logo.png',
-                              width: 50, fit: BoxFit.cover),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          upcomingRaceInfo != null
-                              ? Flexible(
-                                  child: _countdownContainer(
-                                      upcomingRaceInfo, false),
-                                )
-                              : const SizedBox(),
-                          const SizedBox(width: 16),
-                          lastRaceResults != null
-                              ? Flexible(
-                                  child: _lastRaceResultsContainer(
-                                      lastRaceResults, false),
-                                )
-                              : const SizedBox(),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Flexible(
-                            child: _driversStandingsContainer(false),
-                          ),
-                          const SizedBox(width: 16),
-                          Flexible(
-                            child: _constructorsStandingsContainer(false),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
+                            const SizedBox(width: 20),
+                            Image.asset('assets/logo/formula-1-logo.png',
+                                width: 50, fit: BoxFit.cover),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            upcomingRaceInfo != null
+                                ? upcomingRaceInfo.isNotEmpty
+                                    ? Flexible(
+                                        child: _countdownContainer(
+                                            upcomingRaceInfo, false),
+                                      )
+                                    : const SizedBox()
+                                : const SizedBox(),
+                            const SizedBox(width: 16),
+                            lastRaceResults != null
+                                ? Flexible(
+                                    child: _lastRaceResultsContainer(
+                                        lastRaceResults, false),
+                                  )
+                                : const SizedBox(),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: _driversStandingsContainer(false),
+                            ),
+                            const SizedBox(width: 16),
+                            Flexible(
+                              child: _constructorsStandingsContainer(false),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+            ),
           ),
         ),
       ),
@@ -303,7 +324,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         subtitle: Text(
           '${fastestLapData['team_name']}',
-          style: TextStyle(color: Colors.grey[600]),
+          style: TextStyle(color: Colors.grey[800]),
         ),
         trailing: IconButton(
           icon: const Icon(
@@ -397,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         subtitle: Text(
           '${driverData['team_name']}',
-          style: TextStyle(color: Colors.grey[600]),
+          style: TextStyle(color: Colors.grey[800]),
         ),
         trailing: IconButton(
           icon: const Icon(
@@ -547,7 +568,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String formattedDate = DateFormat('EEEE MMMM d').format(raceDate);
     return Container(
       width: double.infinity,
-      height: isMobile ? 370 : 487,
+      height: isMobile ? 375 : 487,
       decoration: BoxDecoration(
         color: primary,
         borderRadius: BorderRadius.circular(20),
@@ -805,7 +826,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     } else {
                       return Container(
                         width: isMobile ? 270 : 350,
-                        padding:  EdgeInsets.symmetric(vertical: isMobile ? 15 : 20),
+                        padding:
+                            EdgeInsets.symmetric(vertical: isMobile ? 15 : 20),
                         //width: isMobile ? 270 : 350,
                         child: ElevatedButton(
                           style: ButtonStyle(
@@ -900,110 +922,120 @@ class _HomeScreenState extends State<HomeScreen> {
             driversStandings != null
                 ? driversStandings!.isNotEmpty
                     ? Expanded(
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: driversStandings!.length,
-                          itemBuilder: (context, index) {
-                            final driver = driversStandings![index];
-                            final teamBadgePath =
-                                getBadgePath(driver['constructor_name']);
-                            final positionColor = getTeamColour(
-                                    driver['constructor_name'])
-                                .withOpacity(0.5); // Adjusted background color
-                            final points = driver['points'];
-                            final driverName = driver['driver_name']
-                                .split(' ')
-                                .last
-                                .toUpperCase(); // Show last name
+                        child: ScrollbarTheme(
+                          data: ScrollbarThemeData(
+                            thumbColor: WidgetStateProperty.all(Colors.white30),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: ListView.builder(
+                              controller: _scrollControllerDrivers,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              itemCount: driversStandings!.length,
+                              itemBuilder: (context, index) {
+                                final driver = driversStandings![index];
+                                final teamBadgePath =
+                                    getBadgePath(driver['constructor_name']);
+                                final positionColor =
+                                    getTeamColour(driver['constructor_name'])
+                                        .withOpacity(
+                                            0.5); // Adjusted background color
+                                final points = driver['points'];
+                                final driverName = driver['driver_name']
+                                    .split(' ')
+                                    .last
+                                    .toUpperCase(); // Show last name
 
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DriversScreen(
-                                        driverId: driver['driver_id'],
-                                        driverName: driver['driver_name']),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      positionColor,
-                                      Colors.black
-                                    ], // From blue to black
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // Position and Logo
-                                    Row(
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DriversScreen(
+                                            driverId: driver['driver_id'],
+                                            driverName: driver['driver_name']),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          positionColor,
+                                          Colors.black
+                                        ], // From blue to black
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
-                                          width: 25,
-                                          child: Text(
-                                            driver['position'],
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
+                                        // Position and Logo
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 25,
+                                              child: Text(
+                                                driver['position'],
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ),
-                                            textAlign: TextAlign.center,
+                                            const SizedBox(width: 20),
+                                            Container(
+                                              width: isMobile ? 50 : 60,
+                                              child: Image.asset(
+                                                teamBadgePath!,
+                                                height: isMobile ? 20 : 30,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        // Driver Name
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            child: Text(
+                                              driverName,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                         ),
-                                        const SizedBox(width: 20),
-                                        Container(
-                                          width: isMobile ? 50 : 60,
-                                          child: Image.asset(
-                                            teamBadgePath!,
-                                            height: isMobile ? 20 : 30,
-                                            fit: BoxFit.contain,
+                                        // Points
+                                        Text(
+                                          points.toString(),
+                                          style: TextStyle(
+                                            fontSize: isMobile ? 16 : 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    // Driver Name
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        child: Text(
-                                          driverName,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    // Points
-                                    Text(
-                                      points.toString(),
-                                      style: TextStyle(
-                                        fontSize: isMobile ? 16 : 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                         ),
                       )
                     : Container(
@@ -1054,109 +1086,122 @@ class _HomeScreenState extends State<HomeScreen> {
             constructorsStandings != null
                 ? constructorsStandings!.isNotEmpty
                     ? Expanded(
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          itemCount: constructorsStandings!.length,
-                          itemBuilder: (context, index) {
-                            final constructor = constructorsStandings![index];
-                            final teamBadgePath =
-                                getBadgePath(constructor['constructor_name']);
-                            final positionColor = getTeamColour(
-                                    constructor['constructor_name'])
-                                .withOpacity(0.5); // Adjusted background color
-                            final points = constructor['points'];
-                            final constructorName =
-                                constructor['constructor_name'].toUpperCase();
+                        child: ScrollbarTheme(
+                          data: ScrollbarThemeData(
+                            thumbColor: WidgetStateProperty.all(Colors.white30),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: ListView.builder(
+                              controller: _scrollControllerConstructors,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              itemCount: constructorsStandings!.length,
+                              itemBuilder: (context, index) {
+                                final constructor =
+                                    constructorsStandings![index];
+                                final teamBadgePath = getBadgePath(
+                                    constructor['constructor_name']);
+                                final positionColor = getTeamColour(
+                                        constructor['constructor_name'])
+                                    .withOpacity(
+                                        0.5); // Adjusted background color
+                                final points = constructor['points'];
+                                final constructorName =
+                                    constructor['constructor_name']
+                                        .toUpperCase();
 
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TeamsDetailScreen(
-                                        teamId: constructor['constructor_id'],
-                                        teamName:
-                                            constructor['constructor_name']),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 4,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      positionColor,
-                                      Colors.black
-                                    ], // From blue to black
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // Position and Logo
-                                    Row(
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TeamsDetailScreen(
+                                            teamId:
+                                                constructor['constructor_id'],
+                                            teamName: constructor[
+                                                'constructor_name']),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          positionColor,
+                                          Colors.black
+                                        ], // From blue to black
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
-                                          width: 25,
-                                          child: Text(
-                                            constructor['position'],
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
+                                        // Position and Logo
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 25,
+                                              child: Text(
+                                                constructor['position'],
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ),
-                                            textAlign: TextAlign.center,
+                                            const SizedBox(width: 20),
+                                            Container(
+                                              width: isMobile ? 50 : 60,
+                                              child: Image.asset(
+                                                teamBadgePath!,
+                                                height: isMobile ? 20 : 30,
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        // Driver Name
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            child: Text(
+                                              constructorName,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                         ),
-                                        const SizedBox(width: 20),
-                                        Container(
-                                          width: isMobile ? 50 : 60,
-                                          child: Image.asset(
-                                            teamBadgePath!,
-                                            height: isMobile ? 20 : 30,
-                                            fit: BoxFit.contain,
+                                        // Points
+                                        Text(
+                                          points.toString(),
+                                          style: TextStyle(
+                                            fontSize: isMobile ? 16 : 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    // Driver Name
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        child: Text(
-                                          constructorName,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    // Points
-                                    Text(
-                                      points.toString(),
-                                      style: TextStyle(
-                                        fontSize: isMobile ? 16 : 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                         ),
                       )
                     : Container(

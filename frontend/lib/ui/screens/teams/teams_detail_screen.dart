@@ -139,16 +139,23 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                             ); // Error handling
                           } else if (snapshot.hasData) {
                             Map<String, dynamic> data = snapshot.data!;
-
-                            return Container(
-                              height: 250,
-                              child: TabBarView(
-                                children: [
-                                  _buildCareerStats(true, data),
-                                  _buildCareerStats(false, data),
-                                ],
-                              ),
-                            );
+                            if (data.isEmpty) {
+                              return const Text(
+                                'Error: Data for this team is currently unavailable. Please try again later or select a different team.',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              );
+                            } else {
+                              return Container(
+                                height: 250,
+                                child: TabBarView(
+                                  children: [
+                                    _buildCareerStats(true, data),
+                                    _buildCareerStats(false, data),
+                                  ],
+                                ),
+                              );
+                            }
                           }
                           return Container();
                         },
@@ -179,10 +186,18 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                           } else if (snapshot.hasData) {
                             Map<String, dynamic> data = snapshot.data!;
 
-                            return Center(
-                              child: TeamSeasonsTable(
-                                  seasonsData: data['season_results']),
-                            );
+                            if (data.isEmpty) {
+                              return const Text(
+                                'Error: Data for this team is currently unavailable. Please try again later or select a different team.',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              );
+                            } else {
+                              return Center(
+                                child: TeamSeasonsTable(
+                                    seasonsData: data['season_results']),
+                              );
+                            }
                           }
                           return Container();
                         },
@@ -288,16 +303,25 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                                         } else if (snapshot.hasData) {
                                           Map<String, dynamic> data =
                                               snapshot.data!;
-
-                                          return Container(
-                                            height: 220,
-                                            child: TabBarView(
-                                              children: [
-                                                _buildCareerStats(true, data),
-                                                _buildCareerStats(false, data),
-                                              ],
-                                            ),
-                                          );
+                                          if (data.isEmpty) {
+                                            return const Text(
+                                              'Error: Data for this team is currently unavailable. Please try again later or select a different team.',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14),
+                                            );
+                                          } else {
+                                            return Container(
+                                              height: 220,
+                                              child: TabBarView(
+                                                children: [
+                                                  _buildCareerStats(true, data),
+                                                  _buildCareerStats(
+                                                      false, data),
+                                                ],
+                                              ),
+                                            );
+                                          }
                                         }
                                         return Container();
                                       },
@@ -350,9 +374,19 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                                           Map<String, dynamic> data =
                                               snapshot.data!;
 
-                                          return TeamSeasonsTable(
-                                            seasonsData: data['season_results'],
-                                          );
+                                          if (data.isEmpty) {
+                                            return const Text(
+                                              'Error: Data for this team is currently unavailable. Please try again later or select a different team.',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14),
+                                            );
+                                          } else {
+                                            return TeamSeasonsTable(
+                                              seasonsData:
+                                                  data['season_results'],
+                                            );
+                                          }
                                         }
                                         return Container();
                                       },

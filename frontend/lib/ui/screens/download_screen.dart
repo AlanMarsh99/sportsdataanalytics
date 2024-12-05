@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:frontend/utils/download_utils.dart';
 import 'package:csv/csv.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/pdf.dart'; 
+import 'package:pdf/pdf.dart';
 import 'package:frontend/ui/theme.dart';
 
 class DownloadScreen extends StatefulWidget {
@@ -17,6 +17,7 @@ class DownloadScreen extends StatefulWidget {
 
 class _DownloadScreenState extends State<DownloadScreen> {
   final APIService apiService = APIService();
+  final ScrollController _scrollController = ScrollController();
 
   // State variables for selected formats
   String _selectedFormatUpcomingRace = 'JSON';
@@ -31,13 +32,17 @@ class _DownloadScreenState extends State<DownloadScreen> {
   // Controllers for Year and Round input fields
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _roundController = TextEditingController();
-  final TextEditingController _constructorsYearController = TextEditingController();
+  final TextEditingController _constructorsYearController =
+      TextEditingController();
   final TextEditingController _driversYearController = TextEditingController();
   final TextEditingController _allRacesYearController = TextEditingController();
-  final TextEditingController _raceResultsYearController = TextEditingController();
-  final TextEditingController _raceResultsRoundController = TextEditingController();
+  final TextEditingController _raceResultsYearController =
+      TextEditingController();
+  final TextEditingController _raceResultsRoundController =
+      TextEditingController();
   final TextEditingController _pitStopsYearController = TextEditingController();
-  final TextEditingController _pitStopsRoundController = TextEditingController();
+  final TextEditingController _pitStopsRoundController =
+      TextEditingController();
 
   // State variables for loading indicators
   bool _isLoadingUpcomingRace = false;
@@ -54,12 +59,13 @@ class _DownloadScreenState extends State<DownloadScreen> {
     _yearController.dispose();
     _roundController.dispose();
     _constructorsYearController.dispose();
-    _driversYearController.dispose(); 
+    _driversYearController.dispose();
     _allRacesYearController.dispose();
     _raceResultsYearController.dispose();
     _raceResultsRoundController.dispose();
     _pitStopsYearController.dispose();
     _pitStopsRoundController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -202,7 +208,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
         throw Exception('Year must be a valid number');
       }
 
-      Map<String, dynamic> constructorsStandings = await apiService.getConstructorStandings(year);
+      Map<String, dynamic> constructorsStandings =
+          await apiService.getConstructorStandings(year);
 
       switch (format) {
         case 'JSON':
@@ -242,7 +249,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
         throw Exception('Year must be a valid number');
       }
 
-      Map<String, dynamic> driversStandings = await apiService.getDriverStandings(year);
+      Map<String, dynamic> driversStandings =
+          await apiService.getDriverStandings(year);
 
       switch (format) {
         case 'JSON':
@@ -318,7 +326,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
       _isLoadingRaceResults = true;
     });
     try {
-      if (_raceResultsYearController.text.isEmpty || _raceResultsRoundController.text.isEmpty) {
+      if (_raceResultsYearController.text.isEmpty ||
+          _raceResultsRoundController.text.isEmpty) {
         throw Exception('Year and Round cannot be empty');
       }
       int year;
@@ -333,7 +342,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
       List<dynamic> raceResults = await apiService.getRaceResults(year, round);
 
       if (raceResults.isEmpty) {
-        throw Exception('No results found for the race in year $year, round $round');
+        throw Exception(
+            'No results found for the race in year $year, round $round');
       }
 
       Map<String, dynamic> data = {'results': raceResults};
@@ -366,7 +376,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
       _isLoadingPitStops = true;
     });
     try {
-      if (_pitStopsYearController.text.isEmpty || _pitStopsRoundController.text.isEmpty) {
+      if (_pitStopsYearController.text.isEmpty ||
+          _pitStopsRoundController.text.isEmpty) {
         throw Exception('Year and Round cannot be empty');
       }
       int year = int.parse(_pitStopsYearController.text);
@@ -375,7 +386,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
       List<dynamic> pitStops = await apiService.getPitStops(year, round);
 
       if (pitStops.isEmpty) {
-        throw Exception('No pit stop data found for the race in year $year, round $round');
+        throw Exception(
+            'No pit stop data found for the race in year $year, round $round');
       }
 
       Map<String, dynamic> data = {'pit_stops': pitStops};
@@ -520,7 +532,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
   }
 
   // Function to download Constructors Standings as CSV
-  Future<void> _downloadConstructorsStandingsCsv(Map<String, dynamic> data) async {
+  Future<void> _downloadConstructorsStandingsCsv(
+      Map<String, dynamic> data) async {
     try {
       List<List<dynamic>> rows = [
         ['Position', 'Points', 'Wins', 'Constructor ID', 'Constructor Name'],
@@ -538,7 +551,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
       String csvData = const ListToCsvConverter().convert(rows);
       Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
       await downloadFile('constructors_standings.csv', bytes, 'text/csv');
-      _showSuccessSnackBar('Successfully downloaded constructors_standings.csv');
+      _showSuccessSnackBar(
+          'Successfully downloaded constructors_standings.csv');
     } catch (e) {
       throw Exception('Failed to download CSV: $e');
     }
@@ -548,7 +562,14 @@ class _DownloadScreenState extends State<DownloadScreen> {
   Future<void> _downloadDriversStandingsCsv(Map<String, dynamic> data) async {
     try {
       List<List<dynamic>> rows = [
-        ['Position', 'Points', 'Wins', 'Driver ID', 'Driver Name', 'Constructor Name'],
+        [
+          'Position',
+          'Points',
+          'Wins',
+          'Driver ID',
+          'Driver Name',
+          'Constructor Name'
+        ],
       ];
       List<dynamic> standingsList = data['driver_standings'];
       for (var standing in standingsList) {
@@ -626,10 +647,21 @@ class _DownloadScreenState extends State<DownloadScreen> {
   }
 
   // Function to download Detailed Race Results
-  Future<void> _downloadRaceResultsCsv(Map<String, dynamic> data, int year, int round) async {
+  Future<void> _downloadRaceResultsCsv(
+      Map<String, dynamic> data, int year, int round) async {
     try {
       List<List<dynamic>> rows = [
-        ['Position', 'Driver', 'Driver ID', 'Team', 'Team ID', 'Time', 'Grid', 'Laps', 'Points'],
+        [
+          'Position',
+          'Driver',
+          'Driver ID',
+          'Team',
+          'Team ID',
+          'Time',
+          'Grid',
+          'Laps',
+          'Points'
+        ],
       ];
       List<dynamic> resultsList = data['results'];
       for (var result in resultsList) {
@@ -648,17 +680,27 @@ class _DownloadScreenState extends State<DownloadScreen> {
       String csvData = const ListToCsvConverter().convert(rows);
       Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
       await downloadFile('race_results_${year}_$round.csv', bytes, 'text/csv');
-      _showSuccessSnackBar('Successfully downloaded race_results_${year}_$round.csv');
+      _showSuccessSnackBar(
+          'Successfully downloaded race_results_${year}_$round.csv');
     } catch (e) {
       throw Exception('Failed to download CSV: $e');
     }
   }
 
   // Function to download Pit Stops as CSV
-  Future<void> _downloadPitStopsCsv(Map<String, dynamic> data, int year, int round) async {
+  Future<void> _downloadPitStopsCsv(
+      Map<String, dynamic> data, int year, int round) async {
     try {
       List<List<dynamic>> rows = [
-        ['Driver', 'Team', 'Team ID', 'Total Duration', 'Lap', 'Time of Day', 'Duration'],
+        [
+          'Driver',
+          'Team',
+          'Team ID',
+          'Total Duration',
+          'Lap',
+          'Time of Day',
+          'Duration'
+        ],
       ];
 
       List<dynamic> pitStopsList = data['pit_stops'];
@@ -666,7 +708,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
         String driver = driverPitStops['driver'];
         String team = driverPitStops['team'];
         String teamId = driverPitStops['team_id'];
-        String totalDuration = driverPitStops['total_duration'].toStringAsFixed(3);
+        String totalDuration =
+            driverPitStops['total_duration'].toStringAsFixed(3);
         List<dynamic> stops = driverPitStops['stops'];
 
         for (var stop in stops) {
@@ -685,7 +728,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
       String csvData = const ListToCsvConverter().convert(rows);
       Uint8List bytes = Uint8List.fromList(utf8.encode(csvData));
       await downloadFile('pit_stops_${year}_$round.csv', bytes, 'text/csv');
-      _showSuccessSnackBar('Successfully downloaded pit_stops_${year}_$round.csv');
+      _showSuccessSnackBar(
+          'Successfully downloaded pit_stops_${year}_$round.csv');
     } catch (e) {
       throw Exception('Failed to download CSV: $e');
     }
@@ -718,9 +762,18 @@ class _DownloadScreenState extends State<DownloadScreen> {
               dataList = [
                 {'Round': data['race_id'].toString()},
                 {'Year': data['year'].toString()},
-                {'First Position': data['first_position']['driver_name'].toString()},
-                {'Second Position': data['second_position']['driver_name'].toString()},
-                {'Third Position': data['third_position']['driver_name'].toString()},
+                {
+                  'First Position':
+                      data['first_position']['driver_name'].toString()
+                },
+                {
+                  'Second Position':
+                      data['second_position']['driver_name'].toString()
+                },
+                {
+                  'Third Position':
+                      data['third_position']['driver_name'].toString()
+                },
                 {
                   'Fastest Lap':
                       (data['fastest_lap']['driver_name'] ?? 'N/A').toString()
@@ -738,76 +791,107 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 {'Winner Driver ID': data['winner_driver_id'].toString()},
                 {'Winning Time': data['winning_time'].toString()},
                 {'Fastest Lap': data['fastest_lap'].toString()},
-                {'Fastest Lap Driver ID': data['fastest_lap_driver_id'].toString()},
+                {
+                  'Fastest Lap Driver ID':
+                      data['fastest_lap_driver_id'].toString()
+                },
                 {'Fastest Lap Time': data['fastest_lap_time'].toString()},
                 {'Pole Position': data['pole_position'].toString()},
-                {'Pole Position Driver ID': data['pole_position_driver_id'].toString()},
+                {
+                  'Pole Position Driver ID':
+                      data['pole_position_driver_id'].toString()
+                },
                 {'Fastest Pit Stop': data['fastest_pit_stop'].toString()},
                 {
                   'Fastest Pit Stop Driver ID':
                       data['fastest_pit_stop_driver_id'].toString()
                 },
-                {'Fastest Pit Stop Time': data['fastest_pit_stop_time'].toString()},
+                {
+                  'Fastest Pit Stop Time':
+                      data['fastest_pit_stop_time'].toString()
+                },
               ];
             } else if (filename == 'constructors_standings') {
               title = 'Constructors Standings';
               List<dynamic> standingsList = data['constructors_standings'];
-              dataList = standingsList.map<Map<String, String>>((standing) => {
-                    'Position': standing['position'].toString(),
-                    'Points': standing['points'].toString(),
-                    'Wins': standing['wins'].toString(),
-                    'Constructor Name': standing['constructor_name'].toString(),
-                  }).toList();
+              dataList = standingsList
+                  .map<Map<String, String>>((standing) => {
+                        'Position': standing['position'].toString(),
+                        'Points': standing['points'].toString(),
+                        'Wins': standing['wins'].toString(),
+                        'Constructor Name':
+                            standing['constructor_name'].toString(),
+                      })
+                  .toList();
             } else if (filename == 'drivers_standings') {
               title = 'Drivers Standings';
               List<dynamic> standingsList = data['driver_standings'];
-              dataList = standingsList.map<Map<String, String>>((standing) => {
-                    'Position': standing['position'].toString(),
-                    'Points': standing['points'].toString(),
-                    'Wins': standing['wins'].toString(),
-                    'Driver Name': standing['driver_name'].toString(),
-                    'Constructor Name': standing['constructor_name'].toString(),
-                  }).toList();
+              dataList = standingsList
+                  .map<Map<String, String>>((standing) => {
+                        'Position': standing['position'].toString(),
+                        'Points': standing['points'].toString(),
+                        'Wins': standing['wins'].toString(),
+                        'Driver Name': standing['driver_name'].toString(),
+                        'Constructor Name':
+                            standing['constructor_name'].toString(),
+                      })
+                  .toList();
             } else if (filename.startsWith('all_races_')) {
               String year = filename.split('_').last;
               title = 'All Races in Year $year';
               List<dynamic> racesList = data['races'];
-              dataList = racesList.map<Map<String, String>>((race) => {
-                    'Date': race['date']?.toString() ?? 'N/A',
-                    'Race Name': race['race_name']?.toString() ?? 'N/A',
-                    'Race ID': race['race_id']?.toString() ?? 'N/A',
-                    'Circuit Name': race['circuit_name']?.toString() ?? 'N/A',
-                    'Round': race['round']?.toString() ?? 'N/A',
-                    'Location': race['location']?.toString() ?? 'N/A',
-                    'Winner': race['winner']?.toString() ?? 'N/A',
-                    'Winner Driver ID': race['winner_driver_id']?.toString() ?? 'N/A',
-                    'Winning Time': race['winning_time']?.toString() ?? 'N/A',
-                    'Fastest Lap': race['fastest_lap']?.toString() ?? 'N/A',
-                    'Fastest Lap Driver ID': race['fastest_lap_driver_id']?.toString() ?? 'N/A',
-                    'Fastest Lap Time': race['fastest_lap_time']?.toString() ?? 'N/A',
-                    'Pole Position': race['pole_position']?.toString() ?? 'N/A',
-                    'Pole Position Driver ID': race['pole_position_driver_id']?.toString() ?? 'N/A',
-                    'Fastest Pit Stop': race['fastest_pit_stop']?.toString() ?? 'N/A',
-                    'Fastest Pit Stop Driver ID': race['fastest_pit_stop_driver_id']?.toString() ?? 'N/A',
-                    'Fastest Pit Stop Time': race['fastest_pit_stop_time']?.toString() ?? 'N/A',
-                  }).toList();
+              dataList = racesList
+                  .map<Map<String, String>>((race) => {
+                        'Date': race['date']?.toString() ?? 'N/A',
+                        'Race Name': race['race_name']?.toString() ?? 'N/A',
+                        'Race ID': race['race_id']?.toString() ?? 'N/A',
+                        'Circuit Name':
+                            race['circuit_name']?.toString() ?? 'N/A',
+                        'Round': race['round']?.toString() ?? 'N/A',
+                        'Location': race['location']?.toString() ?? 'N/A',
+                        'Winner': race['winner']?.toString() ?? 'N/A',
+                        'Winner Driver ID':
+                            race['winner_driver_id']?.toString() ?? 'N/A',
+                        'Winning Time':
+                            race['winning_time']?.toString() ?? 'N/A',
+                        'Fastest Lap': race['fastest_lap']?.toString() ?? 'N/A',
+                        'Fastest Lap Driver ID':
+                            race['fastest_lap_driver_id']?.toString() ?? 'N/A',
+                        'Fastest Lap Time':
+                            race['fastest_lap_time']?.toString() ?? 'N/A',
+                        'Pole Position':
+                            race['pole_position']?.toString() ?? 'N/A',
+                        'Pole Position Driver ID':
+                            race['pole_position_driver_id']?.toString() ??
+                                'N/A',
+                        'Fastest Pit Stop':
+                            race['fastest_pit_stop']?.toString() ?? 'N/A',
+                        'Fastest Pit Stop Driver ID':
+                            race['fastest_pit_stop_driver_id']?.toString() ??
+                                'N/A',
+                        'Fastest Pit Stop Time':
+                            race['fastest_pit_stop_time']?.toString() ?? 'N/A',
+                      })
+                  .toList();
             } else if (filename.startsWith('race_results_')) {
               List<String> filenameParts = filename.split('_');
               String year = filenameParts[2];
               String round = filenameParts[3];
               title = 'Race Results for Year $year, Round $round';
               List<dynamic> resultsList = data['results'];
-              dataList = resultsList.map<Map<String, String>>((result) => {
-                'Position': result['position'].toString(),
-                'Driver': result['driver'],
-                'Driver ID': result['driver_id'],
-                'Team': result['team'],
-                'Team ID': result['team_id'],
-                'Time': result['time'],
-                'Grid': result['grid'].toString(),
-                'Laps': result['laps'].toString(),
-                'Points': result['points'].toString(),
-              }).toList();
+              dataList = resultsList
+                  .map<Map<String, String>>((result) => {
+                        'Position': result['position'].toString(),
+                        'Driver': result['driver'],
+                        'Driver ID': result['driver_id'],
+                        'Team': result['team'],
+                        'Team ID': result['team_id'],
+                        'Time': result['time'],
+                        'Grid': result['grid'].toString(),
+                        'Laps': result['laps'].toString(),
+                        'Points': result['points'].toString(),
+                      })
+                  .toList();
             } else if (filename.startsWith('pit_stops_')) {
               List<String> filenameParts = filename.split('_');
               String year = filenameParts[2];
@@ -820,7 +904,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 String driver = driverPitStops['driver'];
                 String team = driverPitStops['team'];
                 String teamId = driverPitStops['team_id'];
-                String totalDuration = driverPitStops['total_duration'].toStringAsFixed(3);
+                String totalDuration =
+                    driverPitStops['total_duration'].toStringAsFixed(3);
                 List<dynamic> stops = driverPitStops['stops'];
 
                 for (var stop in stops) {
@@ -844,19 +929,23 @@ class _DownloadScreenState extends State<DownloadScreen> {
             widgets.add(
               pw.Text(
                 title,
-                style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+                style:
+                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
               ),
             );
 
             widgets.add(pw.SizedBox(height: 10));
 
-            if (filename.startsWith('all_races_') || filename.startsWith('race_results_') || filename.startsWith('pit_stops_')) {
+            if (filename.startsWith('all_races_') ||
+                filename.startsWith('race_results_') ||
+                filename.startsWith('pit_stops_')) {
               // Add Table for All Races
               widgets.add(
                 pw.Table.fromTextArray(
                   headers: dataList.isNotEmpty ? dataList[0].keys.toList() : [],
                   data: dataList.map((item) => item.values.toList()).toList(),
-                  headerStyle: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  headerStyle: pw.TextStyle(
+                      fontSize: 10, fontWeight: pw.FontWeight.bold),
                   cellStyle: pw.TextStyle(fontSize: 8),
                   border: pw.TableBorder.all(width: 0.5),
                   headerDecoration: pw.BoxDecoration(),
@@ -864,13 +953,15 @@ class _DownloadScreenState extends State<DownloadScreen> {
                   cellHeight: 20,
                 ),
               );
-            } else if (filename == 'constructors_standings' || filename == 'drivers_standings') {
+            } else if (filename == 'constructors_standings' ||
+                filename == 'drivers_standings') {
               // Add Table for Standings
               widgets.add(
                 pw.Table.fromTextArray(
                   headers: dataList.isNotEmpty ? dataList[0].keys.toList() : [],
                   data: dataList.map((item) => item.values.toList()).toList(),
-                  headerStyle: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+                  headerStyle: pw.TextStyle(
+                      fontSize: 10, fontWeight: pw.FontWeight.bold),
                   cellStyle: pw.TextStyle(fontSize: 8),
                   border: pw.TableBorder.all(width: 0.5),
                   headerDecoration: pw.BoxDecoration(),
@@ -886,7 +977,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
                   final value = item.values.first;
                   return pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 5),
-                    child: pw.Text('$key: $value', style: pw.TextStyle(fontSize: 14)),
+                    child: pw.Text('$key: $value',
+                        style: pw.TextStyle(fontSize: 14)),
                   );
                 }).toList(),
               );
@@ -940,1228 +1032,1284 @@ class _DownloadScreenState extends State<DownloadScreen> {
         ),
       ),
       child: Scaffold(
-        backgroundColor:
-            Colors.transparent, // Make Scaffold background transparent to show gradient
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              // Screen Title
-              Align(
-                alignment: Alignment.centerLeft,
-                child: const Text(
-                  'DOWNLOAD DATA',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+        backgroundColor: Colors
+            .transparent, // Make Scaffold background transparent to show gradient
+        body: Scrollbar(
+          trackVisibility: true,
+          controller: _scrollController,
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Screen Title
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: const Text(
+                      'DOWNLOAD DATA',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-              // Download Upcoming Race
-              Card(
-                color: primary,
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title
-                      const Text(
-                        'Upcoming Race',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-
-                      // "Select Format" Label Container
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: const Text(
-                          'Select Format',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-
-                      // Dropdown for Format Selection
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          isDense: false, // Ensures adequate vertical space
-                          value: _selectedFormatUpcomingRace,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
+                  // Download Upcoming Race
+                  Card(
+                    color: primary,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Title
+                          const Text(
+                            'Upcoming Race',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 12.0),
                           ),
-                          dropdownColor: Colors.white,
-                          // Icons for different file types
-                          isExpanded: true,
-                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
-                            IconData icon;
-                            switch (value) {
-                              case 'CSV':
-                                icon = Icons.table_chart;
-                                break;
-                              case 'JSON':
-                                icon = Icons.code;
-                                break;
-                              case 'PDF':
-                                icon = Icons.picture_as_pdf;
-                                break;
-                              default:
-                                icon = Icons.download;
-                            }
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Icon(icon, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 10),
-                                  Text(value,
-                                      style:
-                                          const TextStyle(color: Colors.black87)),
-                                ],
+                          const SizedBox(height: 10),
+
+                          // "Select Format" Label Container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: const Text(
+                              'Select Format',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedFormatUpcomingRace = newValue;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // DOWNLOAD Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.white, // Button color
-                            backgroundColor: secondary,
-                            shape: RoundedRectangleBorder(
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+
+                          // Dropdown for Format Selection
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          icon: _isLoadingUpcomingRace
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.download, size: 20),
-                          label: const Text(
-                            'DOWNLOAD',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: _isLoadingUpcomingRace
-                              ? null
-                              : () {
-                                  _downloadFile(
-                                      'upcoming_race', _selectedFormatUpcomingRace);
-                                },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Download Last Race Results
-              Card(
-                color: primary,
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title
-                      const Text(
-                        'Last Race Results',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-
-                      // "Select Format" Label Container
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: const Text(
-                          'Select Format',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-
-                      // Dropdown for Format Selection
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          isDense: false,
-                          value: _selectedFormatLastRaceResults,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 12.0),
-                          ),
-                          dropdownColor: Colors.white,
-                          isExpanded: true,
-                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
-                            IconData icon;
-                            switch (value) {
-                              case 'CSV':
-                                icon = Icons.table_chart;
-                                break;
-                              case 'JSON':
-                                icon = Icons.code;
-                                break;
-                              case 'PDF':
-                                icon = Icons.picture_as_pdf;
-                                break;
-                              default:
-                                icon = Icons.download;
-                            }
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Icon(icon, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 10),
-                                  Text(value,
-                                      style:
-                                          const TextStyle(color: Colors.black87)),
-                                ],
+                            child: DropdownButtonFormField<String>(
+                              isDense: false, // Ensures adequate vertical space
+                              value: _selectedFormatUpcomingRace,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 12.0),
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedFormatLastRaceResults = newValue;
-                              });
-                            }
-                          },
-                        ),
+                              dropdownColor: Colors.white,
+                              // Icons for different file types
+                              isExpanded: true,
+                              items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                                IconData icon;
+                                switch (value) {
+                                  case 'CSV':
+                                    icon = Icons.table_chart;
+                                    break;
+                                  case 'JSON':
+                                    icon = Icons.code;
+                                    break;
+                                  case 'PDF':
+                                    icon = Icons.picture_as_pdf;
+                                    break;
+                                  default:
+                                    icon = Icons.download;
+                                }
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    children: [
+                                      Icon(icon,
+                                          size: 20, color: Colors.black54),
+                                      const SizedBox(width: 10),
+                                      Text(value,
+                                          style: const TextStyle(
+                                              color: Colors.black87)),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedFormatUpcomingRace = newValue;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // DOWNLOAD Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                foregroundColor: Colors.white, // Button color
+                                backgroundColor: secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              icon: _isLoadingUpcomingRace
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.download, size: 20),
+                              label: const Text(
+                                'DOWNLOAD',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: _isLoadingUpcomingRace
+                                  ? null
+                                  : () {
+                                      _downloadFile('upcoming_race',
+                                          _selectedFormatUpcomingRace);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      // Download Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.white, // Button color
-                            backgroundColor: secondary,
-                            shape: RoundedRectangleBorder(
+                    ),
+                  ),
+
+                  // Download Last Race Results
+                  Card(
+                    color: primary,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Title
+                          const Text(
+                            'Last Race Results',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // "Select Format" Label Container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: const Text(
+                              'Select Format',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+
+                          // Dropdown for Format Selection
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          icon: _isLoadingLastRaceResults
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.download, size: 20),
-                          label: const Text(
-                            'DOWNLOAD',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: _isLoadingLastRaceResults
-                              ? null
-                              : () {
-                                  _downloadFile('last_race_results',
-                                      _selectedFormatLastRaceResults);
-                                },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Download Race Information
-              Card(
-                color: primary,
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title
-                      const Text(
-                        'Race Information',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Input fields for Year and Round
-                      TextField(
-                        controller: _yearController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Year',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: _roundController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Round',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-
-                      // "Select Format" Label Container
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: const Text(
-                          'Select Format',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-
-                      // Dropdown for Format Selection
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          isDense: false, // Ensures adequate vertical space
-                          value: _selectedFormatRaceInfo,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 12.0),
-                          ),
-                          dropdownColor: Colors.white,
-                          isExpanded: true,
-                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
-                            IconData icon;
-                            switch (value) {
-                              case 'CSV':
-                                icon = Icons.table_chart;
-                                break;
-                              case 'JSON':
-                                icon = Icons.code;
-                                break;
-                              case 'PDF':
-                                icon = Icons.picture_as_pdf;
-                                break;
-                              default:
-                                icon = Icons.download;
-                            }
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Icon(icon, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 10),
-                                  Text(value,
-                                      style:
-                                          const TextStyle(color: Colors.black87)),
-                                ],
+                            child: DropdownButtonFormField<String>(
+                              isDense: false,
+                              value: _selectedFormatLastRaceResults,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 12.0),
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedFormatRaceInfo = newValue;
-                              });
-                            }
-                          },
-                        ),
+                              dropdownColor: Colors.white,
+                              isExpanded: true,
+                              items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                                IconData icon;
+                                switch (value) {
+                                  case 'CSV':
+                                    icon = Icons.table_chart;
+                                    break;
+                                  case 'JSON':
+                                    icon = Icons.code;
+                                    break;
+                                  case 'PDF':
+                                    icon = Icons.picture_as_pdf;
+                                    break;
+                                  default:
+                                    icon = Icons.download;
+                                }
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    children: [
+                                      Icon(icon,
+                                          size: 20, color: Colors.black54),
+                                      const SizedBox(width: 10),
+                                      Text(value,
+                                          style: const TextStyle(
+                                              color: Colors.black87)),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedFormatLastRaceResults = newValue;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // Download Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                foregroundColor: Colors.white, // Button color
+                                backgroundColor: secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              icon: _isLoadingLastRaceResults
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.download, size: 20),
+                              label: const Text(
+                                'DOWNLOAD',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: _isLoadingLastRaceResults
+                                  ? null
+                                  : () {
+                                      _downloadFile('last_race_results',
+                                          _selectedFormatLastRaceResults);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      // Download Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.white, // Button color
-                            backgroundColor: secondary,
-                            shape: RoundedRectangleBorder(
+                    ),
+                  ),
+
+                  // Download Race Information
+                  Card(
+                    color: primary,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Title
+                          const Text(
+                            'Race Information',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // Input fields for Year and Round
+                          TextField(
+                            controller: _yearController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Year',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: _roundController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Round',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // "Select Format" Label Container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: const Text(
+                              'Select Format',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+
+                          // Dropdown for Format Selection
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          icon: _isLoadingRaceInfo
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
+                            child: DropdownButtonFormField<String>(
+                              isDense: false, // Ensures adequate vertical space
+                              value: _selectedFormatRaceInfo,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 12.0),
+                              ),
+                              dropdownColor: Colors.white,
+                              isExpanded: true,
+                              items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                                IconData icon;
+                                switch (value) {
+                                  case 'CSV':
+                                    icon = Icons.table_chart;
+                                    break;
+                                  case 'JSON':
+                                    icon = Icons.code;
+                                    break;
+                                  case 'PDF':
+                                    icon = Icons.picture_as_pdf;
+                                    break;
+                                  default:
+                                    icon = Icons.download;
+                                }
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    children: [
+                                      Icon(icon,
+                                          size: 20, color: Colors.black54),
+                                      const SizedBox(width: 10),
+                                      Text(value,
+                                          style: const TextStyle(
+                                              color: Colors.black87)),
+                                    ],
                                   ),
-                                )
-                              : const Icon(Icons.download, size: 20),
-                          label: const Text(
-                            'DOWNLOAD',
-                            style: TextStyle(fontSize: 16),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedFormatRaceInfo = newValue;
+                                  });
+                                }
+                              },
+                            ),
                           ),
-                          onPressed: _isLoadingRaceInfo
-                              ? null
-                              : () {
-                                  _downloadFile('race_info', _selectedFormatRaceInfo);
-                                },
-                        ),
+                          const SizedBox(height: 10),
+                          // Download Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                foregroundColor: Colors.white, // Button color
+                                backgroundColor: secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              icon: _isLoadingRaceInfo
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.download, size: 20),
+                              label: const Text(
+                                'DOWNLOAD',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: _isLoadingRaceInfo
+                                  ? null
+                                  : () {
+                                      _downloadFile(
+                                          'race_info', _selectedFormatRaceInfo);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
 
-              // Download Constructors Standings
-              Card(
-                color: primary,
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title
-                      const Text(
-                        'Constructors Standings',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Input field for Year
-                      TextField(
-                        controller: _constructorsYearController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Year',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-                      // "Select Format" Label Container
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: const Text(
-                          'Select Format',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // Dropdown for Format Selection
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          isDense: false,
-                          value: _selectedFormatConstructorsStandings,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
+                  // Download Constructors Standings
+                  Card(
+                    color: primary,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Title
+                          const Text(
+                            'Constructors Standings',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                           ),
-                          dropdownColor: Colors.white,
-                          isExpanded: true,
-                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
-                            IconData icon;
-                            switch (value) {
-                              case 'CSV':
-                                icon = Icons.table_chart;
-                                break;
-                              case 'JSON':
-                                icon = Icons.code;
-                                break;
-                              case 'PDF':
-                                icon = Icons.picture_as_pdf;
-                                break;
-                              default:
-                                icon = Icons.download;
-                            }
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Icon(icon, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 10),
-                                  Text(value, style: const TextStyle(color: Colors.black87)),
-                                ],
+                          const SizedBox(height: 10),
+                          // Input field for Year
+                          TextField(
+                            controller: _constructorsYearController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Year',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedFormatConstructorsStandings = newValue;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // DOWNLOAD Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.white,
-                            backgroundColor: secondary,
-                            shape: RoundedRectangleBorder(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          // "Select Format" Label Container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: const Text(
+                              'Select Format',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          // Dropdown for Format Selection
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          icon: _isLoadingConstructorsStandings
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.download, size: 20),
-                          label: const Text(
-                            'DOWNLOAD',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: _isLoadingConstructorsStandings
-                              ? null
-                              : () {
-                                  _downloadFile('constructors_standings', _selectedFormatConstructorsStandings);
-                                },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Download Drivers Standings
-              Card(
-                color: primary,
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title
-                      const Text(
-                        'Drivers Standings',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Input field for Year
-                      TextField(
-                        controller: _driversYearController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Year',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-                      // "Select Format" Label Container
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: const Text(
-                          'Select Format',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // Dropdown for Format Selection
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          isDense: false,
-                          value: _selectedFormatDriversStandings,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                          ),
-                          dropdownColor: Colors.white,
-                          isExpanded: true,
-                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
-                            IconData icon;
-                            switch (value) {
-                              case 'CSV':
-                                icon = Icons.table_chart;
-                                break;
-                              case 'JSON':
-                                icon = Icons.code;
-                                break;
-                              case 'PDF':
-                                icon = Icons.picture_as_pdf;
-                                break;
-                              default:
-                                icon = Icons.download;
-                            }
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Icon(icon, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 10),
-                                  Text(value, style: const TextStyle(color: Colors.black87)),
-                                ],
+                            child: DropdownButtonFormField<String>(
+                              isDense: false,
+                              value: _selectedFormatConstructorsStandings,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 12.0),
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedFormatDriversStandings = newValue;
-                              });
-                            }
-                          },
-                        ),
+                              dropdownColor: Colors.white,
+                              isExpanded: true,
+                              items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                                IconData icon;
+                                switch (value) {
+                                  case 'CSV':
+                                    icon = Icons.table_chart;
+                                    break;
+                                  case 'JSON':
+                                    icon = Icons.code;
+                                    break;
+                                  case 'PDF':
+                                    icon = Icons.picture_as_pdf;
+                                    break;
+                                  default:
+                                    icon = Icons.download;
+                                }
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    children: [
+                                      Icon(icon,
+                                          size: 20, color: Colors.black54),
+                                      const SizedBox(width: 10),
+                                      Text(value,
+                                          style: const TextStyle(
+                                              color: Colors.black87)),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedFormatConstructorsStandings =
+                                        newValue;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // DOWNLOAD Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                foregroundColor: Colors.white,
+                                backgroundColor: secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              icon: _isLoadingConstructorsStandings
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.download, size: 20),
+                              label: const Text(
+                                'DOWNLOAD',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: _isLoadingConstructorsStandings
+                                  ? null
+                                  : () {
+                                      _downloadFile('constructors_standings',
+                                          _selectedFormatConstructorsStandings);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      // DOWNLOAD Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.white,
-                            backgroundColor: secondary,
-                            shape: RoundedRectangleBorder(
+                    ),
+                  ),
+                  // Download Drivers Standings
+                  Card(
+                    color: primary,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Title
+                          const Text(
+                            'Drivers Standings',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // Input field for Year
+                          TextField(
+                            controller: _driversYearController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Year',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          // "Select Format" Label Container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: const Text(
+                              'Select Format',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          // Dropdown for Format Selection
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          icon: _isLoadingDriversStandings
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
+                            child: DropdownButtonFormField<String>(
+                              isDense: false,
+                              value: _selectedFormatDriversStandings,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 12.0),
+                              ),
+                              dropdownColor: Colors.white,
+                              isExpanded: true,
+                              items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                                IconData icon;
+                                switch (value) {
+                                  case 'CSV':
+                                    icon = Icons.table_chart;
+                                    break;
+                                  case 'JSON':
+                                    icon = Icons.code;
+                                    break;
+                                  case 'PDF':
+                                    icon = Icons.picture_as_pdf;
+                                    break;
+                                  default:
+                                    icon = Icons.download;
+                                }
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    children: [
+                                      Icon(icon,
+                                          size: 20, color: Colors.black54),
+                                      const SizedBox(width: 10),
+                                      Text(value,
+                                          style: const TextStyle(
+                                              color: Colors.black87)),
+                                    ],
                                   ),
-                                )
-                              : const Icon(Icons.download, size: 20),
-                          label: const Text(
-                            'DOWNLOAD',
-                            style: TextStyle(fontSize: 16),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedFormatDriversStandings = newValue;
+                                  });
+                                }
+                              },
+                            ),
                           ),
-                          onPressed: _isLoadingDriversStandings
-                              ? null
-                              : () {
-                                  _downloadFile('drivers_standings', _selectedFormatDriversStandings);
-                                },
-                        ),
+                          const SizedBox(height: 10),
+                          // DOWNLOAD Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                foregroundColor: Colors.white,
+                                backgroundColor: secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              icon: _isLoadingDriversStandings
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.download, size: 20),
+                              label: const Text(
+                                'DOWNLOAD',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: _isLoadingDriversStandings
+                                  ? null
+                                  : () {
+                                      _downloadFile('drivers_standings',
+                                          _selectedFormatDriversStandings);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
 
-              // Download All Races in a Year
-              Card(
-                color: primary,
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title
-                      const Text(
-                        'All Races in a Year',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Input field for Year
-                      TextField(
-                        controller: _allRacesYearController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Year',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-                      // "Select Format" Label Container
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: const Text(
-                          'Select Format',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // Dropdown for Format Selection
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          isDense: false,
-                          value: _selectedFormatAllRaces,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
+                  // Download All Races in a Year
+                  Card(
+                    color: primary,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Title
+                          const Text(
+                            'All Races in a Year',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                           ),
-                          dropdownColor: Colors.white,
-                          isExpanded: true,
-                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
-                            IconData icon;
-                            switch (value) {
-                              case 'CSV':
-                                icon = Icons.table_chart;
-                                break;
-                              case 'JSON':
-                                icon = Icons.code;
-                                break;
-                              case 'PDF':
-                                icon = Icons.picture_as_pdf;
-                                break;
-                              default:
-                                icon = Icons.download;
-                            }
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Icon(icon, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 10),
-                                  Text(value, style: const TextStyle(color: Colors.black87)),
-                                ],
+                          const SizedBox(height: 10),
+                          // Input field for Year
+                          TextField(
+                            controller: _allRacesYearController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Year',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedFormatAllRaces = newValue;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // DOWNLOAD Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.white,
-                            backgroundColor: secondary,
-                            shape: RoundedRectangleBorder(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          // "Select Format" Label Container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: const Text(
+                              'Select Format',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          // Dropdown for Format Selection
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          icon: _isLoadingAllRaces
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
+                            child: DropdownButtonFormField<String>(
+                              isDense: false,
+                              value: _selectedFormatAllRaces,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 12.0),
+                              ),
+                              dropdownColor: Colors.white,
+                              isExpanded: true,
+                              items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                                IconData icon;
+                                switch (value) {
+                                  case 'CSV':
+                                    icon = Icons.table_chart;
+                                    break;
+                                  case 'JSON':
+                                    icon = Icons.code;
+                                    break;
+                                  case 'PDF':
+                                    icon = Icons.picture_as_pdf;
+                                    break;
+                                  default:
+                                    icon = Icons.download;
+                                }
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    children: [
+                                      Icon(icon,
+                                          size: 20, color: Colors.black54),
+                                      const SizedBox(width: 10),
+                                      Text(value,
+                                          style: const TextStyle(
+                                              color: Colors.black87)),
+                                    ],
                                   ),
-                                )
-                              : const Icon(Icons.download, size: 20),
-                          label: const Text(
-                            'DOWNLOAD',
-                            style: TextStyle(fontSize: 16),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedFormatAllRaces = newValue;
+                                  });
+                                }
+                              },
+                            ),
                           ),
-                          onPressed: _isLoadingAllRaces
-                              ? null
-                              : () {
-                                  _downloadFile('all_races', _selectedFormatAllRaces);
-                                },
-                        ),
+                          const SizedBox(height: 10),
+                          // DOWNLOAD Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                foregroundColor: Colors.white,
+                                backgroundColor: secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              icon: _isLoadingAllRaces
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.download, size: 20),
+                              label: const Text(
+                                'DOWNLOAD',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: _isLoadingAllRaces
+                                  ? null
+                                  : () {
+                                      _downloadFile(
+                                          'all_races', _selectedFormatAllRaces);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
 
-              // Download Detailed Race Results
-              Card(
-                color: primary,
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title
-                      const Text(
-                        'Detailed Race Results',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Input fields for Year and Round
-                      TextField(
-                        controller: _raceResultsYearController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Year',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: _raceResultsRoundController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Round',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-                      // "Select Format" Label Container
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: const Text(
-                          'Select Format',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // Dropdown for Format Selection
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          isDense: false, // Ensures adequate vertical space
-                          value: _selectedFormatRaceResults,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
+                  // Download Detailed Race Results
+                  Card(
+                    color: primary,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Title
+                          const Text(
+                            'Detailed Race Results',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                           ),
-                          dropdownColor: Colors.white,
-                          isExpanded: true,
-                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
-                            IconData icon;
-                            switch (value) {
-                              case 'CSV':
-                                icon = Icons.table_chart;
-                                break;
-                              case 'JSON':
-                                icon = Icons.code;
-                                break;
-                              case 'PDF':
-                                icon = Icons.picture_as_pdf;
-                                break;
-                              default:
-                                icon = Icons.download;
-                            }
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Icon(icon, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 10),
-                                  Text(value, style: const TextStyle(color: Colors.black87)),
-                                ],
+                          const SizedBox(height: 10),
+                          // Input fields for Year and Round
+                          TextField(
+                            controller: _raceResultsYearController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Year',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedFormatRaceResults = newValue;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Download Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.white, // Button color
-                            backgroundColor: secondary,
-                            shape: RoundedRectangleBorder(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: _raceResultsRoundController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Round',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          // "Select Format" Label Container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: const Text(
+                              'Select Format',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          // Dropdown for Format Selection
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          icon: _isLoadingRaceResults
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
+                            child: DropdownButtonFormField<String>(
+                              isDense: false, // Ensures adequate vertical space
+                              value: _selectedFormatRaceResults,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 12.0),
+                              ),
+                              dropdownColor: Colors.white,
+                              isExpanded: true,
+                              items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                                IconData icon;
+                                switch (value) {
+                                  case 'CSV':
+                                    icon = Icons.table_chart;
+                                    break;
+                                  case 'JSON':
+                                    icon = Icons.code;
+                                    break;
+                                  case 'PDF':
+                                    icon = Icons.picture_as_pdf;
+                                    break;
+                                  default:
+                                    icon = Icons.download;
+                                }
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    children: [
+                                      Icon(icon,
+                                          size: 20, color: Colors.black54),
+                                      const SizedBox(width: 10),
+                                      Text(value,
+                                          style: const TextStyle(
+                                              color: Colors.black87)),
+                                    ],
                                   ),
-                                )
-                              : const Icon(Icons.download, size: 20),
-                          label: const Text(
-                            'DOWNLOAD',
-                            style: TextStyle(fontSize: 16),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedFormatRaceResults = newValue;
+                                  });
+                                }
+                              },
+                            ),
                           ),
-                          onPressed: _isLoadingRaceResults
-                              ? null
-                              : () {
-                                  _downloadFile('race_results', _selectedFormatRaceResults);
-                                },
-                        ),
+                          const SizedBox(height: 10),
+                          // Download Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                foregroundColor: Colors.white, // Button color
+                                backgroundColor: secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              icon: _isLoadingRaceResults
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.download, size: 20),
+                              label: const Text(
+                                'DOWNLOAD',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: _isLoadingRaceResults
+                                  ? null
+                                  : () {
+                                      _downloadFile('race_results',
+                                          _selectedFormatRaceResults);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
 
-              // Download Pit Stop Data
-              Card(
-                color: primary,
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title
-                      const Text(
-                        'Pit Stop Data',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Input fields for Year and Round
-                      TextField(
-                        controller: _pitStopsYearController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Year',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: _pitStopsRoundController,
-                        keyboardType: TextInputType.number,
-                        cursorColor: secondary,
-                        decoration: const InputDecoration(
-                          labelText: 'Round',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white24,
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(height: 10),
-                      // "Select Format" Label Container
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                        child: const Text(
-                          'Select Format',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // Dropdown for Format Selection
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          isDense: false, // Ensures adequate vertical space
-                          value: _selectedFormatPitStops,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
+                  // Download Pit Stop Data
+                  Card(
+                    color: primary,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Section Title
+                          const Text(
+                            'Pit Stop Data',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                           ),
-                          dropdownColor: Colors.white,
-                          isExpanded: true,
-                          items: ['CSV', 'JSON', 'PDF'].map((String value) {
-                            IconData icon;
-                            switch (value) {
-                              case 'CSV':
-                                icon = Icons.table_chart;
-                                break;
-                              case 'JSON':
-                                icon = Icons.code;
-                                break;
-                              case 'PDF':
-                                icon = Icons.picture_as_pdf;
-                                break;
-                              default:
-                                icon = Icons.download;
-                            }
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                children: [
-                                  Icon(icon, size: 20, color: Colors.black54),
-                                  const SizedBox(width: 10),
-                                  Text(value, style: const TextStyle(color: Colors.black87)),
-                                ],
+                          const SizedBox(height: 10),
+                          // Input fields for Year and Round
+                          TextField(
+                            controller: _pitStopsYearController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Year',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedFormatPitStops = newValue;
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Download Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            foregroundColor: Colors.white, // Button color
-                            backgroundColor: secondary,
-                            shape: RoundedRectangleBorder(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: _pitStopsRoundController,
+                            keyboardType: TextInputType.number,
+                            cursorColor: secondary,
+                            decoration: const InputDecoration(
+                              labelText: 'Round',
+                              labelStyle: TextStyle(color: Colors.white),
+                              filled: true,
+                              fillColor: Colors.white24,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 12.0),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          // "Select Format" Label Container
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: const Text(
+                              'Select Format',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          // Dropdown for Format Selection
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(8.0),
                             ),
-                          ),
-                          icon: _isLoadingPitStops
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
+                            child: DropdownButtonFormField<String>(
+                              isDense: false, // Ensures adequate vertical space
+                              value: _selectedFormatPitStops,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 12.0),
+                              ),
+                              dropdownColor: Colors.white,
+                              isExpanded: true,
+                              items: ['CSV', 'JSON', 'PDF'].map((String value) {
+                                IconData icon;
+                                switch (value) {
+                                  case 'CSV':
+                                    icon = Icons.table_chart;
+                                    break;
+                                  case 'JSON':
+                                    icon = Icons.code;
+                                    break;
+                                  case 'PDF':
+                                    icon = Icons.picture_as_pdf;
+                                    break;
+                                  default:
+                                    icon = Icons.download;
+                                }
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    children: [
+                                      Icon(icon,
+                                          size: 20, color: Colors.black54),
+                                      const SizedBox(width: 10),
+                                      Text(value,
+                                          style: const TextStyle(
+                                              color: Colors.black87)),
+                                    ],
                                   ),
-                                )
-                              : const Icon(Icons.download, size: 20),
-                          label: const Text(
-                            'DOWNLOAD',
-                            style: TextStyle(fontSize: 16),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedFormatPitStops = newValue;
+                                  });
+                                }
+                              },
+                            ),
                           ),
-                          onPressed: _isLoadingPitStops
-                              ? null
-                              : () {
-                                  _downloadFile('pit_stops', _selectedFormatPitStops);
-                                },
-                        ),
+                          const SizedBox(height: 10),
+                          // Download Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                foregroundColor: Colors.white, // Button color
+                                backgroundColor: secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              icon: _isLoadingPitStops
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.download, size: 20),
+                              label: const Text(
+                                'DOWNLOAD',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              onPressed: _isLoadingPitStops
+                                  ? null
+                                  : () {
+                                      _downloadFile(
+                                          'pit_stops', _selectedFormatPitStops);
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }

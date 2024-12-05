@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:frontend/core/models/race.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/theme.dart';
@@ -266,27 +267,32 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: TextField(
-            cursorColor: Colors.white,
-            decoration: InputDecoration(
-              hintText: 'Enter a driver, race, or circuit',
-              hintStyle: const TextStyle(color: Colors.white70),
-              labelText: 'Filter races',
-              labelStyle: const TextStyle(color: Colors.white),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: Colors.white),
+          child: Container(
+            width: isMobile ? double.infinity : 500,
+            child: TextField(
+              cursorColor: Colors.white,
+              decoration: InputDecoration(
+                hintText: 'Enter a driver, race, or circuit',
+                hintStyle: const TextStyle(color: Colors.white70),
+                labelText: 'Filter races',
+                labelStyle: const TextStyle(color: Colors.white),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
               ),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
+              onChanged: updateFilter,
             ),
-            onChanged: updateFilter,
           ),
         ),
         Expanded(
