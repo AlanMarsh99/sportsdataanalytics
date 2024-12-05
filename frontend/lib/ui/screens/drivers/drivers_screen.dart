@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/drivers/driver_allRaces_screen.dart';
@@ -252,34 +253,50 @@ class _DriversScreenState extends State<DriversScreen> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ); // Show loading while fetching
                             } else if (snapshot.hasError) {
-                              return const Text(
-                                'Error: Failed to load driver stats',
-                                style: TextStyle(color: Colors.white),
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                child: Text(
+                                  'Error: Failed to load driver stats',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ); // Error handling
                             } else if (snapshot.hasData) {
                               Map<String, dynamic> data = snapshot.data!;
-
-                              return Container(
-                                height: 250,
-                                child: TabBarView(
-                                  children: [
-                                    _buildCareerStats(true, data),
-                                    _buildCareerStats(false, data),
-                                  ],
-                                ),
-                              );
+                              if (data.isEmpty) {
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    'Error: No data available at the moment. Please try again later.',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 14),
+                                  ),
+                                );
+                              } else {
+                                return Container(
+                                  height: 250,
+                                  child: TabBarView(
+                                    children: [
+                                      _buildCareerStats(true, data),
+                                      _buildCareerStats(false, data),
+                                    ],
+                                  ),
+                                );
+                              }
                             }
                             return Container();
                           },
                         ),
 
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 10),
                         const Text(
                           'SEASONS',
                           style: TextStyle(
@@ -291,98 +308,115 @@ class _DriversScreenState extends State<DriversScreen> {
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ); // Show loading while fetching
                               } else if (snapshot.hasError) {
-                                return const Text(
-                                  'Error: Failed to load driver stats',
-                                  style: TextStyle(color: Colors.white),
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  child: Text(
+                                    'Error: Failed to load driver stats',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ); // Error handling
                               } else if (snapshot.hasData) {
                                 Map<String, dynamic> data = snapshot.data!;
 
-                                return Column(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topRight,
-                                      child: MouseRegion(
-                                        onEnter: (_) => setState(() {
-                                          buttonColor = Colors.redAccent;
-                                        }),
-                                        onExit: (_) => setState(() {
-                                          buttonColor = Colors.white;
-                                        }),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () {
-                                                // Navigate to the "All Races" screen
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DriverAllRacesScreen(
-                                                      selectedDriver:
-                                                          selectedDriver!,
-                                                      driversMap: driversMap,
-                                                      driversNames:
-                                                          driversNames,
-                                                      driversStats: data,
+                                if (data.isEmpty) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                    child: Text(
+                                      'Error: No data available at the moment. Please try again later.',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 14),
+                                    ),
+                                  );
+                                } else {
+                                  return Column(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: MouseRegion(
+                                          onEnter: (_) => setState(() {
+                                            buttonColor = Colors.redAccent;
+                                          }),
+                                          onExit: (_) => setState(() {
+                                            buttonColor = Colors.white;
+                                          }),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  // Navigate to the "All Races" screen
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DriverAllRacesScreen(
+                                                        selectedDriver:
+                                                            selectedDriver!,
+                                                        driversMap: driversMap,
+                                                        driversNames:
+                                                            driversNames,
+                                                        driversStats: data,
+                                                      ),
                                                     ),
+                                                  );
+                                                },
+                                                child: Text(
+                                                  'All races',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: buttonColor,
                                                   ),
-                                                );
-                                              },
-                                              child: Text(
-                                                'All races',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: buttonColor,
                                                 ),
                                               ),
-                                            ),
-                                            IconButton(
-                                              padding: EdgeInsets.zero,
-                                              constraints:
-                                                  const BoxConstraints(),
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DriverAllRacesScreen(
-                                                      selectedDriver:
-                                                          selectedDriver!,
-                                                      driversMap: driversMap,
-                                                      driversNames:
-                                                          driversNames,
-                                                      driversStats: data,
+                                              IconButton(
+                                                padding: EdgeInsets.zero,
+                                                constraints:
+                                                    const BoxConstraints(),
+                                                onPressed: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DriverAllRacesScreen(
+                                                        selectedDriver:
+                                                            selectedDriver!,
+                                                        driversMap: driversMap,
+                                                        driversNames:
+                                                            driversNames,
+                                                        driversStats: data,
+                                                      ),
                                                     ),
-                                                  ),
-                                                );
-                                              },
-                                              icon: Icon(
-                                                Icons.arrow_forward_ios,
-                                                color: buttonColor,
-                                                size: 12,
+                                                  );
+                                                },
+                                                icon: Icon(
+                                                  Icons.arrow_forward_ios,
+                                                  color: buttonColor,
+                                                  size: 12,
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    DriverSeasonsTable(data: data)
-                                  ],
-                                );
+                                      const SizedBox(height: 10),
+                                      DriverSeasonsTable(data: data)
+                                    ],
+                                  );
+                                }
                               }
                               return Container();
                             },
@@ -553,22 +587,30 @@ class _DriversScreenState extends State<DriversScreen> {
                                         ); // Show loading while fetching
                                       } else if (snapshot.hasError) {
                                         return const Text(
-                                          'Error: Failed to load driver stats',
+                                          'Error: Failed to load driver stats. Please try again later.',
                                           style: TextStyle(color: Colors.white),
                                         ); // Error handling
                                       } else if (snapshot.hasData) {
                                         Map<String, dynamic> data =
                                             snapshot.data!;
-
-                                        return Container(
-                                          height: 250,
-                                          child: TabBarView(
-                                            children: [
-                                              _buildCareerStats(true, data),
-                                              _buildCareerStats(false, data),
-                                            ],
-                                          ),
-                                        );
+                                        if (data.isEmpty) {
+                                          return const Text(
+                                            'Error: No data available at the moment. Please try again later.',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14),
+                                          );
+                                        } else {
+                                          return Container(
+                                            height: 250,
+                                            child: TabBarView(
+                                              children: [
+                                                _buildCareerStats(true, data),
+                                                _buildCareerStats(false, data),
+                                              ],
+                                            ),
+                                          );
+                                        }
                                       }
                                       return Container();
                                     },
@@ -596,105 +638,127 @@ class _DriversScreenState extends State<DriversScreen> {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {
                                         return const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(top: 100),
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ); // Show loading while fetching
                                       } else if (snapshot.hasError) {
-                                        return const Text(
-                                          'Error: Failed to load driver stats',
-                                          style: TextStyle(color: Colors.white),
+                                        return const Padding(
+                                          padding: EdgeInsets.only(top: 100),
+                                          child: Text(
+                                            'Error: Failed to load driver stats. Please try again later.',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
                                         ); // Error handling
                                       } else if (snapshot.hasData) {
                                         Map<String, dynamic> data =
                                             snapshot.data!;
 
-                                        return Column(
-                                          children: [
-                                            Align(
-                                              alignment: Alignment.topRight,
-                                              child: MouseRegion(
-                                                onEnter: (_) => setState(() {
-                                                  buttonColor =
-                                                      Colors.redAccent;
-                                                }),
-                                                onExit: (_) => setState(() {
-                                                  buttonColor = Colors.white;
-                                                }),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        // Navigate to the "All Races" screen
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                DriverAllRacesScreen(
-                                                              selectedDriver:
-                                                                  selectedDriver!,
-                                                              driversMap:
-                                                                  driversMap,
-                                                              driversNames:
-                                                                  driversNames,
-                                                              driversStats:
-                                                                  data,
+                                        if (data.isEmpty) {
+                                          return const Padding(
+                                            padding: EdgeInsets.only(top: 100),
+                                            child: Text(
+                                              'Error: No data available at the moment. Please try again later.',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14),
+                                            ),
+                                          );
+                                        } else {
+                                          return Column(
+                                            children: [
+                                              Align(
+                                                alignment: Alignment.topRight,
+                                                child: MouseRegion(
+                                                  onEnter: (_) => setState(() {
+                                                    buttonColor =
+                                                        Colors.redAccent;
+                                                  }),
+                                                  onExit: (_) => setState(() {
+                                                    buttonColor = Colors.white;
+                                                  }),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          // Navigate to the "All Races" screen
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  DriverAllRacesScreen(
+                                                                selectedDriver:
+                                                                    selectedDriver!,
+                                                                driversMap:
+                                                                    driversMap,
+                                                                driversNames:
+                                                                    driversNames,
+                                                                driversStats:
+                                                                    data,
+                                                              ),
                                                             ),
+                                                          );
+                                                        },
+                                                        child: Text(
+                                                          'All races',
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: buttonColor,
                                                           ),
-                                                        );
-                                                      },
-                                                      child: Text(
-                                                        'All races',
-                                                        style: TextStyle(
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: buttonColor,
                                                         ),
                                                       ),
-                                                    ),
-                                                    IconButton(
-                                                      padding: EdgeInsets.zero,
-                                                      constraints:
-                                                          const BoxConstraints(),
-                                                      onPressed: () {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                DriverAllRacesScreen(
-                                                              selectedDriver:
-                                                                  selectedDriver!,
-                                                              driversMap:
-                                                                  driversMap,
-                                                              driversNames:
-                                                                  driversNames,
-                                                              driversStats:
-                                                                  data,
+                                                      IconButton(
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        constraints:
+                                                            const BoxConstraints(),
+                                                        onPressed: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  DriverAllRacesScreen(
+                                                                selectedDriver:
+                                                                    selectedDriver!,
+                                                                driversMap:
+                                                                    driversMap,
+                                                                driversNames:
+                                                                    driversNames,
+                                                                driversStats:
+                                                                    data,
+                                                              ),
                                                             ),
-                                                          ),
-                                                        );
-                                                      },
-                                                      icon: Icon(
-                                                        Icons.arrow_forward_ios,
-                                                        color: buttonColor,
-                                                        size: 12,
+                                                          );
+                                                        },
+                                                        icon: Icon(
+                                                          Icons
+                                                              .arrow_forward_ios,
+                                                          color: buttonColor,
+                                                          size: 12,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            const SizedBox(height: 10),
-                                            DriverSeasonsTable(data: data)
-                                          ],
-                                        );
+                                              const SizedBox(height: 10),
+                                              DriverSeasonsTable(data: data)
+                                            ],
+                                          );
+                                        }
                                       }
                                       return Container();
                                     },
