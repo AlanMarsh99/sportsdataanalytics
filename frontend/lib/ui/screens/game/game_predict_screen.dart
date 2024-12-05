@@ -162,7 +162,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
               ],
             )),
         Padding(
-          padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+          padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
           child: upcomingRaceInfo == null
               ? Container(
                   height: MediaQuery.of(context).size.height * 0.6,
@@ -204,12 +204,17 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                             ),
                           ),
                           // Content overlaid on top of the image
-                          Center(
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
                               child: Text(
-                            'No data available about the upcoming race at the moment. Try again later.',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                            textAlign: TextAlign.center,
-                          ))
+                                'No data available about the upcoming race at the moment. Try again later.',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -369,7 +374,7 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                         color: Colors.white,
                         size: isMobile ? 18 : 22,
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Flexible(
                         child: Text(
                           'Predictions close 1 day before the race (before qualifying)',
