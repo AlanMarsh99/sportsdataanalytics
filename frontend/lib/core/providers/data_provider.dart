@@ -48,15 +48,7 @@ class DataProvider extends ChangeNotifier {
       _upcomingRaceInfo = await apiService.getUpcomingRace();
        notifyListeners();
 
-      Map<String, dynamic>? data =
-          await apiService.getDriverStandings(DateTime.now().year);
-      if (data.isNotEmpty) {
-        _driversStandings = data['driver_standings'];
-      } else {
-        _driversStandings = [];
-      }
-
-      _lastRaceResults = await apiService.getLastRaceResults();
+       _lastRaceResults = await apiService.getLastRaceResults();
       if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
         int lastRaceYear = int.parse(_lastRaceResults!['year']);
         int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
@@ -76,6 +68,16 @@ class DataProvider extends ChangeNotifier {
         } else {
           _lastRaceInfo = Race.fromJson(raceInfo);
         }
+      }
+
+      notifyListeners();
+
+      Map<String, dynamic>? data =
+          await apiService.getDriverStandings(DateTime.now().year);
+      if (data.isNotEmpty) {
+        _driversStandings = data['driver_standings'];
+      } else {
+        _driversStandings = [];
       }
 
       Map<String, dynamic>? data2 =

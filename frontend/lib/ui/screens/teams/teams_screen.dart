@@ -100,7 +100,15 @@ class _TeamsScreenState extends State<TeamsScreen> {
                     ); // Error handling
                   } else if (snapshot.hasData) {
                     List<dynamic> data = snapshot.data!;
-                    return TeamsSeasonTable(data: data);
+
+                    if (data.isEmpty) {
+                      return const Text(
+                        'Error: Data for this season is currently unavailable. Please try again later or select a different season.',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      );
+                    } else {
+                      return TeamsSeasonTable(data: data);
+                    }
                   }
                   return Container();
                 },

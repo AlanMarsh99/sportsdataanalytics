@@ -130,32 +130,28 @@ class _DriversScreenState extends State<DriversScreen> {
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white),
                               )
-                            : Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 25, bottom: 10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.arrow_back,
-                                        color: Colors.white,
-                                        size: 24.0,
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_back,
+                                      color: Colors.white,
+                                      size: 24.0,
                                     ),
-                                    const SizedBox(width: 10),
-                                    const Text(
-                                      'DRIVERS',
-                                      style: TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    )
-                                  ],
-                                ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                    'DRIVERS',
+                                    style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  )
+                                ],
                               ),
                         const SizedBox(height: 16),
                         Row(
