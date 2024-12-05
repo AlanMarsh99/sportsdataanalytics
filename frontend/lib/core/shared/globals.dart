@@ -85,6 +85,7 @@ class Globals {
     'Williams': 'assets/teams/logos/williams-logo.png',
   };
 
+
   static final Map<String, Color> teamColors = {
     'Alpine F1 Team': Color.fromARGB(255, 0, 208, 255),
     'Aston Martin': const Color(0xFF006F62),
@@ -96,6 +97,32 @@ class Globals {
     'Red Bull': const Color(0xFF1E41FF),
     'Sauber': Color.fromARGB(255, 136, 0, 0),
     'Williams': Color.fromARGB(255, 14, 104, 222),
+  };
+
+  static final Map<String, String> driverTeamMapping = {
+    'Lewis Hamilton': 'Mercedes',
+    'Max Verstappen': 'Red Bull',
+    'Charles Leclerc': 'Ferrari',
+    'Sergio Pérez': 'Red Bull',
+    'Lando Norris': 'McLaren',
+    'Carlos Sainz': 'Ferrari',
+    'George Russell': 'Mercedes',
+    'Esteban Ocon': 'Alpine F1 Team',
+    'Fernando Alonso': 'Alpine F1 Team',
+    'Oscar Piastri': 'McLaren',
+    'Valtteri Bottas': 'Alfa Romeo',
+    'Guanyu Zhou': 'Alfa Romeo',
+    'Logan Sargeant': 'Williams',
+    'Alexander Albon': 'Williams',
+    'Daniel Ricciardo': 'Haas F1 Team',
+    'Yuki Tsunoda': 'AlphaTauri',
+    'Nicholas Latifi': 'Williams',
+    'Kevin Magnussen': 'Haas F1 Team',
+  };
+
+  static final Map<String, Color> driverColors = {
+    for (var entry in driverTeamMapping.entries)
+      entry.key: teamColors[entry.value] ?? Colors.grey,
   };
 
   static final Map<String, String> teamBadges = {
