@@ -20,7 +20,6 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
   List<Team> teamsList = [];
   List<Team> filteredTeamsList = [];
   bool sortAscending = true; // Track the sorting order
-  int sortColumnIndex = 0; // Track the sorted column
 
   // State variables for sorting
   int? sortColumnIndex;
