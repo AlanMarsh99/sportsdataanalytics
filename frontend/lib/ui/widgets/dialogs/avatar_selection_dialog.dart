@@ -143,11 +143,31 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
         itemCount: avatars.length,
         itemBuilder: (context, index) {
           Avatar avatar = avatars[index];
+
           bool isUnlocked = widget.userApp.level >= avatar.level;
-          //bool isSelected = widget.userApp.avatar == avatar.id;
+          String tooltipMessage = "";
+
+          if (avatar.level == 50) {
+            if (widget.userApp.leaguesWon >= 1) {
+              isUnlocked = true;
+            } else {
+              tooltipMessage = 'Win 1 league to unlock';
+            }
+          } else {
+            if (avatar.level == 60) {
+              if (widget.userApp.globalLeaderboardWins! >= 1) {
+                isUnlocked = true;
+              } else {
+                tooltipMessage = 'Win 1 global leaderboard to unlock';
+              }
+            } else {
+              tooltipMessage =
+                  isUnlocked ? '' : 'Level ${avatar.level} required';
+            }
+          }
 
           return Tooltip(
-            message: isUnlocked ? '' : 'Level ${avatar.level} required',
+            message: tooltipMessage,
             child: InkWell(
               onTap: () {
                 if (isUnlocked) {
@@ -157,6 +177,7 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
                 }
               },
               child: Stack(
+                alignment: Alignment.center,
                 children: [
                   // Display Avatar Image
                   CircleAvatar(
@@ -185,10 +206,10 @@ class _AvatarSelectionDialogState extends State<AvatarSelectionDialog> {
                     if (selectedAvatar == avatar.name)
                       Positioned(
                         top: 0,
-                        right: 20,
+                        right: 10,
                         child: Icon(
                           Icons.check_circle,
-                          color: Colors.green[900],
+                          color: Colors.green,
                         ),
                       ),
                 ],
