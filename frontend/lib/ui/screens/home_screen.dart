@@ -149,9 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final upcomingRaceInfo = dataProvider.upcomingRaceInfo;
 
     if (upcomingRaceInfo != null && firstTime) {
-      firstTime = false;
-      startCountdown(upcomingRaceInfo);
-      userPredictionFuture = _checkUserPrediction(upcomingRaceInfo);
+      if (upcomingRaceInfo.isNotEmpty) {
+        firstTime = false;
+        startCountdown(upcomingRaceInfo);
+        userPredictionFuture = _checkUserPrediction(upcomingRaceInfo);
+      }
     }
 
     final lastRaceResults = dataProvider.lastRaceResults;
@@ -210,7 +212,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Column(
                           children: [
                             upcomingRaceInfo != null
-                                ? _countdownContainer(upcomingRaceInfo, true)
+                                ? upcomingRaceInfo.isNotEmpty
+                                    ? _countdownContainer(
+                                        upcomingRaceInfo, true)
+                                    : const SizedBox()
                                 : const SizedBox(),
                             const SizedBox(height: 16),
                             lastRaceResults != null
@@ -256,10 +261,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           children: [
                             upcomingRaceInfo != null
-                                ? Flexible(
-                                    child: _countdownContainer(
-                                        upcomingRaceInfo, false),
-                                  )
+                                ? upcomingRaceInfo.isNotEmpty
+                                    ? Flexible(
+                                        child: _countdownContainer(
+                                            upcomingRaceInfo, false),
+                                      )
+                                    : const SizedBox()
                                 : const SizedBox(),
                             const SizedBox(width: 16),
                             lastRaceResults != null
