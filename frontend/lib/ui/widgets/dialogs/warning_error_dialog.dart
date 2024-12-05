@@ -32,6 +32,6 @@ class WarningDialog extends StatelessWidget {
               style: TextStyle(color: primary),
             ),
           ),
-        ]);
+        ],);
   }
 }

@@ -49,6 +49,7 @@ dependencies:
   pdf: ^3.10.1
   printing: ^5.10.0
   dash_chat_2: ^0.0.21
+  confetti: ^0.8.0
 
 
 
