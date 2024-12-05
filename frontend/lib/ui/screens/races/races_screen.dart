@@ -86,7 +86,14 @@ class _RacesScreenState extends State<RacesScreen> {
                     ); // Error handling
                   } else if (snapshot.hasData) {
                     List<dynamic> races = snapshot.data as List<dynamic>;
-                    return RacesSeasonTable(races: races);
+                    if (races.isEmpty) {
+                      return const Text(
+                        'Error: Data for this season is currently unavailable. Please try again later or select a different season.',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      );
+                    } else {
+                      return RacesSeasonTable(races: races);
+                    }
                   }
                   return Container();
                 },

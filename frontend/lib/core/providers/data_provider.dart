@@ -45,23 +45,18 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> getHomeScreenInfo() async {
     try {
-      _upcomingRaceInfo = await apiService.getUpcomingRace().timeout(
-            const Duration(seconds: 10),
-          );
+      _upcomingRaceInfo = await apiService.getUpcomingRace();
+       notifyListeners();
 
       Map<String, dynamic>? data =
-          await apiService.getDriverStandings(DateTime.now().year).timeout(
-                const Duration(seconds: 10),
-              );
+          await apiService.getDriverStandings(DateTime.now().year);
       if (data.isNotEmpty) {
         _driversStandings = data['driver_standings'];
       } else {
         _driversStandings = [];
       }
 
-      _lastRaceResults = await apiService.getLastRaceResults().timeout(
-            const Duration(seconds: 10),
-          );
+      _lastRaceResults = await apiService.getLastRaceResults();
       if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
         int lastRaceYear = int.parse(_lastRaceResults!['year']);
         int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
@@ -84,9 +79,7 @@ class DataProvider extends ChangeNotifier {
       }
 
       Map<String, dynamic>? data2 =
-          await apiService.getConstructorStandings(DateTime.now().year).timeout(
-                const Duration(seconds: 10),
-              );
+          await apiService.getConstructorStandings(DateTime.now().year);
 
       if (data2.isNotEmpty) {
         _constructorsStandings = data2['constructors_standings'];
