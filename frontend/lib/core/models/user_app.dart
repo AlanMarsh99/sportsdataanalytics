@@ -12,6 +12,9 @@ class UserApp {
   int? predictionPoints;
   bool firstTimeTutorial;
   int? globalLeaderboardWins;
+  bool? notifyLeaderboardWin;
+  bool? notifyLeagueWin;
+  List<String>? leagueNameWin;
 
   UserApp({
     required this.id,
@@ -26,7 +29,10 @@ class UserApp {
     required this.numPredictions,
     this.predictionPoints,
     required this.firstTimeTutorial,
-    this.globalLeaderboardWins
+    this.globalLeaderboardWins,
+    this.notifyLeaderboardWin,
+    this.notifyLeagueWin,
+    this.leagueNameWin,
   });
 
   Map<String, dynamic> toMap() {
@@ -42,7 +48,10 @@ class UserApp {
       'leaguesFinished': leaguesFinished,
       'numPredictions': numPredictions,
       'firstTimeTutorial': firstTimeTutorial,
-      'globalLeaderboardWins': globalLeaderboardWins
+      'globalLeaderboardWins': globalLeaderboardWins,
+      'notifyLeaderboardWin': notifyLeaderboardWin,
+      'notifyLeagueWin': notifyLeagueWin,
+      'leagueNameWin': leagueNameWin,
     };
   }
 
@@ -59,7 +68,10 @@ class UserApp {
       leaguesFinished: map['leaguesFinished'],
       numPredictions: map['numPredictions'],
       firstTimeTutorial: map['firstTimeTutorial'] ?? true,
-      globalLeaderboardWins: map['globalLeaderboardWins'] ?? 0
+      globalLeaderboardWins: map['globalLeaderboardWins'] ?? 0,
+      notifyLeaderboardWin: map['notifyLeaderboardWin'] ?? false,
+      notifyLeagueWin: map['notifyLeagueWin'] ?? false,
+      leagueNameWin: List<String>.from(map['leagueNameWin'] ?? []),
     );
   }
 
