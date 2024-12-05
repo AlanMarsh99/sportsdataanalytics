@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/team.dart';
 import 'package:frontend/core/shared/globals.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/teams/teams_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
@@ -16,6 +17,8 @@ class TeamsSeasonTable extends StatefulWidget {
 class _TeamsSeasonTableState extends State<TeamsSeasonTable> {
   List<Team> teamsList = [];
   List<Team> filteredTeamsList = [];
+  bool sortAscending = true; // Track the sorting order
+  int sortColumnIndex = 0; // Track the sorted column
 
   @override
   void initState() {
@@ -30,18 +33,17 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable> {
 
   static String? getBadgePath(String teamName) {
     String mappedName = getMappedTeamName(teamName);
-    return Globals.teamBadges[mappedName] ?? 'assets/teams/logos/placeholder.png';
+    return Globals.teamBadges[mappedName] ??
+        'assets/teams/logos/placeholder.png';
   }
 
   void updateFilter(String value) {
     setState(() {
       final filter = value.toLowerCase();
       filteredTeamsList = teamsList.where((team) {
-        // Check if the team name matches the filter
         final teamNameMatch = team.name.toLowerCase().contains(filter);
-        // Check if any driver in the team matches the filter
-        final driversMatch = team.driversList.any((driver) => driver.toLowerCase().contains(filter));
-        // Check if wins or podiums match the filter
+        final driversMatch = team.driversList
+            .any((driver) => driver.toLowerCase().contains(filter));
         final winsMatch = team.yearWins.toString().contains(filter);
         final podiumsMatch = team.yearPodiums.toString().contains(filter);
 
@@ -50,30 +52,51 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable> {
     });
   }
 
+  void onSort(int columnIndex, bool ascending) {
+    setState(() {
+      sortColumnIndex = columnIndex;
+      sortAscending = ascending;
+
+      if (columnIndex == 1) {
+        // Sort by Wins
+        filteredTeamsList.sort((a, b) =>
+            ascending ? a.yearWins.compareTo(b.yearWins) : b.yearWins.compareTo(a.yearWins));
+      } else if (columnIndex == 2) {
+        // Sort by Podiums
+        filteredTeamsList.sort((a, b) =>
+            ascending ? a.yearPodiums.compareTo(b.yearPodiums) : b.yearPodiums.compareTo(a.yearPodiums));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Filtering TextField
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: TextField(
-            cursorColor: Colors.white,
-            decoration: InputDecoration(
-              hintText: 'Enter a team, driver, wins, or podiums',
-              hintStyle: const TextStyle(color: Colors.white70),
-              labelText: 'Filter teams',
-              labelStyle: const TextStyle(color: Colors.white),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: Colors.white),
+          child: Container(
+            width: isMobile ? double.infinity : 500,
+            child: TextField(
+              cursorColor: Colors.white,
+              decoration: InputDecoration(
+                hintText: 'Enter a team, driver, wins, or podiums',
+                hintStyle: const TextStyle(color: Colors.white70),
+                labelText: 'Filter teams',
+                labelStyle: const TextStyle(color: Colors.white),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
               ),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
+              onChanged: updateFilter,
             ),
-            onChanged: updateFilter,
           ),
         ),
         Expanded(
@@ -91,33 +114,43 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable> {
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: DataTable(
-                      columns: const [
-                        DataColumn(
+                      sortAscending: sortAscending,
+                      sortColumnIndex: sortColumnIndex,
+                      columns: [
+                        const DataColumn(
                           label: Text(
                             'Team',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.black),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
                           ),
                         ),
                         DataColumn(
-                          label: Text(
+                          label: const Text(
                             'Wins',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.black),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
                           ),
+                          onSort: (columnIndex, ascending) =>
+                              onSort(columnIndex, ascending),
                         ),
                         DataColumn(
-                          label: Text(
+                          label: const Text(
                             'Podiums',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.black),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
                           ),
+                          onSort: (columnIndex, ascending) =>
+                              onSort(columnIndex, ascending),
                         ),
-                        DataColumn(
+                        const DataColumn(
                           label: Text(
                             'Drivers',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.black),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
                           ),
                         ),
                       ],
