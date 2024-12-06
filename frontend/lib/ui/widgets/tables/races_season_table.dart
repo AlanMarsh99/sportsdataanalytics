@@ -569,7 +569,7 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                               return BarTooltipItem(
                                                 '$driverName\n$title: ${rod.toY.toInt()}',
                                                 const TextStyle(
-                                                  color: Colors.black,
+                                                  color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               );

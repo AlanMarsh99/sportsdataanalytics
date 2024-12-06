@@ -457,7 +457,7 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
                                               return BarTooltipItem(
                                                 '$teamName\n$title: ${rod.toY.toInt()}',
                                                 const TextStyle(
-                                                  color: Colors.black,
+                                                  color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               );
