@@ -46,9 +46,9 @@ class DataProvider extends ChangeNotifier {
   Future<void> getHomeScreenInfo() async {
     try {
       _upcomingRaceInfo = await apiService.getUpcomingRace();
-       notifyListeners();
+      notifyListeners();
 
-       _lastRaceResults = await apiService.getLastRaceResults();
+      _lastRaceResults = await apiService.getLastRaceResults();
       if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
         int lastRaceYear = int.parse(_lastRaceResults!['year']);
         int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
@@ -61,7 +61,7 @@ class DataProvider extends ChangeNotifier {
             .onError((error, stackTrace) {
           return {};
         });
-        
+
 
         if (raceInfo.isEmpty) {
           _lastRaceInfo = null;
