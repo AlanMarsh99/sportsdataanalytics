@@ -30,7 +30,7 @@ exports.processRaceResults = functions
 
         try {
             // Step 1: Retrieve the last processed race
-            /*const lastProcessedRaceDoc = await db.collection("config").doc("lastProcessedRace").get();
+            const lastProcessedRaceDoc = await db.collection("config").doc("lastProcessedRace").get();
             const lastProcessedRace = lastProcessedRaceDoc.exists ? lastProcessedRaceDoc.data() : null;
 
             if (!lastProcessedRace) {
@@ -79,7 +79,7 @@ exports.processRaceResults = functions
                 year: "2024",
             };*/
 
-            /*if (raceResults.year === String(year) && raceResults.race_id === String(round)) {
+            if (raceResults.year === String(year) && raceResults.race_id === String(round)) {
                 console.log(`Race results for year ${year} and round ${round} already processed`);
                 return null;
             }
@@ -220,11 +220,11 @@ exports.processRaceResults = functions
             });
 
             // Commit the batch
-            await batch.commit();*/
+            await batch.commit();
 
             // Step 6: Check if it's the last race of the season
-            //if (raceResults.is_last_race_of_season === true) {
-            if (true) {
+            if (raceResults.is_last_race_of_season === true) {
+            //if (true) {
                 console.log(`Last race of the season!`);
 
                 // Step 7: Find the user with the most points this season
