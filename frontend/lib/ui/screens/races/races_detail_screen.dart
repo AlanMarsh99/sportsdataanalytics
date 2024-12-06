@@ -273,8 +273,16 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                                                   color: Colors.white));
                                         } else if (snapshot.hasData &&
                                             snapshot.data != null) {
-                                          return LapGraphWidget(
-                                              racePositions: snapshot.data!);
+                                          return Container(
+                                            padding: EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: primary,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: LapGraphWidget(
+                                                racePositions: snapshot.data!),
+                                          );
                                         } else {
                                           return const Text('No data available',
                                               style: TextStyle(
@@ -703,9 +711,23 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                                                               .hasData &&
                                                           snapshot.data !=
                                                               null) {
-                                                        return LapGraphWidget(
-                                                            racePositions:
-                                                                snapshot.data!);
+                                                        return Container(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  12),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: primary,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                          ),
+                                                          child: LapGraphWidget(
+                                                              racePositions:
+                                                                  snapshot
+                                                                      .data!),
+                                                        );
                                                       } else {
                                                         return const Text(
                                                             'No data available',
@@ -1179,25 +1201,20 @@ class LapGraphWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           // Legend
-          Expanded(
-            child: SingleChildScrollView(
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: driverLegends.map((driverLegend) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                          width: 12, height: 12, color: driverLegend.color),
-                      const SizedBox(width: 4),
-                      Text(driverLegend.name,
-                          style: const TextStyle(color: Colors.white)),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: driverLegends.map((driverLegend) {
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(width: 12, height: 12, color: driverLegend.color),
+                  const SizedBox(width: 4),
+                  Text(driverLegend.name,
+                      style: const TextStyle(color: Colors.white)),
+                ],
+              );
+            }).toList(),
           ),
         ],
       ),
