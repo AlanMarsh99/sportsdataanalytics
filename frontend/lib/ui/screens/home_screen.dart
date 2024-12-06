@@ -113,6 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void startCountdown(Map<String, dynamic> upcomingRaceInfo) {
     // Parse the date and time from the JSON
+    if (upcomingRaceInfo['date'] == null || upcomingRaceInfo['hour'] == null) {
+      return;
+    }
     String date = upcomingRaceInfo['date']; // e.g., "2023-08-27"
     String hour = upcomingRaceInfo['hour']; // e.g., "13:00"
 
@@ -162,7 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
             context: context,
             builder: (context) {
               return CongratulationsDialog(
-                  message: "You've done it! You've claimed the top spot on the Global Leaderboard of RaceVision this season!");
+                  message:
+                      "You've done it! You've claimed the top spot on the Global Leaderboard of RaceVision this season!");
             },
           );
           firstTimeLeaderboard = false;
@@ -264,8 +268,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     : const SizedBox(),
                                 const SizedBox(height: 16),
                                 lastRaceResults != null
-                                    ? _lastRaceResultsContainer(
-                                        lastRaceResults, true)
+                                    ? lastRaceResults.isNotEmpty
+                                        ? _lastRaceResultsContainer(
+                                            lastRaceResults, true)
+                                        : const SizedBox()
                                     : const SizedBox(),
                               ],
                             ),
@@ -315,10 +321,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     : const SizedBox(),
                                 const SizedBox(width: 16),
                                 lastRaceResults != null
-                                    ? Flexible(
-                                        child: _lastRaceResultsContainer(
-                                            lastRaceResults, false),
-                                      )
+                                    ? lastRaceResults.isNotEmpty
+                                        ? Flexible(
+                                            child: _lastRaceResultsContainer(
+                                                lastRaceResults, false),
+                                          )
+                                        : const SizedBox()
                                     : const SizedBox(),
                               ],
                             ),
@@ -343,7 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         ConfettiWidget(
           confettiController: _confettiController,
-          blastDirection:  3.1416 / 2,
+          blastDirection: 3.1416 / 2,
           emissionFrequency: 0.5,
           gravity: 0.1,
           numberOfParticles: 60,
@@ -497,118 +505,126 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _lastRaceResultsContainer(
       Map<String, dynamic> lastRaceResults, bool isMobile) {
-    return Container(
-      width: double.infinity,
-      height: isMobile ? 520 : 487,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: primary,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "LAST RACE RESULTS",
-                style: TextStyle(
-                    fontSize: isMobile ? 14 : 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: MouseRegion(
-                onEnter: (_) => setState(() {
-                  buttonColor = Colors.redAccent;
-                }),
-                onExit: (_) => setState(() {
-                  buttonColor = Colors.white;
-                }),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment:
-                      CrossAxisAlignment.center, // Ensures vertical alignment
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        if (lastRaceInfo != null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  RacesDetailScreen(race: lastRaceInfo!),
-                            ),
-                          );
-                        }
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(0, 0),
-                      ),
-                      child: Text(
-                        "View full results",
-                        style: TextStyle(
-                          fontSize: isMobile ? 12 : 14,
-                          fontWeight: FontWeight.bold,
-                          color: buttonColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () {
-                        if (lastRaceInfo != null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  RacesDetailScreen(race: lastRaceInfo!),
-                            ),
-                          );
-                        }
-                      },
-                      icon: Icon(
-                        Icons.arrow_forward_ios,
-                        color: buttonColor,
-                        size: 12,
-                      ),
-                    ),
-                  ],
+    if (lastRaceResults['first_position'] == null ||
+        lastRaceResults['second_position'] == null ||
+        lastRaceResults['third_position'] == null ||
+        lastRaceResults['fastest_lap'] == null) {
+      return SizedBox();
+    } else {
+      return Container(
+        width: double.infinity,
+        height: isMobile ? 520 : 487,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: primary,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "LAST RACE RESULTS",
+                  style: TextStyle(
+                      fontSize: isMobile ? 14 : 18,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
-            const SizedBox(height: 5),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Podium",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              Align(
+                alignment: Alignment.centerRight,
+                child: MouseRegion(
+                  onEnter: (_) => setState(() {
+                    buttonColor = Colors.redAccent;
+                  }),
+                  onExit: (_) => setState(() {
+                    buttonColor = Colors.white;
+                  }),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center, // Ensures vertical alignment
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          if (lastRaceInfo != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RacesDetailScreen(race: lastRaceInfo!),
+                              ),
+                            );
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 0),
+                        ),
+                        child: Text(
+                          "View full results",
+                          style: TextStyle(
+                            fontSize: isMobile ? 12 : 14,
+                            fontWeight: FontWeight.bold,
+                            color: buttonColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          if (lastRaceInfo != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RacesDetailScreen(race: lastRaceInfo!),
+                              ),
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: buttonColor,
+                          size: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            const Divider(color: Colors.white),
-            _buildPodiumCard(1, lastRaceResults['first_position']),
-            _buildPodiumCard(2, lastRaceResults['second_position']),
-            _buildPodiumCard(3, lastRaceResults['third_position']),
-            const SizedBox(height: 20),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Fastest lap",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              const SizedBox(height: 5),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Podium",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            const Divider(color: Colors.white),
-            _buildDriverCard(lastRaceResults['fastest_lap']),
-          ],
+              const Divider(color: Colors.white),
+              _buildPodiumCard(1, lastRaceResults['first_position']),
+              _buildPodiumCard(2, lastRaceResults['second_position']),
+              _buildPodiumCard(3, lastRaceResults['third_position']),
+              const SizedBox(height: 20),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Fastest lap",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const Divider(color: Colors.white),
+              _buildDriverCard(lastRaceResults['fastest_lap']),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _countdownContainer(

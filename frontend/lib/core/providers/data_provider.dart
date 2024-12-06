@@ -45,53 +45,113 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> getHomeScreenInfo() async {
     try {
-      _upcomingRaceInfo = await apiService.getUpcomingRace();
+      Map<String, dynamic>? info = await apiService.getUpcomingRace();
+      if (info != null) {
+        _upcomingRaceInfo = info;
+      } else {
+        _upcomingRaceInfo = {};
+      }
       notifyListeners();
 
       _lastRaceResults = await apiService.getLastRaceResults();
-      if (_lastRaceResults != null && _lastRaceResults!.isNotEmpty) {
-        int lastRaceYear = int.parse(_lastRaceResults!['year']);
-        int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
+      if (_lastRaceResults != null) {
+        if (_lastRaceResults!.isNotEmpty) {
+          int lastRaceYear = int.parse(_lastRaceResults!['year']);
+          int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
 
-        Map<String, dynamic> raceInfo = await apiService
-            .getRaceInfo(lastRaceYear, lastRaceRound)
-            .timeout(
-              const Duration(seconds: 10),
-            )
-            .onError((error, stackTrace) {
-          return {};
-        });
-
-
-        if (raceInfo.isEmpty) {
-          _lastRaceInfo = null;
+          Map<String, dynamic> raceInfo =
+              await apiService.getRaceInfo(lastRaceYear, lastRaceRound);
+          if (raceInfo != null) {
+            if (raceInfo.isEmpty) {
+              _lastRaceInfo = null;
+            } else {
+              _lastRaceInfo = Race.fromJson(raceInfo);
+            }
+          } else {
+            _lastRaceInfo = null;
+          }
         } else {
-          _lastRaceInfo = Race.fromJson(raceInfo);
+          _lastRaceInfo = null;
         }
+      } else {
+        _lastRaceInfo = null;
       }
-
       notifyListeners();
 
       Map<String, dynamic>? data =
           await apiService.getDriverStandings(DateTime.now().year);
-      if (data.isNotEmpty) {
-        _driversStandings = data['driver_standings'];
+      if (data != null) {
+        if (data.isNotEmpty) {
+          _driversStandings = data['driver_standings'];
+        } else {
+          _driversStandings = [];
+        }
       } else {
         _driversStandings = [];
       }
 
       Map<String, dynamic>? data2 =
           await apiService.getConstructorStandings(DateTime.now().year);
-
-      if (data2.isNotEmpty) {
-        _constructorsStandings = data2['constructors_standings'];
+      if (data2 != null) {
+        if (data2.isNotEmpty) {
+          _constructorsStandings = data2['constructors_standings'];
+        } else {
+          _constructorsStandings = [];
+        }
       } else {
         _constructorsStandings = [];
       }
 
       notifyListeners();
     } catch (error) {
-      print("Error fetching home screen info: $error");
+      print("Error fetching home screen info: $error. Trying again.");
+      try {
+        _upcomingRaceInfo = await apiService.getUpcomingRace();
+        notifyListeners();
+
+        _lastRaceResults = await apiService.getLastRaceResults();
+        if (_lastRaceResults != null) {
+          if (_lastRaceResults!.isNotEmpty) {
+            int lastRaceYear = int.parse(_lastRaceResults!['year']);
+            int lastRaceRound = int.parse(_lastRaceResults!['race_id']);
+
+            Map<String, dynamic> raceInfo =
+                await apiService.getRaceInfo(lastRaceYear, lastRaceRound);
+
+            if (raceInfo.isEmpty) {
+              _lastRaceInfo = null;
+            } else {
+              _lastRaceInfo = Race.fromJson(raceInfo);
+            }
+          }
+        } else {
+          _lastRaceInfo = null;
+        }
+
+        notifyListeners();
+
+        Map<String, dynamic>? data =
+            await apiService.getDriverStandings(DateTime.now().year);
+
+        if (data.isNotEmpty) {
+          _driversStandings = data['driver_standings'];
+        } else {
+          _driversStandings = [];
+        }
+
+        Map<String, dynamic>? data2 =
+            await apiService.getConstructorStandings(DateTime.now().year);
+
+        if (data2.isNotEmpty) {
+          _constructorsStandings = data2['constructors_standings'];
+        } else {
+          _constructorsStandings = [];
+        }
+
+        notifyListeners();
+      } catch (error) {
+        print("Try 2. Error fetching home screen info: $error");
+      }
     }
   }
 
