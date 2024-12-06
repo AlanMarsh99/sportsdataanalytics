@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool firstTimeLeaderboard = true;
   bool firstTimeLeague = true;
   final _confettiController =
-      ConfettiController(duration: const Duration(seconds: 5));
+      ConfettiController(duration: const Duration(seconds: 6));
 
   @override
   void initState() {
@@ -344,8 +344,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ConfettiWidget(
           confettiController: _confettiController,
           blastDirection:  3.1416 / 2,
-          emissionFrequency: 0.1,
+          emissionFrequency: 0.5,
           gravity: 0.1,
+          numberOfParticles: 60,
         ),
       ],
     );
