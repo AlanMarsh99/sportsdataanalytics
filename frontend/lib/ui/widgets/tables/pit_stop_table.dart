@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/responsive.dart';
 import '/core/models/pit_stops.dart';
 
 class PitStopsTable extends StatelessWidget {
@@ -8,6 +9,7 @@ class PitStopsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Scrollbar(
       thumbVisibility: true,
       child: SingleChildScrollView(
@@ -22,7 +24,7 @@ class PitStopsTable extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                columnSpacing: 16.0,
+                columnSpacing: isMobile ? 15 : 56,
                 columns: const [
                   DataColumn(
                     label: Text(
@@ -53,7 +55,7 @@ class PitStopsTable extends StatelessWidget {
                   ),
                   DataColumn(
                     label: Text(
-                      'Duration (s)',
+                      'Duration(s)',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -70,7 +72,7 @@ class PitStopsTable extends StatelessWidget {
                     ),
                   ),
                 ],
-                rows: _buildRows(data),
+                rows: _buildRows(data, isMobile),
               ),
             ),
           ),
@@ -79,19 +81,21 @@ class PitStopsTable extends StatelessWidget {
     );
   }
 
-  List<DataRow> _buildRows(PitStopDataResponse data) {
+  List<DataRow> _buildRows(PitStopDataResponse data, bool isMobile) {
     List<DataRow> rows = [];
     for (var driver in data.drivers) {
       for (var stop in driver.stops) {
         rows.add(
           DataRow(
             cells: [
-              DataCell(
-                Text(
-                  _capitaliseLastName(driver.driver), // Capitalise only the first letter of the last name
+              DataCell(SizedBox(
+                width: isMobile ? 80 : null,
+                child: Text(
+                  _capitaliseLastName(driver
+                      .driver), // Capitalise only the first letter of the last name
                   style: const TextStyle(color: Colors.black),
                 ),
-              ),
+              )),
               DataCell(
                 Text(
                   driver.team,
@@ -106,7 +110,8 @@ class PitStopsTable extends StatelessWidget {
               ),
               DataCell(
                 Text(
-                  stop.duration.toStringAsFixed(3), // Format duration to 3 decimal places
+                  stop.duration.toStringAsFixed(
+                      3), // Format duration to 3 decimal places
                   style: const TextStyle(color: Colors.black),
                 ),
               ),
@@ -130,7 +135,8 @@ class PitStopsTable extends StatelessWidget {
     if (parts.length > 1) {
       // Capitalise the last name only
       String lastName = parts.last;
-      lastName = lastName[0].toUpperCase() + lastName.substring(1).toLowerCase();
+      lastName =
+          lastName[0].toUpperCase() + lastName.substring(1).toLowerCase();
       // Recombine with the first name
       return '${parts.first} $lastName';
     } else {
