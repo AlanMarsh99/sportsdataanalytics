@@ -22,6 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _passwordVisible = false;
   bool _repeatPasswordVisible = false;
   bool isMobile = false;
+  final FocusNode _emailFocusNode = FocusNode();
 
   @override
   void dispose() {
@@ -29,6 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     _repeatPasswordController.dispose();
+    _emailFocusNode.dispose();
     super.dispose();
   }
 
@@ -45,7 +47,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         body: Padding(
           padding: EdgeInsets.symmetric(
               horizontal: 40, vertical: isMobile ? 40 : 80),
@@ -139,6 +141,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           width: isMobile ? double.infinity : 500,
           child: TextFormField(
             controller: _emailController,
+            focusNode: _emailFocusNode,
             cursorColor: Colors.white,
             style: const TextStyle(
               color: Colors.white,
