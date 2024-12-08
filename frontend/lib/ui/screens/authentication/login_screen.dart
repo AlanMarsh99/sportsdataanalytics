@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/core/shared/validators.dart';
@@ -9,29 +10,38 @@ import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({
+    Key? key,
+    required this.isMobile,
+  }) : super(key: key);
+
+  final bool isMobile;
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  var _emailController = TextEditingController();
+  var _passwordController = TextEditingController();
   bool _passwordVisible = false;
-  bool isMobile = false;
   final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    isMobile = Responsive.isMobile(context);
+    var nav = Provider.of<NavigationProvider>(context, listen: false);
+    print("Building LoginScreen");
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -44,107 +54,100 @@ class _LoginScreenState extends State<LoginScreen> {
         resizeToAvoidBottomInset: true,
         body: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal: 40, vertical: isMobile ? 40 : 80),
-          child: Consumer<AuthService>(
-            builder: (context, auth, child) {
-              return Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  child: Column(
+              horizontal: 40, vertical: widget.isMobile ? 40 : 80),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Image.asset('assets/logo/logo-detail.png',
+                      width: widget.isMobile ? 150 : 200, fit: BoxFit.cover),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: widget.isMobile
+                        ? MainAxisAlignment.start
+                        : MainAxisAlignment.center,
                     children: [
-                      Image.asset('assets/logo/logo-detail.png',
-                          width: isMobile ? 150 : 200, fit: BoxFit.cover),
-                      const SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: isMobile
-                            ? MainAxisAlignment.start
-                            : MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                              size: 30.0,
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'Welcome back',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'OpenSans',
-                              fontSize: 30.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 30.0,
+                        ),
+                        onPressed: () {
+                          nav.updateIndex(0);
+                        },
                       ),
-                      const SizedBox(height: 15.0),
+                      const SizedBox(width: 10),
                       const Text(
-                        'Log in to play the F1 Predictions Challenge with your friends and win prizes!',
+                        'Welcome back',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',
-                          fontSize: 16.0,
+                          fontSize: 30.0,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: isMobile ? 30.0 : 50),
-                      _buildEmailTF(),
-                      const SizedBox(
-                        height: 30.0,
-                      ),
-                      _buildPasswordTF(),
-                      SizedBox(
-                        height: isMobile ? 25 : 50,
-                      ),
-                      auth.status == Status.Authenticating
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : _buildLogInButton(auth),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Don't have an account?  ",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: isMobile ? 14 : 16),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SignUpScreen(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'Sign up',
-                              style: TextStyle(
-                                  color: redAccent,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'OpenSans',
-                                  fontSize: isMobile ? 14 : 16),
-                            ),
+                    ],
+                  ),
+                  const SizedBox(height: 15.0),
+                  const Text(
+                    'Log in to play the F1 Predictions Challenge with your friends and win prizes!',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'OpenSans',
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  SizedBox(height: widget.isMobile ? 30.0 : 50),
+                  _buildEmailTF(),
+                  const SizedBox(
+                    height: 30.0,
+                  ),
+                  _buildPasswordTF(nav),
+                  SizedBox(
+                    height: widget.isMobile ? 25 : 50,
+                  ),
+                  Consumer<AuthService>(builder: (context, auth, child) {
+                    return auth.status == Status.Authenticating
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
                           )
-                        ],
+                        : _buildLogInButton(auth, nav);
+                  }),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don't have an account?  ",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: widget.isMobile ? 14 : 16),
                       ),
-                      const SizedBox(
-                        height: 10,
+                      TextButton(
+                        onPressed: () {
+                          nav.updateIndex(7);
+                        },
+                        child: Text(
+                          'Sign up',
+                          style: TextStyle(
+                              color: redAccent,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'OpenSans',
+                              fontSize: widget.isMobile ? 14 : 16),
+                        ),
                       )
                     ],
                   ),
-                ),
-              );
-            },
+                  const SizedBox(
+                    height: 10,
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -152,6 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildEmailTF() {
+    print("Rebuilding Email TextField");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -164,10 +168,11 @@ class _LoginScreenState extends State<LoginScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
-          width: isMobile ? double.infinity : 500,
+          width: widget.isMobile ? double.infinity : 500,
           child: TextFormField(
             controller: _emailController,
             focusNode: _emailFocusNode,
+            autofocus: false,
             cursorColor: Colors.white,
             style: const TextStyle(
               color: Colors.white,
@@ -195,9 +200,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildPasswordTF() {
+  Widget _buildPasswordTF(NavigationProvider nav) {
+    print("Rebuilding Password TextField");
     return Container(
-      width: isMobile ? double.infinity : 500,
+      width: widget.isMobile ? double.infinity : 500,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -210,12 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ForgotPasswordScreen(),
-                    ),
-                  );
+                  nav.updateIndex(8);
                 },
                 child: Container(
                   child: const Text(
@@ -237,6 +238,8 @@ class _LoginScreenState extends State<LoginScreen> {
             height: 60.0,
             child: TextFormField(
               controller: _passwordController,
+              focusNode: _passwordFocusNode,
+              autofocus: false,
               cursorColor: Colors.white,
               obscureText: !_passwordVisible,
               style: const TextStyle(
@@ -279,10 +282,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLogInButton(AuthService auth) {
+  Widget _buildLogInButton(AuthService auth, NavigationProvider nav) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
-      width: isMobile ? double.infinity : 500,
+      width: widget.isMobile ? double.infinity : 500,
       child: ElevatedButton(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(secondary),
@@ -308,21 +311,21 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            signIn(auth);
+            signIn(auth, nav);
           }
         },
       ),
     );
   }
 
-  void signIn(AuthService auth) async {
+  void signIn(AuthService auth, NavigationProvider nav) async {
     await auth.signIn(
       _emailController.text.trim(),
       _passwordController.text,
     );
 
     if (auth.status == Status.Authenticated) {
-      Navigator.pop(context);
+      nav.updateIndex(0);
     }
 
     if (auth.status == Status.Unauthenticated) {

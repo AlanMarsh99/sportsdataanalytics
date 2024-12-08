@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/ui/responsive.dart';
+import 'package:frontend/ui/screens/authentication/forgot_password_screen.dart';
+import 'package:frontend/ui/screens/authentication/login_screen.dart';
+import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/game_first_screen.dart';
 import 'package:frontend/ui/screens/game/tutorial_screen.dart';
@@ -25,6 +29,9 @@ class NavigationProvider extends ChangeNotifier {
     const TeamsScreen(),
     const GameFirstScreen(),
     const DownloadScreen(),
+    LoginScreen(isMobile: true),
+    SignUpScreen(isMobile: true),
+    ForgotPasswordScreen()
   ];
 
   final List<NavigationRailDestination> _destinations = [
@@ -59,6 +66,7 @@ class NavigationProvider extends ChangeNotifier {
 
   void updateIndex(int index) {
     _selectedIndex = index;
+    print("Updating index to $index");
     switch (index) {
       case 0:
         _selectedScreen = HomeScreen();
@@ -95,6 +103,19 @@ class NavigationProvider extends ChangeNotifier {
         _selectedScreen = DownloadScreen();
         _currentRoute = 'download';
         break;
+      case 6:
+        _selectedScreen = LoginScreen(
+          isMobile: true,
+        );
+        _currentRoute = 'login';
+      case 7:
+        _selectedScreen = SignUpScreen(
+          isMobile: true,
+        );
+        _currentRoute = 'signup';
+      case 8:
+        _selectedScreen = ForgotPasswordScreen();
+        _currentRoute = 'forgotpassword';
     }
     notifyListeners();
   }

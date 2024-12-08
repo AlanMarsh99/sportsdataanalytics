@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/core/services/auth_services.dart';
 import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/core/shared/validators.dart';
@@ -9,20 +10,28 @@ import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({
+    Key? key,
+    required this.isMobile,
+  }) : super(key: key);
+
+  final bool isMobile;
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _repeatPasswordController = TextEditingController();
+  static GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  var _emailController = TextEditingController();
+  var _usernameController = TextEditingController();
+  var _passwordController = TextEditingController();
+  var _repeatPasswordController = TextEditingController();
   bool _passwordVisible = false;
   bool _repeatPasswordVisible = false;
-  bool isMobile = false;
   final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _usernameFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+  final FocusNode _repeatPasswordFocusNode = FocusNode();
 
   @override
   void dispose() {
@@ -31,13 +40,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _passwordController.dispose();
     _repeatPasswordController.dispose();
     _emailFocusNode.dispose();
+    _usernameFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _repeatPasswordFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    isMobile = Responsive.isMobile(context);
-
+    var nav = Provider.of<NavigationProvider>(context, listen: false);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -50,75 +61,73 @@ class _SignUpScreenState extends State<SignUpScreen> {
         resizeToAvoidBottomInset: true,
         body: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal: 40, vertical: isMobile ? 40 : 80),
-          child: Consumer<AuthService>(
-            builder: (context, auth, child) {
-              return Form(
-                key: _formKey,
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Column(
+              horizontal: 40, vertical: widget.isMobile ? 40 : 80),
+          child: Form(
+            key: _formKey,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Image.asset('assets/logo/logo-detail.png',
+                        width: widget.isMobile ? 150 : 200, fit: BoxFit.cover),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Row(
+                      mainAxisAlignment: widget.isMobile
+                          ? MainAxisAlignment.start
+                          : MainAxisAlignment.center,
                       children: [
-                        Image.asset('assets/logo/logo-detail.png',
-                            width: isMobile ? 150 : 200, fit: BoxFit.cover),
-                        const SizedBox(
-                          height: 30,
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 30.0,
+                          ),
+                          onPressed: () {
+                            nav.updateIndex(6);
+                          },
                         ),
-                        Row(
-                          mainAxisAlignment: isMobile
-                              ? MainAxisAlignment.start
-                              : MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back,
-                                color: Colors.white,
-                                size: 30.0,
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                            const SizedBox(width: 10),
-                            const Text(
-                              'Create an account',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'OpenSans',
-                                fontSize: 30.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Create an account',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'OpenSans',
+                            fontSize: 30.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 30),
-                        _buildEmailTF(),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
-                        _buildUsernameTF(),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
-                        _buildPasswordTF(),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
-                        _buildRepeatPasswordTF(),
-                        SizedBox(
-                          height: isMobile ? 25 : 50,
-                        ),
-                        auth.status == Status.Authenticating
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : _buildSignUpButton(auth),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 30),
+                    _buildEmailTF(),
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    _buildUsernameTF(),
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    _buildPasswordTF(),
+                    const SizedBox(
+                      height: 30.0,
+                    ),
+                    _buildRepeatPasswordTF(),
+                    SizedBox(
+                      height: widget.isMobile ? 25 : 50,
+                    ),
+                    Consumer<AuthService>(builder: (context, auth, child) {
+                      return auth.status == Status.Authenticating
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : _buildSignUpButton(auth, nav);
+                    })
+                  ],
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),
@@ -138,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
-          width: isMobile ? double.infinity : 500,
+          width: widget.isMobile ? double.infinity : 500,
           child: TextFormField(
             controller: _emailController,
             focusNode: _emailFocusNode,
@@ -157,6 +166,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               hintText: 'Enter your email',
               hintStyle: Globals.kHintTextStyle,
             ),
+            onEditingComplete: () {
+              FocusScope.of(context).nextFocus();
+            },
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
             validator: (value) {
               if (!Validators.validateEmail(value!)) {
                 return 'Please enter a valid email';
@@ -182,9 +196,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
-          width: isMobile ? double.infinity : 500,
+          width: widget.isMobile ? double.infinity : 500,
           child: TextFormField(
             controller: _usernameController,
+            focusNode: _usernameFocusNode,
             cursorColor: Colors.white,
             style: const TextStyle(
               color: Colors.white,
@@ -228,9 +243,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
-          width: isMobile ? double.infinity : 500,
+          width: widget.isMobile ? double.infinity : 500,
           child: TextFormField(
             controller: _passwordController,
+            focusNode: _passwordFocusNode,
             cursorColor: Colors.white,
             obscureText: !_passwordVisible,
             style: const TextStyle(
@@ -291,9 +307,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
-          width: isMobile ? double.infinity : 500,
+          width: widget.isMobile ? double.infinity : 500,
           child: TextFormField(
             controller: _repeatPasswordController,
+            focusNode: _repeatPasswordFocusNode,
             cursorColor: Colors.white,
             obscureText: !_repeatPasswordVisible,
             style: const TextStyle(
@@ -340,10 +357,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildSignUpButton(AuthService auth) {
+  Widget _buildSignUpButton(AuthService auth, NavigationProvider nav) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25.0),
-      width: isMobile ? double.infinity : 500,
+      width: widget.isMobile ? double.infinity : 500,
       child: ElevatedButton(
         style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all<Color>(secondary),
@@ -408,11 +425,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               );
 
               // Navigate to the next screen.
-              await Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const NavigationScreen()),
-              );
+              nav.updateIndex(0);
             } catch (e) {
               // Handle errors and inform the user.
               ScaffoldMessenger.of(context).showSnackBar(
