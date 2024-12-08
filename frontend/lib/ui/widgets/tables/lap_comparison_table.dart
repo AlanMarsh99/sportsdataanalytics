@@ -31,7 +31,7 @@ class LapComparisonTable extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                columnSpacing: 16.0,
+                columnSpacing: isMobile ? 15 : 56,
                 columns: [
                    DataColumn(
                     label: Text(
@@ -43,7 +43,7 @@ class LapComparisonTable extends StatelessWidget {
                     ),
                   ),
                   DataColumn(
-                    label: Text(
+                    label: Text(isMobile ? '${driver1LapData.driverName.split(' ').last}\nPosition' :
                       '${driver1LapData.driverName.split(' ').last} Position',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class LapComparisonTable extends StatelessWidget {
                     ),
                   ),
                   DataColumn(
-                    label: Text(
+                    label: Text(isMobile ? '${driver2LapData.driverName.split(' ').last}\nPosition' :
                       '${driver2LapData.driverName.split(' ').last} Position',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,

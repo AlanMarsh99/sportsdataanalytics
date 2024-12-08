@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/API_service.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/races_season_table.dart';
 
@@ -33,6 +34,7 @@ class _RacesScreenState extends State<RacesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -57,12 +59,12 @@ class _RacesScreenState extends State<RacesScreen> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Season: ',
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: isMobile ? 16 : 18,
+                    ),
                   ),
                   const SizedBox(width: 15),
                   _buildSeasonDropdown()

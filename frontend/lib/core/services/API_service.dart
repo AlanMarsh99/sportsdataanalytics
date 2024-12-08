@@ -13,7 +13,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/home/upcoming_race/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         print('Response status: ${response.statusCode}');
@@ -40,7 +40,7 @@ class APIService {
         Uri.parse('$baseUrl/race/$year/$round/driver/$driverId/lap_data');
 
     try {
-      final response = await http.get(url).timeout(const Duration(seconds: 10));
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -63,7 +63,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/home/last_race_results/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         print('Response status: ${response.statusCode}');
         print('Response body: ${response.body}');
@@ -133,7 +133,7 @@ class APIService {
   // Fetch lap by lap race positions
   Future<RacePositions?> fetchRacePositions(int year, int round) async {
     final url = Uri.parse('$baseUrl/race/$year/$round/positions/');
-    final response = await http.get(url).timeout(const Duration(seconds: 10));
+    final response = await http.get(url).timeout(const Duration(seconds: 15));
 
     if (response.statusCode == 200) {
       return RacePositions.fromJson(json.decode(response.body));
@@ -151,7 +151,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/races/$year/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -175,7 +175,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/race/$year/$round/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
@@ -201,7 +201,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/race/$year/$round/results/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -225,7 +225,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/race/$year/$round/pitstops/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -251,7 +251,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/drivers/$year/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -275,7 +275,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/driver/$driverId/$year/stats/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');
@@ -299,7 +299,7 @@ class APIService {
     final url = Uri.parse('$baseUrl/driver/$driverId/$year/races/');
 
     try {
-      final response = await http.get(url).timeout(const Duration(seconds: 10));
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
@@ -326,7 +326,7 @@ class APIService {
     final url = Uri.parse('$baseUrl/teams/$year/');
 
     try {
-      final response = await http.get(url).timeout(const Duration(seconds: 10));
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
@@ -351,7 +351,7 @@ class APIService {
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/team/$teamId/$year/stats/'))
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         //print('Response status: ${response.statusCode}');
         //print('Response body: ${response.body}');

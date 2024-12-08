@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/API_service.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/tables/teams_season_table.dart';
 
@@ -34,6 +35,7 @@ class _TeamsScreenState extends State<TeamsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -71,12 +73,12 @@ class _TeamsScreenState extends State<TeamsScreen> {
               const SizedBox(height: 25),*/
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Season: ',
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: isMobile ? 16 : 18,
+                    ),
                   ),
                   const SizedBox(width: 15),
                   _buildSeasonDropdown(),

@@ -125,7 +125,8 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
       driverWins[winner] = (driverWins[winner] ?? 0) + 1;
 
       String poleDriver = race.polePosition;
-      driverPolePositions[poleDriver] = (driverPolePositions[poleDriver] ?? 0) + 1;
+      driverPolePositions[poleDriver] =
+          (driverPolePositions[poleDriver] ?? 0) + 1;
     }
 
     var sortedWins = driverWins.entries.toList()
@@ -179,7 +180,7 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
       child: SingleChildScrollView(
         controller: _verticalScrollController,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(top: 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -223,6 +224,7 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                     child: DataTable(
                       sortColumnIndex: sortColumnIndex,
                       sortAscending: isAscending,
+                      columnSpacing: isMobile ? 15 : 56,
                       columns: [
                         DataColumn(
                           label: InkWell(
@@ -349,7 +351,9 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                             ),
                           ),
                           DataCell(
-                            TextButton(
+                            SizedBox(
+                            width: isMobile ? 130 : null,
+                            child: TextButton(
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -368,24 +372,33 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                 ),
                               ),
                             ),
-                          ),
+                          )),
                           DataCell(
+                              SizedBox(
+                            width: isMobile ? 135 : null,
+                            child:
                             Text(
                               race.circuitName,
                               style: const TextStyle(color: Colors.black),
-                            ),
+                            ),),
                           ),
                           DataCell(
+                             SizedBox(
+                            width: isMobile ? 80 : null,
+                            child:
                             Text(
                               race.winner,
                               style: const TextStyle(color: Colors.black),
                             ),
-                          ),
+                          ),),
                           DataCell(
+                             SizedBox(
+                            width: isMobile ? 80 : null,
+                            child:
                             Text(
                               race.polePosition,
                               style: const TextStyle(color: Colors.black),
-                            ),
+                            ),),
                           ),
                         ]);
                       }).toList(),
@@ -451,12 +464,24 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                         maxY: getMaxYValue(),
                                         barGroups: topDrivers.isEmpty
                                             ? []
-                                            : topDrivers.asMap().entries.map((entry) {
+                                            : topDrivers
+                                                .asMap()
+                                                .entries
+                                                .map((entry) {
                                                 int index = entry.key;
                                                 String driver = entry.value;
-                                                Color driverColor = getDriverColor(driver);
-                                                double animatedWins = (driverWins[driver] ?? 0) * _animationController.value;
-                                                double animatedPoles = (driverPolePositions[driver] ?? 0) * _animationController.value;
+                                                Color driverColor =
+                                                    getDriverColor(driver);
+                                                double animatedWins =
+                                                    (driverWins[driver] ?? 0) *
+                                                        _animationController
+                                                            .value;
+                                                double animatedPoles =
+                                                    (driverPolePositions[
+                                                                driver] ??
+                                                            0) *
+                                                        _animationController
+                                                            .value;
 
                                                 return BarChartGroupData(
                                                   x: index,
@@ -466,11 +491,16 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                                       toY: animatedWins,
                                                       width: barWidth,
                                                       color: driverColor,
-                                                      borderRadius: const BorderRadius.only(
-                                                        topLeft: Radius.circular(10),
-                                                        topRight: Radius.circular(10),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .only(
+                                                        topLeft:
+                                                            Radius.circular(10),
+                                                        topRight:
+                                                            Radius.circular(10),
                                                       ),
-                                                      borderSide: const BorderSide(
+                                                      borderSide:
+                                                          const BorderSide(
                                                         color: Colors.black,
                                                         width: 1.0,
                                                       ),
@@ -478,12 +508,18 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                                     BarChartRodData(
                                                       toY: animatedPoles,
                                                       width: barWidth,
-                                                      color: driverColor.withOpacity(0.5),
-                                                      borderRadius: const BorderRadius.only(
-                                                        topLeft: Radius.circular(10),
-                                                        topRight: Radius.circular(10),
+                                                      color: driverColor
+                                                          .withOpacity(0.5),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .only(
+                                                        topLeft:
+                                                            Radius.circular(10),
+                                                        topRight:
+                                                            Radius.circular(10),
                                                       ),
-                                                      borderSide: const BorderSide(
+                                                      borderSide:
+                                                          const BorderSide(
                                                         color: Colors.black,
                                                         width: 0.7,
                                                       ),
@@ -518,7 +554,8 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                                 if (idx >= 0 &&
                                                     idx < topDrivers.length) {
                                                   return Transform.rotate(
-                                                    angle: isMobile ? -0.5 : 0.0,
+                                                    angle:
+                                                        isMobile ? -0.5 : 0.0,
                                                     child: Text(
                                                       topDrivers[idx],
                                                       style: TextStyle(
@@ -530,7 +567,8 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                                     ),
                                                   );
                                                 } else {
-                                                  return const SizedBox.shrink();
+                                                  return const SizedBox
+                                                      .shrink();
                                                 }
                                               },
                                             ),
@@ -560,9 +598,10 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                         barTouchData: BarTouchData(
                                           enabled: true,
                                           touchTooltipData: BarTouchTooltipData(
-                                            getTooltipItem:
-                                                (group, groupIndex, rod, rodIndex) {
-                                              String driverName = topDrivers[group.x.toInt()];
+                                            getTooltipItem: (group, groupIndex,
+                                                rod, rodIndex) {
+                                              String driverName =
+                                                  topDrivers[group.x.toInt()];
                                               String title = rodIndex == 0
                                                   ? 'Wins'
                                                   : 'Pole Positions';

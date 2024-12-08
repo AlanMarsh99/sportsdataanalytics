@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/result.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
@@ -38,6 +39,8 @@ class _RaceResultsTableState extends State<RaceResultsTable> {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
+
     return Column(
       children: [
         Padding(
@@ -77,6 +80,7 @@ class _RaceResultsTableState extends State<RaceResultsTable> {
                       borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: DataTable(
+                      columnSpacing: isMobile ? 15 : 56,
                       columns: const [
                         DataColumn(
                           label: Text(
@@ -141,32 +145,38 @@ class _RaceResultsTableState extends State<RaceResultsTable> {
                             _buildPositionContainer(result.position),
                           ),
                           DataCell(
-                            TextButton(
-                              onPressed: () {
-                                // Navigate to the race details screen
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DriversScreen(
-                                      driverId: result.driverId,
-                                      driverName: result.driver,
+                            SizedBox(
+                              width: isMobile ? 100 : null,
+                              child: TextButton(
+                                onPressed: () {
+                                  // Navigate to the race details screen
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DriversScreen(
+                                        driverId: result.driverId,
+                                        driverName: result.driver,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                result.driver,
-                                style: const TextStyle(
-                                    color: primary,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline),
+                                  );
+                                },
+                                child: Text(
+                                  result.driver,
+                                  style: const TextStyle(
+                                      color: primary,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline),
+                                ),
                               ),
                             ),
                           ),
                           DataCell(
-                            Text(
-                              result.team,
-                              style: const TextStyle(color: Colors.black),
+                            SizedBox(
+                              width: isMobile ? 70 : null,
+                              child: Text(
+                                result.team,
+                                style: const TextStyle(color: Colors.black),
+                              ),
                             ),
                           ),
                           DataCell(

@@ -19,11 +19,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
   bool isMobile = false;
+  final FocusNode _emailFocusNode = FocusNode();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocusNode.dispose();
     super.dispose();
   }
 
@@ -39,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         body: Padding(
           padding: EdgeInsets.symmetric(
               horizontal: 40, vertical: isMobile ? 40 : 80),
@@ -165,6 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
           width: isMobile ? double.infinity : 500,
           child: TextFormField(
             controller: _emailController,
+            focusNode: _emailFocusNode,
             cursorColor: Colors.white,
             style: const TextStyle(
               color: Colors.white,
