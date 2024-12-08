@@ -63,7 +63,7 @@ class _RacesScreenState extends State<RacesScreen> {
                     'Season: ',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: isMobile ? 14 : 18,
+                      fontSize: isMobile ? 16 : 18,
                     ),
                   ),
                   const SizedBox(width: 15),

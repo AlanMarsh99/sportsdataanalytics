@@ -526,6 +526,7 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 10,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
