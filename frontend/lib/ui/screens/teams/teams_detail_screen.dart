@@ -206,8 +206,7 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                   ),
                 ),
               )
-            : Expanded(
-                child: Padding(
+            : Padding(
                   padding: const EdgeInsets.only(left: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,7 +341,7 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                           Flexible(
                             flex: 3,
                             child: SizedBox(
-                              height: MediaQuery.of(context).size.height - 151,
+                              height: MediaQuery.of(context).size.height * 0.8,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -400,7 +399,7 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                       ),
                     ],
                   ),
-                ),
+                
               ),
       ),
     );

@@ -319,7 +319,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                           )
                                         : const SizedBox()
                                     : const SizedBox(),
-                                const SizedBox(width: 16),
+                                upcomingRaceInfo != null
+                                    ? upcomingRaceInfo.isNotEmpty
+                                        ? const SizedBox(width: 16)
+                                        : const SizedBox()
+                                    : const SizedBox(),
                                 lastRaceResults != null
                                     ? lastRaceResults.isNotEmpty
                                         ? Flexible(
