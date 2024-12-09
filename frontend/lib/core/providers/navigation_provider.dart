@@ -6,6 +6,7 @@ import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/game_first_screen.dart';
+import 'package:frontend/ui/screens/game/game_login_screen.dart';
 import 'package:frontend/ui/screens/game/tutorial_screen.dart';
 import 'package:frontend/ui/screens/home_screen.dart';
 import 'package:frontend/ui/screens/download_screen.dart';
@@ -21,6 +22,8 @@ class NavigationProvider extends ChangeNotifier {
   String _screenTitle = "DRIVERS";
   String _currentRoute = 'home';
   Widget _selectedScreen = const HomeScreen();
+
+  Widget get selectedScreen => _selectedScreen;
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -96,7 +99,7 @@ class NavigationProvider extends ChangeNotifier {
               return F1Carousel();
             }
           } else {
-            return TutorialScreen();
+            return GameLoginScreen();
           }
         });
         _currentRoute = 'game';
@@ -121,7 +124,7 @@ class NavigationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Widget get selectedScreen => _screens.elementAt(_selectedIndex);
+  //Widget get selectedScreen => _screens.elementAt(_selectedIndex);
   List<Widget> get screens => _screens;
   List<NavigationRailDestination> get destinations => _destinations;
 }
