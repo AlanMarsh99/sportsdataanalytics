@@ -60,8 +60,8 @@ class _DriversScreenState extends State<DriversScreen> {
       selectedDriver = widget.driverName;
       _driversNamesFuture =
           APIService().getDriversInYear(int.parse(selectedSeason));
-      /*_driversStatsFuture =
-          APIService().getDriverStats(widget.driverId!, currentYear);*/
+      _driversStatsFuture =
+          APIService().getDriverStats(widget.driverId!, currentYear);
     } else {
       _driversStatsFuture =
           Future.error("No drivers found for the selected season.");
@@ -132,6 +132,7 @@ class _DriversScreenState extends State<DriversScreen> {
                               )
                             : Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   IconButton(
                                     icon: const Icon(
@@ -180,12 +181,6 @@ class _DriversScreenState extends State<DriversScreen> {
                                       driversMap[driver['driver_name']] =
                                           driver['driver_id'];
                                       driversNames.add(driver['driver_name']);
-                                    }
-
-                                    if (widget.driverName != null) {
-                                      selectedDriver = widget.driverName;
-                                    } else {
-                                      selectedDriver ??= driversNames[0];
                                     }
 
                                     if (!driversNames
@@ -486,12 +481,6 @@ class _DriversScreenState extends State<DriversScreen> {
                                       driversMap[driver['driver_name']] =
                                           driver['driver_id'];
                                       driversNames.add(driver['driver_name']);
-                                    }
-
-                                    if (widget.driverName != null) {
-                                      selectedDriver = widget.driverName;
-                                    } else {
-                                      selectedDriver ??= driversNames[0];
                                     }
 
                                     if (!driversNames
