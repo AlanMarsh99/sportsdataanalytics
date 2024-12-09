@@ -41,7 +41,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     var nav = Provider.of<NavigationProvider>(context, listen: false);
-    print("Building LoginScreen");
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -75,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           size: 30.0,
                         ),
                         onPressed: () {
-                          nav.updateIndex(0);
+                          nav.setRoute(nav.previousRoute);
                         },
                       ),
                       const SizedBox(width: 10),
@@ -155,7 +154,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildEmailTF() {
-    print("Rebuilding Email TextField");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -201,7 +199,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildPasswordTF(NavigationProvider nav) {
-    print("Rebuilding Password TextField");
     return Container(
       width: widget.isMobile ? double.infinity : 500,
       child: Column(
@@ -216,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextButton(
                 onPressed: () {
-                   nav.setRoute('forgotpassword');
+                  nav.setRoute('forgotpassword');
                 },
                 child: Container(
                   child: const Text(
@@ -325,7 +322,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (auth.status == Status.Authenticated) {
-      nav.updateIndex(0);
+      nav.setRoute(nav.previousRoute);
     }
 
     if (auth.status == Status.Unauthenticated) {

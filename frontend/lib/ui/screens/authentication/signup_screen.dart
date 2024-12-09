@@ -85,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             size: 30.0,
                           ),
                           onPressed: () {
-                             nav.setRoute('login');
+                            nav.setRoute('login');
                           },
                         ),
                         const SizedBox(width: 10),
@@ -425,6 +425,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               );
 
               // Navigate to the next screen.
+              //nav.setRoute(nav.previousRoute);
               nav.updateIndex(0);
             } catch (e) {
               // Handle errors and inform the user.

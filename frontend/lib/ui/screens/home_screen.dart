@@ -358,7 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
           blastDirection: 3.1416 / 2,
           emissionFrequency: 0.3,
           gravity: 0.1,
-          numberOfParticles: 60,
+          numberOfParticles: 10,
         ),
       ],
     );
