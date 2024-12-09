@@ -107,17 +107,24 @@ class Globals {
     'Lando Norris': 'McLaren',
     'Carlos Sainz': 'Ferrari',
     'George Russell': 'Mercedes',
+    'Pierre Gasly': 'Alpine F1 Team',
+    'Nico Hülkenberg': 'Haas F1 Team',
     'Esteban Ocon': 'Alpine F1 Team',
-    'Fernando Alonso': 'Alpine F1 Team',
+    'Fernando Alonso': 'Aston Martin',
     'Oscar Piastri': 'McLaren',
-    'Valtteri Bottas': 'Alfa Romeo',
-    'Guanyu Zhou': 'Alfa Romeo',
+    'Valtteri Bottas': 'Sauber',
+    'Guanyu Zhou': 'Sauber',
     'Logan Sargeant': 'Williams',
     'Alexander Albon': 'Williams',
     'Daniel Ricciardo': 'Haas F1 Team',
-    'Yuki Tsunoda': 'AlphaTauri',
+    'Yuki Tsunoda': 'RB F1 Team',
     'Nicholas Latifi': 'Williams',
     'Kevin Magnussen': 'Haas F1 Team',
+    'Jack Doohan': 'Alpine F1 Team',
+    'Oliver Bearman': 'Haas F1 Team',
+    'Franco Colapinto': 'Williams',
+    'Liam Lawson': 'RB F1 Team',
+    'Lance Stroll': 'Aston Martin'
   };
 
   static final Map<String, Color> driverColors = {

@@ -1,8 +1,8 @@
 import 'dart:ui';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/race_positions.dart';
+import 'package:frontend/core/shared/globals.dart';
 
 class LapGraphWidget extends StatelessWidget {
   final RacePositions racePositions;
@@ -15,58 +15,47 @@ class LapGraphWidget extends StatelessWidget {
     List<LineChartBarData> lineBarsData = [];
     List<DriverLegend> driverLegends = [];
 
-    // Define colors for the drivers
-    List<Color> availableColors = [
-      Colors.blue,
-      Colors.red,
-      Colors.green,
-      Colors.yellow,
-      Colors.orange,
-      Colors.purple,
-      Colors.cyan,
-      Colors.pink,
-      Colors.teal,
-      Colors.lime,
-    ];
-
-    int colorIndex = 0;
-
     for (var driver in racePositions.drivers) {
       List<FlSpot> spots = [];
-
       for (int i = 0; i < driver.positions.length; i++) {
         int? position = driver.positions[i];
         if (position != null) {
-          double lapNumber = 1 + i * 3; // Updated line
-          double positionValue = position.toDouble();
-          positionValue =
-              21 - positionValue; // Invert to make first position at the top
+          double lapNumber = 1 + i * 3;
+          double positionValue = 21 - position.toDouble();
           spots.add(FlSpot(lapNumber, positionValue));
         }
       }
 
-      // Assign a color to the driver
-      Color color = availableColors[colorIndex % availableColors.length];
-      colorIndex++;
+      Color color = Globals.driverColors[driver.driverName] ?? Colors.grey;
 
-      LineChartBarData lineChartBarData = LineChartBarData(
-        spots: spots,
-        isCurved: false,
-        color: color,
-        barWidth: 2,
-        dotData: const FlDotData(show: false),
-        belowBarData: BarAreaData(show: false),
+      lineBarsData.add(
+        LineChartBarData(
+          spots: spots,
+          isCurved: false,
+          color: color,
+          barWidth: 2,
+          dotData: const FlDotData(show: false),
+          belowBarData: BarAreaData(show: false),
+        ),
       );
 
-      lineBarsData.add(lineChartBarData);
-
-      // Add to driver legends
       driverLegends.add(DriverLegend(name: driver.driverName, color: color));
     }
 
+    Map<String, List<DriverLegend>> teamMap = {};
+    for (var legend in driverLegends) {
+      String? teamName = Globals.driverTeamMapping[legend.name];
+      teamName ??= 'Unknown Team';
+      teamMap.putIfAbsent(teamName, () => []);
+      teamMap[teamName]!.add(legend);
+    }
+
+    List<String> sortedTeamNames = teamMap.keys.toList()..sort();
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: LineChart(
@@ -75,22 +64,18 @@ class LapGraphWidget extends StatelessWidget {
                 gridData: const FlGridData(show: true),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
-                    axisNameWidget: const Text('Lap',
-                        style: TextStyle(color: Colors.white)),
+                    axisNameWidget: const Text('Lap', style: TextStyle(color: Colors.white)),
                     sideTitles: SideTitles(
                       showTitles: true,
-                      interval: 1, // Set to 1 to evaluate each lap number
+                      interval: 1,
                       getTitlesWidget: (double value, TitleMeta meta) {
-                        // Display label if lap is 1 or every 3 laps after that
-                        if (value.toInt() == 1 ||
-                            (value.toInt() - 1) % 3 == 0) {
+                        if (value.toInt() == 1 || (value.toInt() - 1) % 3 == 0) {
                           return Text(
                             value.toInt().toString(),
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 10),
+                            style: const TextStyle(color: Colors.white, fontSize: 10),
                           );
                         } else {
-                          return Container(); // Return empty container for other laps
+                          return Container();
                         }
                       },
                     ),
@@ -106,11 +91,7 @@ class LapGraphWidget extends StatelessWidget {
                         if (position >= 1 && position <= 20) {
                           return Text(
                             '$position',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize:
-                                  10, // Added fontSize to make text smaller
-                            ),
+                            style: const TextStyle(color: Colors.white, fontSize: 10),
                           );
                         } else {
                           return Container();
@@ -127,30 +108,102 @@ class LapGraphWidget extends StatelessWidget {
                 maxY: 20,
                 minX: 1,
                 maxX: 1 + (racePositions.laps.length - 1) * 3,
-
                 borderData: FlBorderData(show: true),
-                lineTouchData: const LineTouchData(
-                  enabled: false,
-                ), // Disable touch interactions
+                lineTouchData: LineTouchData(
+                  enabled: true,
+                  handleBuiltInTouches: true,
+                  touchSpotThreshold: 10,
+                  distanceCalculator: (touchPoint, spotPoint) {
+                    final distance = (touchPoint - spotPoint).distance;
+                    return distance < 20 ? distance : 999999;
+                  },
+                  touchTooltipData: LineTouchTooltipData(
+                    fitInsideHorizontally: true,
+                    fitInsideVertically: true,
+                    getTooltipItems: (touchedSpots) {
+                      if (touchedSpots.isEmpty) return [];
+                      final firstSpot = touchedSpots.first;
+                      return [
+                        LineTooltipItem(
+                          driverLegends[firstSpot.barIndex].name,
+                          const TextStyle(
+                            color: Colors.white, // Tooltip text colour set to white
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ];
+                    },
+                  ),
+
+                  getTouchedSpotIndicator: (barData, spotIndexes) {
+                    return spotIndexes.map((index) {
+                      return TouchedSpotIndicatorData(
+                        FlLine(color: Colors.white, strokeWidth: 2),
+                        FlDotData(show: true),
+                      );
+                    }).toList();
+                  },
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          // Legend
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: driverLegends.map((driverLegend) {
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(width: 12, height: 12, color: driverLegend.color),
-                  const SizedBox(width: 4),
-                  Text(driverLegend.name,
-                      style: const TextStyle(color: Colors.white)),
-                ],
-              );
-            }).toList(),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 200,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: sortedTeamNames.map((teamName) {
+                  final legends = teamMap[teamName]!;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          teamName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: legends.map((legend) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.white.withOpacity(0.1),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                      width: 12,
+                                      height: 12,
+                                      color: legend.color),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    legend.name,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         ],
       ),
