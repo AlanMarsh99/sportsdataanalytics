@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/auth_services.dart';
+import 'package:frontend/ui/responsive.dart';
+import 'package:frontend/ui/screens/authentication/forgot_password_screen.dart';
+import 'package:frontend/ui/screens/authentication/login_screen.dart';
+import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/game_first_screen.dart';
 import 'package:frontend/ui/screens/game/tutorial_screen.dart';
@@ -57,8 +61,14 @@ class NavigationProvider extends ChangeNotifier {
   int get selectedIndex => _selectedIndex;
   String get currentRoute => _currentRoute;
 
+  void setRoute(String route) {
+    _currentRoute = route;
+    notifyListeners();
+  }
+
   void updateIndex(int index) {
     _selectedIndex = index;
+    print("Updating index to $index");
     switch (index) {
       case 0:
         _selectedScreen = HomeScreen();

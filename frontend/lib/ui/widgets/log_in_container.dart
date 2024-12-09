@@ -54,7 +54,7 @@ class LogInContainer extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => LoginScreen(),
+                          builder: (context) => LoginScreen(isMobile: isMobile,),
                         ),
                       );
                     },
@@ -89,7 +89,7 @@ class LogInContainer extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SignUpScreen(),
+                          builder: (context) => SignUpScreen(isMobile: isMobile,),
                         ),
                       );
                     },

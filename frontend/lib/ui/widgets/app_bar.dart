@@ -52,24 +52,28 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   } else {
-                    return TextButton(
-                      child: const Text(
-                        'Log in',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                    return Visibility(
+                      visible: nav.selectedIndex != 6,
+                      child: TextButton(
+                        child: const Text(
+                          'Log in',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      onPressed: () async {
-                        Navigator.push(
+                        onPressed: () async {
+                          /*Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
+                            builder: (context) => LoginScreen(isMobile: isMobile,),
                           ),
-                        );
-                      },
+                        );*/
+                          nav.setRoute('login');
+                        },
+                      ),
                     );
                   }
                 },
@@ -103,23 +107,25 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                     );
                   } else {
                     return TextButton(
-                      child: const Text(
-                        'Log in',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        child: const Text(
+                          'Log in',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      onPressed: () async {
-                        Navigator.push(
+                        onPressed: () async {
+                          /*Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginScreen(),
+                            builder: (context) => LoginScreen(isMobile: isMobile,),
                           ),
-                        );
-                      },
+                        );*/
+                          nav.setRoute('login');
+                        },
+                    
                     );
                   }
                 },

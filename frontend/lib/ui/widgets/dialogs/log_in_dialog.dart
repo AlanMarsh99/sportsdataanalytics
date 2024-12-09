@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
@@ -6,6 +7,7 @@ import 'package:frontend/ui/theme.dart';
 class LogInDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -56,7 +58,7 @@ class LogInDialog extends StatelessWidget {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LoginScreen(),
+                        builder: (context) => LoginScreen(isMobile: isMobile,),
                       ),
                     );
                     Navigator.pop(context);
@@ -89,7 +91,7 @@ class LogInDialog extends StatelessWidget {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SignUpScreen(),
+                        builder: (context) => SignUpScreen(isMobile: isMobile,),
                       ),
                     );
                     Navigator.pop(context);

@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:frontend/core/providers/data_provider.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
@@ -41,7 +42,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: theme,
       home: NavigationScreen(),
-      //SplashScreen(),
     );
   }
 }
