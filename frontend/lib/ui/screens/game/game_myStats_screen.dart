@@ -34,7 +34,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
       username: 'brendan',
       totalPoints: 523,
       seasonPoints: 523,
-      avatar: 'assets/images/placeholder.png',
+      avatar: 'placeholder.png', // Removed the file extension for consistency
       level: 1,
       leaguesWon: 2,
       leaguesFinished: 5,
@@ -102,10 +102,8 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                                     CircleAvatar(
                                       backgroundColor: Colors.white,
                                       radius: 70,
-                                      child: Center(
-                                        child: Image.asset(
-                                            'assets/avatars/${userInfo.avatar}.png'),
-                                      ),
+                                      backgroundImage: AssetImage(
+                                          'assets/avatars/${userInfo.avatar}.png'),
                                     ),
                                     const SizedBox(height: 5),
                                     TextButton(
