@@ -31,7 +31,7 @@ class _DriversScreenState extends State<DriversScreen> {
     String lastName = nameParts.last;
 
     // Retrieve the image path from Globals.driverImages
-    return Globals.driverImages[lastName] ?? 'assets/images/placeholder.png';
+    return Globals.driverImages[lastName] ?? 'assets/avatars/default.png';
   }
 
   int currentOffset = 0;
@@ -60,8 +60,8 @@ class _DriversScreenState extends State<DriversScreen> {
       selectedDriver = widget.driverName;
       _driversNamesFuture =
           APIService().getDriversInYear(int.parse(selectedSeason));
-      _driversStatsFuture =
-          APIService().getDriverStats(widget.driverId!, currentYear);
+      /*_driversStatsFuture =
+          APIService().getDriverStats(widget.driverId!, currentYear);*/
     } else {
       _driversStatsFuture =
           Future.error("No drivers found for the selected season.");
@@ -799,6 +799,36 @@ class _DriversScreenState extends State<DriversScreen> {
             seasonChanged = true;
             _driversNamesFuture =
                 APIService().getDriversInYear(int.parse(selectedSeason));
+          });
+
+          _driversNamesFuture.then((drivers) {
+            if (drivers.isNotEmpty) {
+              setState(() {
+                for (var driver in drivers) {
+                  driversMap[driver['driver_name']] = driver['driver_id'];
+                  driversNames.add(driver['driver_name']);
+                }
+
+                if (!driversNames.contains(selectedDriver)) {
+                  selectedDriver = driversNames[0];
+                }
+
+                _driversStatsFuture = APIService().getDriverStats(
+                    driversMap[selectedDriver], int.parse(selectedSeason));
+              });
+            } else {
+              // Handle the case where there are no drivers
+              setState(() {
+                _driversStatsFuture =
+                    Future.error("No drivers found for the selected season.");
+              });
+            }
+          }).catchError((error) {
+            // Handle errors from the first future
+            setState(() {
+              _driversStatsFuture =
+                  Future.error("Error fetching drivers: $error");
+            });
           });
         },
       ),
