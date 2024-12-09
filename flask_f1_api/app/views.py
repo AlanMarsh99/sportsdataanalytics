@@ -780,6 +780,7 @@ def get_drivers_by_year(year):
 
 ## Get driver career and season stats - WORKS
 @api_blueprint.route('/driver/<string:driver_id>/<int:year>/stats/', methods=['GET'])
+@cache.cached(timeout=0)
 def get_driver_stats(driver_id, year):
     def fetch_race_results(driver_id, season_year):
         # Fetch race results for a driver in a given season
@@ -962,8 +963,9 @@ def get_driver_stats(driver_id, year):
         "team": team
     }
 
-    # Append current season result to season_results
-    season_results.append(current_season_result)
+    # Check if the current season year is already in season_results
+    if not any(result['year'] == str(year) for result in season_results):
+        season_results.append(current_season_result)
 
     # Fetch general information about the driver
     general_info = fetch_driver_general_info(driver_id)
