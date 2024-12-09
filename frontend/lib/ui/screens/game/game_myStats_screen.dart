@@ -34,7 +34,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
       username: 'brendan',
       totalPoints: 523,
       seasonPoints: 523,
-      avatar: 'placeholder.png', // Removed the file extension for consistency
+      avatar: 'placeholder.png',
       level: 1,
       leaguesWon: 2,
       leaguesFinished: 5,
