@@ -85,7 +85,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             size: 30.0,
                           ),
                           onPressed: () {
-                            nav.updateIndex(6);
+                             nav.setRoute('login');
                           },
                         ),
                         const SizedBox(width: 10),

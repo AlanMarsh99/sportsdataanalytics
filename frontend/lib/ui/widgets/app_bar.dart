@@ -71,7 +71,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                             builder: (context) => LoginScreen(isMobile: isMobile,),
                           ),
                         );*/
-                          nav.updateIndex(6);
+                          nav.setRoute('login');
                         },
                       ),
                     );
@@ -106,9 +106,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   } else {
-                    return Visibility(
-                      visible: nav.selectedIndex != 6,
-                      child: TextButton(
+                    return TextButton(
                         child: const Text(
                           'Log in',
                           textAlign: TextAlign.center,
@@ -125,9 +123,9 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                             builder: (context) => LoginScreen(isMobile: isMobile,),
                           ),
                         );*/
-                          nav.updateIndex(0);
+                          nav.setRoute('login');
                         },
-                      ),
+                    
                     );
                   }
                 },

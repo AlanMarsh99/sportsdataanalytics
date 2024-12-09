@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/providers/navigation_provider.dart';
+import 'package:frontend/ui/screens/authentication/forgot_password_screen.dart';
+import 'package:frontend/ui/screens/authentication/login_screen.dart';
+import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/app_bar.dart';
 import 'package:frontend/ui/widgets/end_drawer.dart';
@@ -31,6 +34,15 @@ class _NavigationScreenWebState extends State<NavigationScreenWeb>
   @override
   Widget build(BuildContext context) {
     List<NavigationRailDestination> destinations = widget.nav.destinations;
+     if (widget.nav.currentRoute == 'login') {
+      return LoginScreen(isMobile: false);
+    }
+    if (widget.nav.currentRoute == 'signup') {
+      return SignUpScreen(isMobile: false);
+    }
+    if (widget.nav.currentRoute == 'forgotpassword') {
+      return ForgotPasswordScreen(isMobile: false);
+    }
 
     return Scaffold(
       appBar: MyAppBar(nav: widget.nav, isMobile: false),

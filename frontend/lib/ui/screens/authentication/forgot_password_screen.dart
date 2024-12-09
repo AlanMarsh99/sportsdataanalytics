@@ -8,6 +8,11 @@ import 'package:frontend/ui/theme.dart';
 import 'package:provider/provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({Key? key, required this.isMobile})
+      : super(key: key);
+
+  final bool isMobile;
+
   @override
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
@@ -16,7 +21,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   static final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final FocusNode _emailFocusNode = FocusNode();
-  bool isMobile = false;
 
   @override
   void dispose() {
@@ -26,7 +30,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    isMobile = Responsive.isMobile(context);
     var nav = Provider.of<NavigationProvider>(context, listen: false);
     return Container(
       decoration: const BoxDecoration(
@@ -45,12 +48,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               children: [
                 Image.asset('assets/logo/logo-detail.png',
-                    width: isMobile ? 150 : 200, fit: BoxFit.cover),
+                    width: widget.isMobile ? 150 : 200, fit: BoxFit.cover),
                 const SizedBox(
                   height: 30,
                 ),
                 Row(
-                  mainAxisAlignment: isMobile
+                  mainAxisAlignment: widget.isMobile
                       ? MainAxisAlignment.start
                       : MainAxisAlignment.center,
                   children: [
@@ -61,7 +64,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         size: 30.0,
                       ),
                       onPressed: () {
-                        nav.updateIndex(6);
+                        nav.setRoute('login');
                       },
                     ),
                     const SizedBox(width: 10),
@@ -105,7 +108,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           alignment: Alignment.centerLeft,
           decoration: Globals.kBoxDecorationStyle,
           height: 60.0,
-          width: isMobile ? double.infinity : 500,
+          width: widget.isMobile ? double.infinity : 500,
           child: TextFormField(
             controller: _emailController,
             focusNode: _emailFocusNode,
@@ -139,7 +142,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _buildSendButton(AuthService auth, NavigationProvider nav) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 25.0),
-      width: isMobile ? double.infinity : 500,
+      width: widget.isMobile ? double.infinity : 500,
       child: ElevatedButton(
         style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all<Color>(secondary),
@@ -185,7 +188,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       await auth.resetPassword(email);
       showSnackbar(context, 'Email sent successfully!');
-      nav.updateIndex(6);
+      nav.setRoute('login');
     } catch (e) {
       showSnackbar(context, 'Error: ${e.toString()}');
     }

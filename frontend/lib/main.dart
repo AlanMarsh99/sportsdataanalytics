@@ -15,7 +15,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  debugRepaintRainbowEnabled = true;
 
   runApp(
     Phoenix(
@@ -43,7 +42,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: theme,
       home: NavigationScreen(),
-      //SplashScreen(),
     );
   }
 }

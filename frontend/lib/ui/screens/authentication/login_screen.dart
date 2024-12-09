@@ -129,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          nav.updateIndex(7);
+                          nav.setRoute('signup');
                         },
                         child: Text(
                           'Sign up',
@@ -216,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  nav.updateIndex(8);
+                   nav.setRoute('forgotpassword');
                 },
                 child: Container(
                   child: const Text(

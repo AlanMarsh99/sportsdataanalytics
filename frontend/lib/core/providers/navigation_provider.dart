@@ -29,9 +29,6 @@ class NavigationProvider extends ChangeNotifier {
     const TeamsScreen(),
     const GameFirstScreen(),
     const DownloadScreen(),
-    LoginScreen(isMobile: true),
-    SignUpScreen(isMobile: true),
-    ForgotPasswordScreen()
   ];
 
   final List<NavigationRailDestination> _destinations = [
@@ -63,6 +60,11 @@ class NavigationProvider extends ChangeNotifier {
 
   int get selectedIndex => _selectedIndex;
   String get currentRoute => _currentRoute;
+
+  void setRoute(String route) {
+    _currentRoute = route;
+    notifyListeners();
+  }
 
   void updateIndex(int index) {
     _selectedIndex = index;
@@ -103,19 +105,6 @@ class NavigationProvider extends ChangeNotifier {
         _selectedScreen = DownloadScreen();
         _currentRoute = 'download';
         break;
-      case 6:
-        _selectedScreen = LoginScreen(
-          isMobile: true,
-        );
-        _currentRoute = 'login';
-      case 7:
-        _selectedScreen = SignUpScreen(
-          isMobile: true,
-        );
-        _currentRoute = 'signup';
-      case 8:
-        _selectedScreen = ForgotPasswordScreen();
-        _currentRoute = 'forgotpassword';
     }
     notifyListeners();
   }
