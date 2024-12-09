@@ -39,6 +39,12 @@ ThemeData theme = ThemeData(
   iconTheme: IconThemeData(
     color: primary,
   ),
+  inputDecorationTheme: InputDecorationTheme(
+    errorStyle: TextStyle(
+      fontSize: 14.0,
+      color: Colors.red,
+    ),
+  ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: primary,

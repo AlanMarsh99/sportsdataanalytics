@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/services/auth_services.dart';
-import 'package:frontend/ui/responsive.dart';
-import 'package:frontend/ui/screens/authentication/forgot_password_screen.dart';
-import 'package:frontend/ui/screens/authentication/login_screen.dart';
-import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/screens/drivers/drivers_screen.dart';
 import 'package:frontend/ui/screens/game/game_first_screen.dart';
+import 'package:frontend/ui/screens/game/game_login_screen.dart';
 import 'package:frontend/ui/screens/game/tutorial_screen.dart';
 import 'package:frontend/ui/screens/home_screen.dart';
 import 'package:frontend/ui/screens/download_screen.dart';
@@ -21,6 +18,15 @@ class NavigationProvider extends ChangeNotifier {
   String _screenTitle = "DRIVERS";
   String _currentRoute = 'home';
   Widget _selectedScreen = const HomeScreen();
+
+  String _previousRoute = 'home';
+  String get previousRoute => _previousRoute;
+
+  Widget get selectedScreen => _selectedScreen;
+
+  void setPreviousRoute(String route) {
+    _previousRoute = route;
+  }
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -68,7 +74,6 @@ class NavigationProvider extends ChangeNotifier {
 
   void updateIndex(int index) {
     _selectedIndex = index;
-    print("Updating index to $index");
     switch (index) {
       case 0:
         _selectedScreen = HomeScreen();
@@ -96,7 +101,7 @@ class NavigationProvider extends ChangeNotifier {
               return F1Carousel();
             }
           } else {
-            return TutorialScreen();
+            return GameLoginScreen();
           }
         });
         _currentRoute = 'game';
@@ -105,6 +110,42 @@ class NavigationProvider extends ChangeNotifier {
         _selectedScreen = DownloadScreen();
         _currentRoute = 'download';
         break;
+      case 6:
+        _currentRoute = _previousRoute;
+        switch (_currentRoute) {
+          case 'home':
+            _selectedScreen = HomeScreen();
+            break;
+          case 'races':
+            _selectedScreen = RacesScreen();
+            break;
+          case 'drivers':
+            _selectedScreen = DriversScreen();
+            break;
+          case 'teams':
+            _selectedScreen = TeamsScreen();
+            break;
+          case 'game':
+            _selectedScreen =
+                Consumer<AuthService>(builder: (context, auth, child) {
+              if (auth.status == Status.Authenticated && auth.userApp != null) {
+                if (auth.userApp!.firstTimeTutorial) {
+                  return TutorialScreen();
+                } else {
+                  return F1Carousel();
+                }
+              } else {
+                return GameLoginScreen();
+              }
+            });
+            break;
+          case 'download':
+            _selectedScreen = DownloadScreen();
+            break;
+          default:
+            _selectedScreen = HomeScreen();
+            break;
+        }
     }
     notifyListeners();
   }
@@ -121,7 +162,7 @@ class NavigationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Widget get selectedScreen => _screens.elementAt(_selectedIndex);
+  //Widget get selectedScreen => _screens.elementAt(_selectedIndex);
   List<Widget> get screens => _screens;
   List<NavigationRailDestination> get destinations => _destinations;
 }

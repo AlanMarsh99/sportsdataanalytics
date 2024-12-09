@@ -158,7 +158,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                 TextButton(
                   onPressed: _endTour,
                   child: const Text(
-                    "SKIP",
+                    "SKIP TUTORIAL",
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
