@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/providers/navigation_provider.dart';
 import 'package:frontend/ui/screens/authentication/login_screen.dart';
 import 'package:frontend/ui/screens/authentication/signup_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:provider/provider.dart';
 
 class LogInContainer extends StatelessWidget {
   final bool isMobile;
@@ -51,12 +53,9 @@ class LogInContainer extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LoginScreen(isMobile: isMobile,),
-                        ),
-                      );
+                      NavigationProvider nav =
+                          Provider.of<NavigationProvider>(context, listen: false);
+                      nav.setRoute('login');
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 5.0),
@@ -86,12 +85,9 @@ class LogInContainer extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SignUpScreen(isMobile: isMobile,),
-                        ),
-                      );
+                     NavigationProvider nav =
+                          Provider.of<NavigationProvider>(context, listen: false);
+                      nav.setRoute('signup');
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 5.0),
