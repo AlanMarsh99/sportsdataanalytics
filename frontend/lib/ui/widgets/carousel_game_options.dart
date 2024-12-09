@@ -109,7 +109,13 @@ class _F1CarouselState extends State<F1Carousel> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(Icons.arrow_back_ios, color: Colors.white, size: 18),
+                IconButton(
+                  onPressed: () {
+                    _goToPreviousPage();
+                  },
+                  icon: const Icon(Icons.arrow_back_ios,
+                      color: Colors.white, size: 18),
+                ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10.0),
@@ -148,8 +154,13 @@ class _F1CarouselState extends State<F1Carousel> {
                     ),
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios,
-                    color: Colors.white, size: 18),
+                IconButton(
+                  onPressed: () {
+                    _goToNextPage();
+                  },
+                  icon: const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white, size: 20),
+                ),
               ],
             ),
           ),
