@@ -126,14 +126,15 @@ class LapGraphWidget extends StatelessWidget {
                       return [
                         LineTooltipItem(
                           driverLegends[firstSpot.barIndex].name,
-                          TextStyle(
-                            color: driverLegends[firstSpot.barIndex].color,
+                          const TextStyle(
+                            color: Colors.white, // Tooltip text colour set to white
                             fontWeight: FontWeight.bold,
                           ),
-                        )
+                        ),
                       ];
                     },
                   ),
+
                   getTouchedSpotIndicator: (barData, spotIndexes) {
                     return spotIndexes.map((index) {
                       return TouchedSpotIndicatorData(
