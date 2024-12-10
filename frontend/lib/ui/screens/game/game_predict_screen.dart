@@ -219,12 +219,12 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                               child: Center(
                                 child: Padding(
                                   padding: EdgeInsets.all(20),
-                                  child: Flexible(child: Text(
+                                  child: Text(
                                     'No data available about the upcoming race at the moment. Try again later.',
                                     style: TextStyle(
                                         color: Colors.white, fontSize: isMobile ? 16 : 20),
                                     textAlign: TextAlign.center,
-                                  ),),
+                                  ),
                                 ),
                               ),
                             ),

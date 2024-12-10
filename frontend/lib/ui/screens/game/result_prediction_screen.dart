@@ -451,7 +451,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
               ],
             ),
 
-            const SizedBox(height: 30),
+            SizedBox(height: isMobile ? 20 : 30),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -615,6 +615,7 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                           color: Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),

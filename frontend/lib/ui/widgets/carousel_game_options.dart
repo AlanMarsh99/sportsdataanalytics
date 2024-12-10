@@ -93,6 +93,8 @@ class _F1CarouselState extends State<F1Carousel> {
                 setState(() {
                   _currentIndex = index;
                 });
+                _pageController.jumpToPage(index);
+                carouselController.jumpToPage(index);
               },
               itemCount: _tabs.length,
               itemBuilder: (context, index) {
@@ -123,7 +125,7 @@ class _F1CarouselState extends State<F1Carousel> {
                       carouselController: carouselController,
                       options: Responsive.isMobile(context)
                           ? CarouselOptions(
-                              viewportFraction: 0.4,
+                              viewportFraction: 0.42,
                               height: 45.0,
                               enableInfiniteScroll: true,
                               initialPage: _currentIndex,
@@ -150,7 +152,7 @@ class _F1CarouselState extends State<F1Carousel> {
                                 });
                               },
                             ),
-                      items: _buildCarouselItems(),
+                      items: _buildCarouselItems(isMobile),
                     ),
                   ),
                 ),
@@ -187,14 +189,18 @@ class _F1CarouselState extends State<F1Carousel> {
     );
   }
 
-  List<Widget> _buildCarouselItems() {
+  List<Widget> _buildCarouselItems(bool isMobile) {
     return _tabs.map((tab) {
       return Builder(
         builder: (BuildContext context) {
           return Text(
             tab,
             style: TextStyle(
-              fontSize: tab == _tabs[_currentIndex] ? 21.0 : 14,
+              fontSize: tab == _tabs[_currentIndex]
+                  ? isMobile
+                      ? 18
+                      : 21.0
+                  : 14,
               fontWeight: FontWeight.bold,
               color:
                   tab == _tabs[_currentIndex] ? Colors.redAccent : Colors.white,
@@ -232,34 +238,42 @@ class _F1CarouselState extends State<F1Carousel> {
   }
 
   void _goToNextPage() {
-    setState(() {
-      if (_currentIndex == _tabs.length - 1) {
+    if (_currentIndex == _tabs.length - 1) {
+      setState(() {
         _currentIndex = 0;
-        carouselController.jumpToPage(0);
-        _pageController.jumpToPage(0);
-      } else {
+      });
+      _pageController.jumpToPage(0);
+      carouselController.jumpToPage(0);
+    } else {
+      setState(() {
         _currentIndex++;
-        carouselController.jumpToPage(_currentIndex);
-        _pageController.nextPage(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut);
-      }
-    });
+      });
+      _pageController.animateToPage(
+        _currentIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      carouselController.jumpToPage(_currentIndex);
+    }
   }
 
   void _goToPreviousPage() {
-    setState(() {
-      if (_currentIndex == 0) {
+    if (_currentIndex == 0) {
+      setState(() {
         _currentIndex = _tabs.length - 1;
-        carouselController.jumpToPage(_tabs.length - 1);
-        _pageController.jumpToPage(_tabs.length - 1);
-      } else {
+      });
+      _pageController.jumpToPage(_tabs.length - 1);
+      carouselController.jumpToPage(_tabs.length - 1);
+    } else {
+      setState(() {
         _currentIndex--;
-        carouselController.jumpToPage(_currentIndex);
-        _pageController.previousPage(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut);
-      }
-    });
+      });
+      _pageController.animateToPage(
+        _currentIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      carouselController.jumpToPage(_currentIndex);
+    }
   }
 }
