@@ -722,7 +722,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
                 padding: EdgeInsets.all(5),
                 child: Text(
                   selectedRace != null
-                      ? selectedRace!.raceName
+                      ? selectedRace!.raceName + ' ${selectedRace!.year}'
                       : "Ranking Season ${DateTime.now().year}",
                   style: TextStyle(
                     color: Colors.white,
