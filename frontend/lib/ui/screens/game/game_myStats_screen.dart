@@ -102,10 +102,8 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                                     CircleAvatar(
                                       backgroundColor: Colors.white,
                                       radius: 70,
-                                      child: Center(
-                                        child: Image.asset(
-                                            'assets/avatars/${userInfo.avatar}.png'),
-                                      ),
+                                      backgroundImage: AssetImage(
+                                          'assets/avatars/${userInfo.avatar}.png'),
                                     ),
                                     const SizedBox(height: 5),
                                     TextButton(
