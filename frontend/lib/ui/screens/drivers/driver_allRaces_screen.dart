@@ -192,8 +192,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                 ),
               ),
             )
-          : Expanded(
-              child: Padding(
+          : Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(
                   child: Column(
@@ -351,7 +350,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                     ],
                   ),
                 ),
-              ),
+            
             ),
     );
   }
