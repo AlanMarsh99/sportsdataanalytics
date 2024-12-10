@@ -4,21 +4,103 @@ import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
 
-class DriverAllRacesTableScreen extends StatelessWidget {
+class DriverAllRacesTableScreen extends StatefulWidget {
   const DriverAllRacesTableScreen({Key? key, required this.data})
       : super(key: key);
 
   final List<dynamic> data;
 
   @override
+  _DriverAllRacesTableScreenState createState() =>
+      _DriverAllRacesTableScreenState();
+}
+
+class _DriverAllRacesTableScreenState
+    extends State<DriverAllRacesTableScreen> {
+  final ScrollController _verticalController = ScrollController();
+  final ScrollController _horizontalController = ScrollController();
+
+  // State variables for sorting
+  int? _sortColumnIndex;
+  bool _sortAscending = true;
+
+  // Mutable list to hold and sort the race data
+  late List<Map<String, dynamic>> _raceData;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the mutable list from widget data
+    _raceData = widget.data
+        .map<Map<String, dynamic>>((race) => Map<String, dynamic>.from(race))
+        .toList();
+  }
+
+  @override
+  void dispose() {
+    _verticalController.dispose();
+    _horizontalController.dispose();
+    super.dispose();
+  }
+
+  // Sorting function
+  void _onSort(int columnIndex, bool ascending) {
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+
+      switch (columnIndex) {
+        case 0: // Race
+          _raceData.sort((a, b) {
+            String raceA = a['race_name'].toString();
+            String raceB = b['race_name'].toString();
+            return ascending
+                ? raceA.compareTo(raceB)
+                : raceB.compareTo(raceA);
+          });
+          break;
+        case 1: // Qualifying
+          _raceData.sort((a, b) {
+            int qualA = int.tryParse(a['qualifying_position'].toString()) ?? 0;
+            int qualB = int.tryParse(b['qualifying_position'].toString()) ?? 0;
+            return ascending ? qualA.compareTo(qualB) : qualB.compareTo(qualA);
+          });
+          break;
+        case 2: // Grid
+          _raceData.sort((a, b) {
+            int gridA = int.tryParse(a['grid'].toString()) ?? 0;
+            int gridB = int.tryParse(b['grid'].toString()) ?? 0;
+            return ascending ? gridA.compareTo(gridB) : gridB.compareTo(gridA);
+          });
+          break;
+        case 3: // Result
+          _raceData.sort((a, b) {
+            int resultA = int.tryParse(a['result'].toString()) ?? 0;
+            int resultB = int.tryParse(b['result'].toString()) ?? 0;
+            return ascending
+                ? resultA.compareTo(resultB)
+                : resultB.compareTo(resultA);
+          });
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scrollbar(
+      controller: _verticalController,
       thumbVisibility: true,
       child: SingleChildScrollView(
+        controller: _verticalController,
         scrollDirection: Axis.vertical,
         child: Scrollbar(
+          controller: _horizontalController,
           thumbVisibility: true,
           child: SingleChildScrollView(
+            controller: _horizontalController,
             scrollDirection: Axis.horizontal,
             child: Container(
               decoration: BoxDecoration(
@@ -26,37 +108,54 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                columns: const [
+                sortColumnIndex: _sortColumnIndex,
+                sortAscending: _sortAscending,
+                columns: [
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Race',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Qualifying',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Grid',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Result',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                 ],
-                rows: data.map((race) {
+                rows: _raceData.map((race) {
                   return DataRow(cells: [
                     DataCell(
                       InkWell(
@@ -89,7 +188,7 @@ class DriverAllRacesTableScreen extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        race['grid'],
+                        race['grid'].toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
