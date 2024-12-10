@@ -64,7 +64,7 @@ class _DriversScreenState extends State<DriversScreen> {
           APIService().getDriverStats(widget.driverId!, currentYear);
     } else {
       _driversStatsFuture =
-          Future.error("No drivers found for the selected season.");
+          Future.value({}); 
 
       // First Future to get drivers
       _driversNamesFuture =

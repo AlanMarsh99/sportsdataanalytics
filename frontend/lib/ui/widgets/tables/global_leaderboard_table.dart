@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/user_app.dart';
+import 'package:frontend/ui/responsive.dart';
 
 class GlobalLeaderboardTable extends StatelessWidget {
   const GlobalLeaderboardTable({Key? key, required this.users})
@@ -9,6 +10,7 @@ class GlobalLeaderboardTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Scrollbar(
       thumbVisibility: true,
       child: SingleChildScrollView(
@@ -23,6 +25,7 @@ class GlobalLeaderboardTable extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
+                columnSpacing: isMobile ? 10 : 56,
                 columns: const [
                   DataColumn(
                     label: Text(

@@ -12,6 +12,7 @@ import 'package:frontend/core/shared/globals.dart';
 import 'package:frontend/ui/responsive.dart';
 import 'package:frontend/ui/theme.dart';
 import 'package:frontend/ui/widgets/chat_widget.dart';
+import 'package:frontend/ui/widgets/dialogs/info_dialog.dart';
 
 class ResultPredictionScreen extends StatefulWidget {
   const ResultPredictionScreen(
@@ -278,35 +279,33 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
                         ],
                       ),
                     )
-                  : Expanded(
-                      child: FutureBuilder<Map<String, dynamic>>(
-                        future: predictionAIFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                  color: Colors.white),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text(
-                                'Error: ${snapshot.error}',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            );
-                          } else if (!snapshot.hasData) {
-                            return const Center(
-                              child: Text(
-                                'No data available.',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            );
-                          }
-                          Map<String, dynamic> predictionAI = snapshot.data!;
-                          return _predictionsContainer(predictionAI);
-                        },
-                      ),
+                  : FutureBuilder<Map<String, dynamic>>(
+                      future: predictionAIFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child:
+                                CircularProgressIndicator(color: Colors.white),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text(
+                              'Error: ${snapshot.error}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          );
+                        } else if (!snapshot.hasData) {
+                          return const Center(
+                            child: Text(
+                              'No data available.',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          );
+                        }
+                        Map<String, dynamic> predictionAI = snapshot.data!;
+                        return _predictionsContainer(predictionAI);
+                      },
                     ),
             ],
           ),
@@ -329,198 +328,263 @@ class _ResultPredictionScreenState extends State<ResultPredictionScreen> {
 
     return Container(
       width: double.infinity,
-      height: double.infinity,
+      height: isMobile
+          ? MediaQuery.of(context).size.height * 0.74
+          : double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primary,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CarouselSlider(
-            options: CarouselOptions(
-              height: 80,
-              autoPlay: false,
-              enlargeCenterPage: true,
-              reverse: false,
-              viewportFraction: 0.2,
-              enableInfiniteScroll: false,
-              initialPage: predictions.indexOf(selectedPrediction),
-              onPageChanged: (index, reason) {
-                setState(() {
-                  selectedPrediction = predictions[index];
-                  predictionAIFuture = _fetchPredictionAI();
-                });
-              },
-            ),
-            items: predictions.map((race) {
-              return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        selectedPrediction = race;
-                        predictionAIFuture = _fetchPredictionAI();
-                      });
-                    },
-                    child: Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              Globals.countryFlags[race.raceCountry]! ?? "",
-                              width: 50.0,
-                            ),
-                            SizedBox(
-                              height: 8.0,
-                            ),
-                          ],
-                        ),
-                        if (selectedPrediction == race)
-                          Container(
-                            width: 40,
-                            height: 4.0,
-                            color: secondary,
-                          ),
-                      ],
-                    ),
-                  ));
-            }).toList(),
-          ),
-          const SizedBox(height: 30),
-          // Race Title
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              //color: secondary,
-              border: Border.all(
-                color: secondary,
-                width: 2,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 80,
+                autoPlay: false,
+                enlargeCenterPage: true,
+                reverse: false,
+                viewportFraction: 0.2,
+                enableInfiniteScroll: false,
+                initialPage: predictions.indexOf(selectedPrediction),
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    selectedPrediction = predictions[index];
+                    predictionAIFuture = _fetchPredictionAI();
+                  });
+                },
               ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(5),
-              child: Text(
-                selectedPrediction.raceName!,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          const SizedBox(height: 15),
-          Text('+${selectedPrediction.points} points',
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold)),  
-                   const SizedBox(height: 30),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Race Results Table
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Race results',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
-                      child: const Divider(color: Colors.white),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              items: predictions.map((race) {
+                return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          selectedPrediction = race;
+                          predictionAIFuture = _fetchPredictionAI();
+                        });
+                      },
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
                         children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: isMobile ? 95 : 130),
-                            child: Container(
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(
+                                Globals.countryFlags[race.raceCountry]! ?? "",
+                                width: 50.0,
+                              ),
+                              SizedBox(
+                                height: 8.0,
+                              ),
+                            ],
+                          ),
+                          if (selectedPrediction == race)
+                            Container(
+                              width: 40,
+                              height: 4.0,
+                              color: secondary,
+                            ),
+                        ],
+                      ),
+                    ));
+              }).toList(),
+            ),
+            const SizedBox(height: 30),
+            // Race Title
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                //color: secondary,
+                border: Border.all(
+                  color: secondary,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(5),
+                child: Text(
+                  selectedPrediction.raceName! + ' ${selectedPrediction.year}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('+${selectedPrediction.points} points',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold)),
+                IconButton(
+                  icon: Icon(
+                    Icons.info,
+                    color: Colors.white,
+                    size: isMobile ? 18 : 22,
+                  ),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return InfoDialog(
+                            title: "Understanding the point system",
+                            message:
+                                'Earn points based on the accuracy of your predictions:\n\n'
+                                '- 30 points for correctly predicting the race winner.\n'
+                                '- 30 points for predicting the driver with the fastest lap.\n'
+                                '- 10 points for each driver correctly predicted to finish on the podium (order doesn’t matter).\n\n'
+                                'Put your F1 knowledge to the test and climb the leaderboard! 🏆',
+                          );
+                        });
+                  },
+                )
+              ],
+            ),
+
+            const SizedBox(height: 30),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Race Results Table
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Race results',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        width: isMobile
+                            ? MediaQuery.of(context).size.width + 50
+                            : MediaQuery.of(context).size.width / 2 + 20,
+                        child: const Divider(color: Colors.white),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding:
+                                  EdgeInsets.only(left: isMobile ? 95 : 130),
+                              child: Container(
+                                width: isMobile ? 115 : 130,
+                                child: const Text(
+                                  'ACTUAL',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            Container(
                               width: isMobile ? 115 : 130,
-                              child: const Text(
-                                'ACTUAL',
-                                style: TextStyle(
-                                    color: Colors.white,
+                              child: Text(
+                                widget.user.username.toUpperCase(),
+                                style: const TextStyle(
+                                    color: Colors.redAccent,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
-                          ),
-                          Container(
-                            width: isMobile ? 115 : 130,
-                            child: Text(
-                              widget.user.username.toUpperCase(),
-                              style: const TextStyle(
-                                  color: Colors.redAccent,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          const Text(
-                            'AI',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                            Row(
+                              children: [
+                                const Text(
+                                  'AI',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.info,
+                                    color: Colors.white,
+                                    size: isMobile ? 16 : 18,
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return InfoDialog(
+                                            title: "What's AI?",
+                                            message:
+                                                'The Artificial Intelligence (AI) predictions are based on historical data and advanced machine learning models.\nCompare your results to see if your predictions can outsmart artificial intelligence!',
+                                          );
+                                        });
+                                  },
+                                )
+                              ],
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
-                      child: const Divider(color: Colors.grey, height: 20),
-                    ),
-                    _buildResultRow(
-                        'Podium',
-                        selectedPrediction.actualPodiumNames!,
-                        selectedPrediction.podiumNames!,
-                        podiumNamesAI,
-                        podiumPoints),
-                    SizedBox(
-                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
-                      child: const Divider(color: Colors.grey, height: 20),
-                    ),
-                    _buildResultRow(
-                        'Winner',
-                        [selectedPrediction.actualWinnerName!],
-                        [selectedPrediction.winnerName!],
-                        [winnerNameAI],
-                        winnerPoints),
-                    SizedBox(
-                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
-                      child: const Divider(color: Colors.grey, height: 20),
-                    ),
-                    _buildResultRow(
-                        'Fastest lap',
-                        [selectedPrediction.actualFastestLapName!],
-                        [selectedPrediction.fastestLapName!],
-                        [fastestLapNameAI],
-                        fastestLapPoints),
-                    SizedBox(
-                      width: isMobile ? MediaQuery.of(context).size.width + 50 : MediaQuery.of(context).size.width / 2 + 20,
-                      child: const Divider(color: Colors.grey, height: 20),
-                    ),
-                  ],
-                ),
-              ],
+                      SizedBox(
+                        width: isMobile
+                            ? MediaQuery.of(context).size.width + 50
+                            : MediaQuery.of(context).size.width / 2 + 20,
+                        child: const Divider(color: Colors.grey, height: 20),
+                      ),
+                      _buildResultRow(
+                          'Podium',
+                          selectedPrediction.actualPodiumNames!,
+                          selectedPrediction.podiumNames!,
+                          podiumNamesAI,
+                          podiumPoints),
+                      SizedBox(
+                        width: isMobile
+                            ? MediaQuery.of(context).size.width + 50
+                            : MediaQuery.of(context).size.width / 2 + 20,
+                        child: const Divider(color: Colors.grey, height: 20),
+                      ),
+                      _buildResultRow(
+                          'Winner',
+                          [selectedPrediction.actualWinnerName!],
+                          [selectedPrediction.winnerName!],
+                          [winnerNameAI],
+                          winnerPoints),
+                      SizedBox(
+                        width: isMobile
+                            ? MediaQuery.of(context).size.width + 50
+                            : MediaQuery.of(context).size.width / 2 + 20,
+                        child: const Divider(color: Colors.grey, height: 20),
+                      ),
+                      _buildResultRow(
+                          'Fastest lap',
+                          [selectedPrediction.actualFastestLapName!],
+                          [selectedPrediction.fastestLapName!],
+                          [fastestLapNameAI],
+                          fastestLapPoints),
+                      SizedBox(
+                        width: isMobile
+                            ? MediaQuery.of(context).size.width + 50
+                            : MediaQuery.of(context).size.width / 2 + 20,
+                        child: const Divider(color: Colors.grey, height: 20),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

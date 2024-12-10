@@ -204,17 +204,31 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                             ),
                           ),
                           // Content overlaid on top of the image
-                          const Center(
+                          Container(
+                            width: isMobile
+                                ? MediaQuery.of(context).size.width * 0.7
+                                : MediaQuery.of(context).size.width * 0.55,
+                            height: isMobile ? 130 : 120,
+                            decoration: BoxDecoration(
+                              color: primary.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                             child: Padding(
-                              padding: EdgeInsets.all(20),
-                              child: Text(
-                                'No data available about the upcoming race at the moment. Try again later.',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                                textAlign: TextAlign.center,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: isMobile ? 12 : 20),
+                              child: Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Flexible(child: Text(
+                                    'No data available about the upcoming race at the moment. Try again later.',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: isMobile ? 16 : 20),
+                                    textAlign: TextAlign.center,
+                                  ),),
+                                ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
