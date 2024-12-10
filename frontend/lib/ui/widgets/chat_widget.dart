@@ -42,20 +42,22 @@ class _ChatWidgetState extends State<ChatWidget> {
         currentUserContainerColor: primary,
         showOtherUsersAvatar: true,
         showTime: true,
-        avatarBuilder:
-            (ChatUser user, Function? onPress, Function? onLongPress) {
+        avatarBuilder: (ChatUser user, Function? onPress, Function? onLongPress) {
           return Padding(
             padding: const EdgeInsets.only(right: 5),
             child: CircleAvatar(
               backgroundColor: Colors.white,
               radius: 20,
-              child: Center(
+              child: ClipOval(
                 child: Image.asset(
                   user.profileImage ?? 'assets/avatars/default.png',
+                  width: 40,
+                  height: 40,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => const Icon(
                     Icons.person,
                     size: 40,
+                    color: Colors.grey,
                   ),
                 ),
               ),
