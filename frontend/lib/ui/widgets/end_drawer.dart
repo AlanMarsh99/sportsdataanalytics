@@ -51,9 +51,9 @@ class EndDrawer extends StatelessWidget {
                         // Display Current Avatar
                         CircleAvatar(
                           radius: 50,
-                          backgroundColor: Colors.white,
+                          backgroundColor: Colors.grey[200],
                           backgroundImage: AssetImage(
-                              'avatars/${auth.userApp!.avatar}.png'),
+                              'assets/avatars/${auth.userApp!.avatar}.png'),
                         ),
                         const SizedBox(height: 15),
                         // Display Username
