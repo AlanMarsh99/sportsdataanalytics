@@ -22,6 +22,9 @@ class GameLeaderboardScreen extends StatefulWidget {
 class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
   late Future<List<UserApp>> _fetchUsersFuture;
 
+  // Added ScrollController
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +33,8 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
 
   @override
   void dispose() {
+    // Dispose the ScrollController
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -192,8 +197,15 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
                             return Expanded(
                               child: Align(
                                 alignment: Alignment.topCenter,
-                                child: GlobalLeaderboardTable(
-                                  users: users,
+                                child: Scrollbar( // Wrapped with Scrollbar
+                                  controller: _scrollController, // Added controller
+                                  thumbVisibility: true, // Makes scrollbar visible
+                                  child: SingleChildScrollView( // Added SingleChildScrollView
+                                    controller: _scrollController, // Connected controller
+                                    child: GlobalLeaderboardTable(
+                                      users: users,
+                                    ),
+                                  ),
                                 ),
                               ),
                             );
