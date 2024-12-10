@@ -25,7 +25,7 @@ class GlobalLeaderboardTable extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                columnSpacing: isMobile ? 42 : 56,
+                columnSpacing: isMobile ? 42 : 65,
                 columns: const [
                   DataColumn(
                     label: Text(
@@ -60,7 +60,7 @@ class GlobalLeaderboardTable extends StatelessWidget {
                       DataCell(Row(
                         children: [
                           CircleAvatar(
-                            maxRadius: isMobile ? 18 : 25,
+                            maxRadius: isMobile ? 18 : 20,
                             backgroundColor: Colors.white,
                             backgroundImage: AssetImage(
                               'assets/avatars/${users[index].avatar}.png',
