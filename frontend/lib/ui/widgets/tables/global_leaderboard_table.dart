@@ -25,7 +25,7 @@ class GlobalLeaderboardTable extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                columnSpacing: isMobile ? 10 : 56,
+                columnSpacing: isMobile ? 42 : 56,
                 columns: const [
                   DataColumn(
                     label: Text(
@@ -59,9 +59,12 @@ class GlobalLeaderboardTable extends StatelessWidget {
                       )), // Row index
                       DataCell(Row(
                         children: [
-                          Image.asset(
-                            'assets/avatars/${users[index].avatar}.png',
-                            width: 40,
+                          CircleAvatar(
+                            maxRadius: isMobile ? 18 : 25,
+                            backgroundColor: Colors.white,
+                            backgroundImage: AssetImage(
+                              'assets/avatars/${users[index].avatar}.png',
+                            ),
                           ),
                           const SizedBox(width: 5),
                           Text(

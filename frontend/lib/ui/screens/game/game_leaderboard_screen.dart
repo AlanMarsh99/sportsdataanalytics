@@ -70,7 +70,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'GAME',
                 style: TextStyle(
                     fontSize: 24,
@@ -151,7 +151,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       child: Text(
                         'GLOBAL LEADERBOARD 2024 SEASON',
                         style: TextStyle(
@@ -172,7 +172,7 @@ class _GameLeaderboardScreenState extends State<GameLeaderboardScreen> {
                           // Show a loading indicator while waiting for data
                           return Container(
                             height: MediaQuery.of(context).size.height * 0.4,
-                            child: Center(
+                            child: const Center(
                               child: CircularProgressIndicator(
                                 color: Colors.white,
                               ),

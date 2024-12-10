@@ -123,7 +123,7 @@ class _F1CarouselState extends State<F1Carousel> {
                       carouselController: carouselController,
                       options: Responsive.isMobile(context)
                           ? CarouselOptions(
-                              viewportFraction: 0.4,
+                              viewportFraction: 0.45,
                               height: 45.0,
                               enableInfiniteScroll: true,
                               initialPage: _currentIndex,
