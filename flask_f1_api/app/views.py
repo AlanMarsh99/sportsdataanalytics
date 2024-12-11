@@ -5,7 +5,7 @@ from app.cache import cache
 
 api_blueprint = Blueprint('api', __name__)
 
-BASE_ERGAST_URL = "http://api.jolpi.ca/ergast/f1/"
+BASE_ERGAST_URL = "http://ergast.com/api/f1"
 
 # HOME SCREEN VIEWS
 
