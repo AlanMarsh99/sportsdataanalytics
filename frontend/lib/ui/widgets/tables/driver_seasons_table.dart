@@ -13,11 +13,87 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
   final ScrollController _verticalController = ScrollController();
   final ScrollController _horizontalController = ScrollController();
 
+  // State variables for sorting
+  int? _sortColumnIndex;
+  bool _sortAscending = true;
+
+  // Mutable list to hold and sort the season results
+  late List<Map<String, dynamic>> _seasonResults;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the mutable list from widget data
+    _seasonResults = List<Map<String, dynamic>>.from(
+        widget.data['season_results'] as List<dynamic>);
+  }
+
   @override
   void dispose() {
     _verticalController.dispose();
     _horizontalController.dispose();
     super.dispose();
+  }
+
+  // Sorting function
+  void _onSort(int columnIndex, bool ascending) {
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+
+      switch (columnIndex) {
+        case 0: // Year
+          _seasonResults.sort((a, b) {
+            int yearA = int.tryParse(a['year'].toString()) ?? 0;
+            int yearB = int.tryParse(b['year'].toString()) ?? 0;
+            return ascending ? yearA.compareTo(yearB) : yearB.compareTo(yearA);
+          });
+          break;
+        case 1: // Position
+          _seasonResults.sort((a, b) {
+            int posA = int.tryParse(a['position'].toString()) ?? 0;
+            int posB = int.tryParse(b['position'].toString()) ?? 0;
+            return ascending ? posA.compareTo(posB) : posB.compareTo(posA);
+          });
+          break;
+        case 2: // Points
+          _seasonResults.sort((a, b) {
+            double pointsA = double.tryParse(a['points'].toString()) ?? 0.0;
+            double pointsB = double.tryParse(b['points'].toString()) ?? 0.0;
+            return ascending ? pointsA.compareTo(pointsB) : pointsB.compareTo(pointsA);
+          });
+          break;
+        case 3: // Races
+          _seasonResults.sort((a, b) {
+            int racesA = int.tryParse(a['num_races'].toString()) ?? 0;
+            int racesB = int.tryParse(b['num_races'].toString()) ?? 0;
+            return ascending ? racesA.compareTo(racesB) : racesB.compareTo(racesA);
+          });
+          break;
+        case 4: // Wins
+          _seasonResults.sort((a, b) {
+            int winsA = int.tryParse(a['wins'].toString()) ?? 0;
+            int winsB = int.tryParse(b['wins'].toString()) ?? 0;
+            return ascending ? winsA.compareTo(winsB) : winsB.compareTo(winsA);
+          });
+          break;
+        case 5: // Podiums
+          _seasonResults.sort((a, b) {
+            int podiumsA = int.tryParse(a['podiums'].toString()) ?? 0;
+            int podiumsB = int.tryParse(b['podiums'].toString()) ?? 0;
+            return ascending ? podiumsA.compareTo(podiumsB) : podiumsB.compareTo(podiumsA);
+          });
+          break;
+        case 6: // Pole positions
+          _seasonResults.sort((a, b) {
+            int polesA = int.tryParse(a['pole_positions'].toString()) ?? 0;
+            int polesB = int.tryParse(b['pole_positions'].toString()) ?? 0;
+            return ascending ? polesA.compareTo(polesB) : polesB.compareTo(polesA);
+          });
+          break;
+        // No sorting for Team(s) column
+      }
+    });
   }
 
   @override
@@ -40,57 +116,87 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                columns: const [
+                sortColumnIndex: _sortColumnIndex,
+                sortAscending: _sortAscending,
+                columns: [
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Year',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Position',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Points',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Races',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Wins',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Podiums',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
                   DataColumn(
-                    label: Text(
+                    label: const Text(
                       'Pole positions',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.black),
                     ),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) {
+                      _onSort(columnIndex, ascending);
+                    },
                   ),
-                  DataColumn(
+                  const DataColumn(
                     label: Text(
                       'Team(s)',
                       style: TextStyle(
@@ -98,12 +204,11 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
                     ),
                   ),
                 ],
-                rows: (widget.data['season_results'] as List<dynamic>)
-                    .map((seasonResult) {
+                rows: _seasonResults.map((seasonResult) {
                   return DataRow(cells: [
                     DataCell(
                       Text(
-                        seasonResult['year'],
+                        seasonResult['year'].toString(),
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
