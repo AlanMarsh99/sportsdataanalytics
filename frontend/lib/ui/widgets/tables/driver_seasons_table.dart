@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/responsive.dart'; // Ensure this is your responsive helper
+import 'package:frontend/ui/responsive.dart';
 
 class DriverSeasonsTable extends StatefulWidget {
   const DriverSeasonsTable({Key? key, required this.data}) : super(key: key);
@@ -56,7 +56,7 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
             .toLowerCase()
             .contains(filter);
         return matchesYear || matchesPosition || matchesTeam;
-      }).toList(); // Added .toList() to convert Iterable to List
+      }).toList();
 
       if (_sortColumnIndex != null) {
         _onSort(_sortColumnIndex!, _sortAscending);
