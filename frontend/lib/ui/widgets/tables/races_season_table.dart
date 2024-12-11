@@ -76,8 +76,14 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
 
   void onSort(int columnIndex, bool ascending) {
     setState(() {
-      sortColumnIndex = columnIndex;
-      isAscending = ascending;
+      if (sortColumnIndex == columnIndex) {
+        isAscending = !isAscending; // Toggle sort order if the same column is tapped
+      } else {
+        sortColumnIndex = columnIndex;
+        isAscending = true; // Default to ascending when a new column is tapped
+      }
+
+      // Perform sorting based on columnIndex
       if (columnIndex == 0) {
         filteredRacesList.sort((a, b) {
           final dateA = DateTime.parse(a.date);
@@ -170,6 +176,39 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
     }
   }
 
+  // Helper method to build DataColumn with required features
+  DataColumn buildDataColumn(String label, int columnIndex) {
+    return DataColumn(
+      label: InkWell(
+        onTap: () => onSort(columnIndex, isAscending),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisSize: MainAxisSize.min, // Adjusts to the content size
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(width: 4), // Spacing between text and icon
+              // Conditionally display the sorting arrow
+              if (sortColumnIndex == columnIndex)
+                Icon(
+                  isAscending ? Icons.arrow_upward : Icons.arrow_downward,
+                  color: Colors.black,
+                  size: 16,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
@@ -226,121 +265,11 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                       sortAscending: isAscending,
                       columnSpacing: isMobile ? 15 : 56,
                       columns: [
-                        DataColumn(
-                          label: InkWell(
-                            onTap: () => onSort(0, !isAscending),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Date',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Icon(
-                                  isAscending
-                                      ? Icons.arrow_upward
-                                      : Icons.arrow_downward,
-                                  color: Colors.black,
-                                  size: 16,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: InkWell(
-                            onTap: () => onSort(1, !isAscending),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Race',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Icon(
-                                  isAscending
-                                      ? Icons.arrow_upward
-                                      : Icons.arrow_downward,
-                                  color: Colors.black,
-                                  size: 16,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: InkWell(
-                            onTap: () => onSort(2, !isAscending),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Circuit',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Icon(
-                                  isAscending
-                                      ? Icons.arrow_upward
-                                      : Icons.arrow_downward,
-                                  color: Colors.black,
-                                  size: 16,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: InkWell(
-                            onTap: () => onSort(3, !isAscending),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Winner',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Icon(
-                                  isAscending
-                                      ? Icons.arrow_upward
-                                      : Icons.arrow_downward,
-                                  color: Colors.black,
-                                  size: 16,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: InkWell(
-                            onTap: () => onSort(4, !isAscending),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  'Pole Position',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Icon(
-                                  isAscending
-                                      ? Icons.arrow_upward
-                                      : Icons.arrow_downward,
-                                  color: Colors.black,
-                                  size: 16,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        buildDataColumn('Date', 0),
+                        buildDataColumn('Race', 1),
+                        buildDataColumn('Circuit', 2),
+                        buildDataColumn('Winner', 3),
+                        buildDataColumn('Pole Position', 4),
                       ],
                       rows: filteredRacesList.map((race) {
                         return DataRow(cells: [
@@ -352,53 +281,54 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                           ),
                           DataCell(
                             SizedBox(
-                            width: isMobile ? 130 : null,
-                            child: TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        RacesDetailScreen(race: race),
+                              width: isMobile ? 130 : null,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          RacesDetailScreen(race: race),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  race.raceName,
+                                  style: const TextStyle(
+                                    color: primary,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
                                   ),
-                                );
-                              },
-                              child: Text(
-                                race.raceName,
-                                style: const TextStyle(
-                                  color: primary,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
                                 ),
                               ),
                             ),
-                          )),
-                          DataCell(
-                              SizedBox(
-                            width: isMobile ? 135 : null,
-                            child:
-                            Text(
-                              race.circuitName,
-                              style: const TextStyle(color: Colors.black),
-                            ),),
                           ),
                           DataCell(
-                             SizedBox(
-                            width: isMobile ? 80 : null,
-                            child:
-                            Text(
-                              race.winner,
-                              style: const TextStyle(color: Colors.black),
+                            SizedBox(
+                              width: isMobile ? 135 : null,
+                              child: Text(
+                                race.circuitName,
+                                style: const TextStyle(color: Colors.black),
+                              ),
                             ),
-                          ),),
+                          ),
                           DataCell(
-                             SizedBox(
-                            width: isMobile ? 80 : null,
-                            child:
-                            Text(
-                              race.polePosition,
-                              style: const TextStyle(color: Colors.black),
-                            ),),
+                            SizedBox(
+                              width: isMobile ? 80 : null,
+                              child: Text(
+                                race.winner,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            SizedBox(
+                              width: isMobile ? 80 : null,
+                              child: Text(
+                                race.polePosition,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ),
                           ),
                         ]);
                       }).toList(),

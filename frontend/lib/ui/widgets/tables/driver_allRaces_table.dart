@@ -3,7 +3,7 @@ import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
-import 'package:frontend/ui/responsive.dart'; // Ensure this is your responsive helper
+import 'package:frontend/ui/responsive.dart';
 
 class DriverAllRacesTableScreen extends StatefulWidget {
   const DriverAllRacesTableScreen({Key? key, required this.data})
