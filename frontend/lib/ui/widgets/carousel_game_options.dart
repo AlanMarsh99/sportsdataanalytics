@@ -21,16 +21,48 @@ class _F1CarouselState extends State<F1Carousel> {
   double _rotationAngle = 0.0;
   bool _hasChangedScreen = false;
   final double _delta = 0.5;
+  bool _isAnimating = false;
 
   @override
   void initState() {
     super.initState();
+    _startSteeringWheelAnimation();
     // Callback to sincronize UI after everything is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         _pageController.jumpToPage(_currentIndex);
       });
     });
+  }
+
+  void _startSteeringWheelAnimation() async {
+    const int animationCycles = 2;
+    const Duration animationDelay = Duration(milliseconds: 600);
+
+    setState(() {
+      _isAnimating = true;
+    });
+
+    for (int i = 0; i < animationCycles; i++) {
+      if (!mounted) return;
+      setState(() {
+        _rotationAngle = _delta; // Turn right
+      });
+      await Future.delayed(animationDelay);
+
+      if (!mounted) return;
+      setState(() {
+        _rotationAngle = -_delta; // Turn right
+      });
+      await Future.delayed(animationDelay);
+    }
+
+    if (mounted) {
+      setState(() {
+        _rotationAngle = 0.0;
+        _isAnimating = false;
+      });
+    }
   }
 
   void _rotateWheel(double delta) {
@@ -168,17 +200,17 @@ class _F1CarouselState extends State<F1Carousel> {
           ),
           const SizedBox(height: 20),
           GestureDetector(
-            onPanUpdate: (details) {
+            onPanUpdate: !_isAnimating ? (details) {
               if (!_hasChangedScreen) {
                 _handlePanUpdate(details);
               }
-            },
-            onPanEnd: (_) {
+            } : null ,
+            onPanEnd: !_isAnimating ? (_) {
               setState(() {
                 _rotationAngle = 0.0;
                 _hasChangedScreen = false;
               });
-            },
+            } : null,
             child: Transform.rotate(
               angle: _rotationAngle,
               child: Image.asset('assets/images/wheel.png', width: 200),
