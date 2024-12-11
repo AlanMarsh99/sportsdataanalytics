@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/core/models/race_positions.dart';
 import 'package:frontend/core/shared/globals.dart';
-import 'package:frontend/ui/responsive.dart'; // Import the Responsive class
+import 'package:frontend/ui/responsive.dart';
 
 class LapGraphWidget extends StatefulWidget {
   final RacePositions racePositions;
@@ -184,7 +184,7 @@ class _LapGraphWidgetState extends State<LapGraphWidget> {
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 8, // Reduced from 14 to 12
+                              fontSize: 8,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -221,7 +221,7 @@ class _LapGraphWidgetState extends State<LapGraphWidget> {
                                       Text(
                                         legend.name,
                                         style: const TextStyle(
-                                            color: Colors.white, fontSize: 7), // Reduced from 12 to 10
+                                            color: Colors.white, fontSize: 7),
                                       ),
                                     ],
                                   ),
