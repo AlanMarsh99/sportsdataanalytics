@@ -105,12 +105,12 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                /*return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ); // Show loading while fetching*/
-                                return Container();
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                ); // Show loading while fetching*/
+                                //return Container();
                               } else if (snapshot.hasError) {
                                 return const Text(
                                   'Error: Failed to load driver race stats',
@@ -214,8 +214,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                                         DriverAllRacesTableScreen(data: data),
                                   ),
                                 )
-                              : Container()
-                          ;
+                              : Container();
                         }
                         return Container();
                       },
@@ -269,11 +268,11 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                      /*return const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
-                            ); // Show loading while fetching*/
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      ); // Show loading while fetching*/
                                       return Container();
                                     } else if (snapshot.hasError) {
                                       return const Text(
@@ -333,11 +332,13 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                                                   ],
                                                 ),
                                                 const SizedBox(height: 20),
-                                                Center(child: Text(
-                                                  'No data available for ${selectedSeason} at the moment. Try another year.',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),),
+                                                Center(
+                                                  child: Text(
+                                                    'No data available for ${selectedSeason} at the moment. Try another year.',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
                                                 const SizedBox(height: 40),
                                                 Center(
                                                   child: CircleAvatar(
@@ -388,35 +389,33 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                                 ),
                         ),
                         const SizedBox(width: 30),
-                        Expanded(
-                          child: FutureBuilder<List<dynamic>>(
-                            future: _driverRaceStats,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                ); // Show loading while fetching*/
-                              } else if (snapshot.hasError) {
-                                return const Text(
-                                  'Error: Failed to load driver race stats',
-                                  style: TextStyle(color: Colors.white),
-                                ); // Error handling
-                              } else if (snapshot.hasData) {
-                                List<dynamic> data = snapshot.data!;
+                        FutureBuilder<List<dynamic>>(
+                          future: _driverRaceStats,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ); // Show loading while fetching*/
+                            } else if (snapshot.hasError) {
+                              return const Text(
+                                'Error: Failed to load driver race stats',
+                                style: TextStyle(color: Colors.white),
+                              ); // Error handling
+                            } else if (snapshot.hasData) {
+                              List<dynamic> data = snapshot.data!;
 
-                                return data.isNotEmpty
-                                    ? Center(
-                                        child: DriverAllRacesTableScreen(
-                                            data: data),
-                                      )
-                                    : Container();
-                              }
-                              return Container();
-                            },
-                          ),
+                              return data.isNotEmpty
+                                  ? Center(
+                                      child:
+                                          DriverAllRacesTableScreen(data: data),
+                                    )
+                                  : Container();
+                            }
+                            return Container();
+                          },
                         )
                       ],
                     ),

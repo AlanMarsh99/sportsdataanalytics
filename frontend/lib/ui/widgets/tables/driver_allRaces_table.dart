@@ -261,15 +261,14 @@ class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
   }
 
   Widget table() {
-    return Expanded(
-      child: Scrollbar(
+    return Scrollbar(
         thumbVisibility: true,
         controller: _verticalController,
         child: SingleChildScrollView(
           controller: _verticalController,
           child: _buildTable(Responsive.isMobile(context)),
         ),
-      ),
+      
     );
   }
 
