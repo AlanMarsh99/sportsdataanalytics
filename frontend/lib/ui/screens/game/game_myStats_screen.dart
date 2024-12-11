@@ -28,18 +28,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
     super.dispose();
   }
 
-  UserApp userInfo = UserApp(
-      id: '1',
-      email: 'brendan@test.com',
-      username: 'brendan',
-      totalPoints: 523,
-      seasonPoints: 523,
-      avatar: 'assets/images/placeholder.png',
-      level: 1,
-      leaguesWon: 2,
-      leaguesFinished: 5,
-      numPredictions: 15,
-      firstTimeTutorial: false);
+  late UserApp userInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -80,86 +69,118 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
           builder: (context, auth, child) {
             if (auth.status == Status.Authenticated && auth.userApp != null) {
               userInfo = auth.userApp!;
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        top: 16, bottom: 16.0, left: 16.0, right: 16.0),
-                    child: Row(
+              return  Padding(
+          padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+          child: Container(
+                width: double.infinity,
+                height: isMobile
+                    ? MediaQuery.of(context).size.height * 0.6
+                    : MediaQuery.of(context).size.height * 0.6,
+                decoration: BoxDecoration(
+                  color: primary,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Stack(
+                  alignment: AlignmentDirectional.center,
+                  children: [
+                    // Background Image
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        'assets/images/image6_f1.jpg',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ),
+                    // Semi-transparent overlay to make text readable
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                    ),
+
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          height: 330,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 16, bottom: 16.0, left: 16.0, right: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20),
+                              Container(
+                                height: 330,
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    CircleAvatar(
-                                      backgroundColor: Colors.white,
-                                      radius: 70,
-                                      backgroundImage: AssetImage(
-                                          'assets/avatars/${userInfo.avatar}.png'),
-                                    ),
-                                    const SizedBox(height: 5),
-                                    TextButton(
-                                      onPressed: () async {
-                                        await showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AvatarSelectionDialog(
-                                              userApp: userInfo,
-                                            );
-                                          },
-                                        );
-                                      },
-                                      child: const Text(
-                                        'Change avatar',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor: Colors.white,
+                                            radius: 70,
+                                            backgroundImage: AssetImage(
+                                                'assets/avatars/${userInfo.avatar}.png'),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          TextButton(
+                                            onPressed: () async {
+                                              await showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AvatarSelectionDialog(
+                                                    userApp: userInfo,
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: const Text(
+                                              'Change avatar',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
+                                    _buildStatCard(
+                                        1, null, 'GLOBAL POSITION', false),
                                   ],
                                 ),
                               ),
-                              _buildStatCard(1, null, 'GLOBAL POSITION', false),
+                              const SizedBox(
+                                width: 15,
+                              ),
+                              Container(
+                                height: 330,
+                                child: Column(
+                                  children: [
+                                    _buildStatCard(userInfo.totalPoints, null,
+                                        'TOTAL POINTS', false),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    _buildStatCard(userInfo.leaguesWon, null,
+                                        'LEAGUE WINS', false),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    _buildStatCard(userInfo.numPredictions,
+                                        null, 'PREDICTIONS', false),
+                                  ],
+                                ),
+                              )
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        Container(
-                          height: 330,
-                          child: Column(
-                            children: [
-                              _buildStatCard(userInfo.totalPoints, null,
-                                  'TOTAL POINTS', false),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              _buildStatCard(
-                                  userInfo.leaguesWon,
-                                  userInfo.leaguesFinished,
-                                  'LEAGUE WINS',
-                                  true),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              _buildStatCard(userInfo.numPredictions, null,
-                                  'PREDICTIONS', false),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  /*const SizedBox(
+                        /*const SizedBox(
                     height: 10,
                   ),
                   const Padding(
@@ -184,8 +205,11 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                       ],
                     ),
                   ),*/
-                ],
-              );
+                      ],
+                    )
+                  ],
+                ),
+              ),);
             } else {
               return Padding(
                 padding:
@@ -205,7 +229,7 @@ class _GameMyStatsScreenState extends State<GameMyStatsScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: Image.asset(
-                          'assets/images/image3_f1.jpg',
+                          'assets/images/image6_f1.jpg',
                           fit: BoxFit.cover,
                           width: double.infinity,
                           height: double.infinity,

@@ -504,7 +504,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
             const Spacer(),
             Text(
               showTotal
-                  ? user.seasonPoints.toString()
+                  ? user.totalPoints.toString()
                   : user.predictionPoints != -1
                       ? user.predictionPoints.toString()
                       : "-",
@@ -577,7 +577,7 @@ class _RankingLeagueScreenState extends State<RankingLeagueScreen> {
               userId: user.id,
               round: selectedRace!.round,
               year: selectedRace!.year)
-          : user.seasonPoints;
+          : user.totalPoints;
       user.predictionPoints = points ?? -1;
       return user;
     }).toList()
