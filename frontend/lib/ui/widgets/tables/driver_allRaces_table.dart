@@ -15,8 +15,7 @@ class DriverAllRacesTableScreen extends StatefulWidget {
       _DriverAllRacesTableScreenState();
 }
 
-class _DriverAllRacesTableScreenState
-    extends State<DriverAllRacesTableScreen> {
+class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
   final ScrollController _verticalController = ScrollController();
   final ScrollController _horizontalController = ScrollController();
 
@@ -26,6 +25,8 @@ class _DriverAllRacesTableScreenState
 
   // Mutable list to hold and sort the race data
   late List<Map<String, dynamic>> _raceData;
+  List<Map<String, dynamic>> filteredResultsList = [];
+  String filter = '';
 
   @override
   void initState() {
@@ -34,6 +35,21 @@ class _DriverAllRacesTableScreenState
     _raceData = widget.data
         .map<Map<String, dynamic>>((race) => Map<String, dynamic>.from(race))
         .toList();
+    filteredResultsList = List.from(_raceData);
+  }
+
+  void updateFilter(String value) {
+    filter = value;
+    setState(() {
+      filteredResultsList = _raceData.where((result) {
+        final matchesPosition = result['result'].toString() == filter;
+        final matchesTeam = result['race_name']
+            .toString()
+            .toLowerCase()
+            .contains(filter.toLowerCase());
+        return matchesPosition || matchesTeam;
+      }).toList();
+    });
   }
 
   @override
@@ -51,30 +67,28 @@ class _DriverAllRacesTableScreenState
 
       switch (columnIndex) {
         case 0: // Race
-          _raceData.sort((a, b) {
+          filteredResultsList.sort((a, b) {
             String raceA = a['race_name'].toString();
             String raceB = b['race_name'].toString();
-            return ascending
-                ? raceA.compareTo(raceB)
-                : raceB.compareTo(raceA);
+            return ascending ? raceA.compareTo(raceB) : raceB.compareTo(raceA);
           });
           break;
         case 1: // Qualifying
-          _raceData.sort((a, b) {
+          filteredResultsList.sort((a, b) {
             int qualA = int.tryParse(a['qualifying_position'].toString()) ?? 0;
             int qualB = int.tryParse(b['qualifying_position'].toString()) ?? 0;
             return ascending ? qualA.compareTo(qualB) : qualB.compareTo(qualA);
           });
           break;
         case 2: // Grid
-          _raceData.sort((a, b) {
+          filteredResultsList.sort((a, b) {
             int gridA = int.tryParse(a['grid'].toString()) ?? 0;
             int gridB = int.tryParse(b['grid'].toString()) ?? 0;
             return ascending ? gridA.compareTo(gridB) : gridB.compareTo(gridA);
           });
           break;
         case 3: // Result
-          _raceData.sort((a, b) {
+          filteredResultsList.sort((a, b) {
             int resultA = int.tryParse(a['result'].toString()) ?? 0;
             int resultB = int.tryParse(b['result'].toString()) ?? 0;
             return ascending
@@ -90,118 +104,150 @@ class _DriverAllRacesTableScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-      controller: _verticalController,
-      thumbVisibility: true,
-      child: SingleChildScrollView(
-        controller: _verticalController,
-        scrollDirection: Axis.vertical,
-        child: Scrollbar(
-          controller: _horizontalController,
-          thumbVisibility: true,
-          child: SingleChildScrollView(
-            controller: _horizontalController,
-            scrollDirection: Axis.horizontal,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15.0),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: TextField(
+            cursorColor: Colors.white,
+            decoration: InputDecoration(
+              hintText: 'Enter a race name or a result',
+              hintStyle: TextStyle(color: Colors.white70),
+              labelText: 'Filter results',
+              labelStyle: const TextStyle(color: Colors.white),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.white),
               ),
-              child: DataTable(
-                sortColumnIndex: _sortColumnIndex,
-                sortAscending: _sortAscending,
-                columns: [
-                  DataColumn(
-                    label: const Text(
-                      'Race',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+            ),
+            onChanged: updateFilter,
+          ),
+        ),
+        Expanded(
+          child: Scrollbar(
+            controller: _verticalController,
+            thumbVisibility: true,
+            child: SingleChildScrollView(
+              controller: _verticalController,
+              scrollDirection: Axis.vertical,
+              child: Scrollbar(
+                controller: _horizontalController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _horizontalController,
+                  scrollDirection: Axis.horizontal,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
-                    onSort: (columnIndex, ascending) {
-                      _onSort(columnIndex, ascending);
-                    },
-                  ),
-                  DataColumn(
-                    label: const Text(
-                      'Qualifying',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                    numeric: true,
-                    onSort: (columnIndex, ascending) {
-                      _onSort(columnIndex, ascending);
-                    },
-                  ),
-                  DataColumn(
-                    label: const Text(
-                      'Grid',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                    numeric: true,
-                    onSort: (columnIndex, ascending) {
-                      _onSort(columnIndex, ascending);
-                    },
-                  ),
-                  DataColumn(
-                    label: const Text(
-                      'Result',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                    numeric: true,
-                    onSort: (columnIndex, ascending) {
-                      _onSort(columnIndex, ascending);
-                    },
-                  ),
-                ],
-                rows: _raceData.map((race) {
-                  return DataRow(cells: [
-                    DataCell(
-                      InkWell(
-                        onTap: () async {
-                          // Navigate to the race details screen
-                          int year = int.parse(race['year']);
-                          int round = int.parse(race['round']);
-
-                          Map<String, dynamic> json =
-                              await APIService().getRaceInfo(year, round);
-                          Race r = Race.fromJson(json);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    RacesDetailScreen(race: r)),
-                          );
-                        },
-                        child: Text(
-                          race['race_name'],
-                          style: const TextStyle(
-                              color: primary,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline),
+                    child: DataTable(
+                      sortColumnIndex: _sortColumnIndex,
+                      sortAscending: _sortAscending,
+                      columns: [
+                        DataColumn(
+                          label: const Text(
+                            'Race',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          onSort: (columnIndex, ascending) {
+                            _onSort(columnIndex, ascending);
+                          },
                         ),
-                      ),
+                        DataColumn(
+                          label: const Text(
+                            'Qualifying',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          numeric: true,
+                          onSort: (columnIndex, ascending) {
+                            _onSort(columnIndex, ascending);
+                          },
+                        ),
+                        DataColumn(
+                          label: const Text(
+                            'Grid',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          numeric: true,
+                          onSort: (columnIndex, ascending) {
+                            _onSort(columnIndex, ascending);
+                          },
+                        ),
+                        DataColumn(
+                          label: const Text(
+                            'Result',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          numeric: true,
+                          onSort: (columnIndex, ascending) {
+                            _onSort(columnIndex, ascending);
+                          },
+                        ),
+                      ],
+                      rows: filteredResultsList.map((race) {
+                        return DataRow(cells: [
+                          DataCell(
+                            InkWell(
+                              onTap: () async {
+                                // Navigate to the race details screen
+                                int year = int.parse(race['year']);
+                                int round = int.parse(race['round']);
+
+                                Map<String, dynamic> json =
+                                    await APIService().getRaceInfo(year, round);
+                                Race r = Race.fromJson(json);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          RacesDetailScreen(race: r)),
+                                );
+                              },
+                              child: Text(
+                                race['race_name'],
+                                style: const TextStyle(
+                                    color: primary,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            _buildPositionContainer(
+                                race['qualifying_position']),
+                          ),
+                          DataCell(
+                            Text(
+                              race['grid'].toString(),
+                              style: const TextStyle(color: Colors.black),
+                            ),
+                          ),
+                          DataCell(
+                            _buildPositionContainer(race['result']),
+                          ),
+                        ]);
+                      }).toList(),
                     ),
-                    DataCell(
-                      _buildPositionContainer(race['qualifying_position']),
-                    ),
-                    DataCell(
-                      Text(
-                        race['grid'].toString(),
-                        style: const TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    DataCell(
-                      _buildPositionContainer(race['result']),
-                    ),
-                  ]);
-                }).toList(),
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
