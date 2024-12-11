@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/ui/responsive.dart'; // Ensure this is your responsive helper
 
 class DriverSeasonsTable extends StatefulWidget {
   const DriverSeasonsTable({Key? key, required this.data}) : super(key: key);
@@ -31,29 +32,36 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
     filteredResultsList = List.from(_seasonResults);
   }
 
-  void updateFilter(String value) {
-    filter = value;
-    setState(() {
-      filteredResultsList = _seasonResults.where((result) {
-        final matchesYear = result['year']
-            .toString()
-            .toLowerCase()
-            .contains(filter.toLowerCase());
-        final matchesPosition = result['position'].toString() == filter;
-        final matchesTeam = result['team']
-            .toString()
-            .toLowerCase()
-            .contains(filter.toLowerCase());
-        return matchesYear || matchesPosition || matchesTeam;
-      }).toList();
-    });
-  }
-
   @override
   void dispose() {
     _verticalController.dispose();
     _horizontalController.dispose();
     super.dispose();
+  }
+
+  void updateFilter(String value) {
+    setState(() {
+      filter = value.toLowerCase();
+      filteredResultsList = _seasonResults.where((result) {
+        final matchesYear = result['year']
+            .toString()
+            .toLowerCase()
+            .contains(filter);
+        final matchesPosition = result['position']
+            .toString()
+            .toLowerCase()
+            .contains(filter);
+        final matchesTeam = result['team']
+            .toString()
+            .toLowerCase()
+            .contains(filter);
+        return matchesYear || matchesPosition || matchesTeam;
+      }).toList(); // Added .toList() to convert Iterable to List
+
+      if (_sortColumnIndex != null) {
+        _onSort(_sortColumnIndex!, _sortAscending);
+      }
+    });
   }
 
   // Sorting function
@@ -125,192 +133,233 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: TextField(
-            cursorColor: Colors.white,
-            decoration: InputDecoration(
-              hintText: 'Enter a year, a position or a team',
-              hintStyle: TextStyle(color: Colors.white70),
-              labelText: 'Filter results',
-              labelStyle: const TextStyle(color: Colors.white),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: Colors.white),
-              ),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-            ),
-            onChanged: updateFilter,
+  /// Helper method to determine column spacing based on screen width
+  double _getColumnSpacing(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    if (screenWidth < 600) {
+      // Mobile
+      return 15.0;
+    } else if (screenWidth >= 600 && screenWidth < 1200) {
+      // Tablet
+      return 30.0;
+    } else {
+      // Desktop
+      return 56.0;
+    }
+  }
+
+  Widget _buildFilter(bool isMobile) {
+    return SizedBox(
+      width: isMobile ? double.infinity : 500,
+      child: TextField(
+        cursorColor: Colors.white,
+        decoration: InputDecoration(
+          hintText: 'Enter a year, position or team',
+          hintStyle: const TextStyle(color: Colors.white70),
+          labelText: 'Filter results',
+          labelStyle: const TextStyle(color: Colors.white),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: const BorderSide(color: Colors.white),
+          ),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: Colors.white,
           ),
         ),
-        Scrollbar(
-          controller: _verticalController,
-          thumbVisibility: true,
-          child: SingleChildScrollView(
-            controller: _verticalController,
-            scrollDirection: Axis.vertical,
-            child: Scrollbar(
-              controller: _horizontalController,
-              thumbVisibility: true,
-              child: SingleChildScrollView(
-                controller: _horizontalController,
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: DataTable(
-                    sortColumnIndex: _sortColumnIndex,
-                    sortAscending: _sortAscending,
-                    columns: [
-                      DataColumn(
-                        label: const Text(
-                          'Year',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        numeric: true,
-                        onSort: (columnIndex, ascending) {
-                          _onSort(columnIndex, ascending);
-                        },
-                      ),
-                      DataColumn(
-                        label: const Text(
-                          'Position',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        numeric: true,
-                        onSort: (columnIndex, ascending) {
-                          _onSort(columnIndex, ascending);
-                        },
-                      ),
-                      DataColumn(
-                        label: const Text(
-                          'Points',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        numeric: true,
-                        onSort: (columnIndex, ascending) {
-                          _onSort(columnIndex, ascending);
-                        },
-                      ),
-                      DataColumn(
-                        label: const Text(
-                          'Races',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        numeric: true,
-                        onSort: (columnIndex, ascending) {
-                          _onSort(columnIndex, ascending);
-                        },
-                      ),
-                      DataColumn(
-                        label: const Text(
-                          'Wins',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        numeric: true,
-                        onSort: (columnIndex, ascending) {
-                          _onSort(columnIndex, ascending);
-                        },
-                      ),
-                      DataColumn(
-                        label: const Text(
-                          'Podiums',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        numeric: true,
-                        onSort: (columnIndex, ascending) {
-                          _onSort(columnIndex, ascending);
-                        },
-                      ),
-                      DataColumn(
-                        label: const Text(
-                          'Pole positions',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        numeric: true,
-                        onSort: (columnIndex, ascending) {
-                          _onSort(columnIndex, ascending);
-                        },
-                      ),
-                      const DataColumn(
-                        label: Text(
-                          'Team(s)',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                      ),
-                    ],
-                    rows: filteredResultsList.map((seasonResult) {
-                      return DataRow(cells: [
-                        DataCell(
-                          Text(
-                            seasonResult['year'].toString(),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        DataCell(
-                          _buildPositionContainer(seasonResult['position']),
-                        ),
-                        DataCell(
-                          Text(
-                            seasonResult['points'].toString(),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        DataCell(
-                          Text(
-                            seasonResult['num_races'].toString(),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        DataCell(
-                          Text(
-                            seasonResult['wins'].toString(),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        DataCell(
-                          Text(
-                            seasonResult['podiums'].toString(),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        DataCell(
-                          Text(
-                            seasonResult['pole_positions'].toString(),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                        DataCell(
-                          Text(
-                            seasonResult['team'].toString(),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ]);
-                    }).toList(),
-                  ),
+        onChanged: updateFilter,
+      ),
+    );
+  }
+
+  Widget _buildTable(bool isMobile) {
+    double columnSpacing = _getColumnSpacing(context);
+
+    return Scrollbar(
+      thumbVisibility: true,
+      controller: _horizontalController,
+      notificationPredicate: (notif) => notif.metrics.axis == Axis.horizontal,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        controller: _horizontalController,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: DataTable(
+            sortColumnIndex: _sortColumnIndex,
+            sortAscending: _sortAscending,
+            columnSpacing: columnSpacing,
+            columns: [
+              DataColumn(
+                label: const Text(
+                  'Year',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Position',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Points',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Races',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Wins',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Podiums',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Pole Positions',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              const DataColumn(
+                label: Text(
+                  'Team(s)',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
                 ),
               ),
-            ),
+            ],
+            rows: filteredResultsList.map((seasonResult) {
+              return DataRow(cells: [
+                DataCell(
+                  Text(
+                    seasonResult['year'].toString(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                DataCell(
+                  _buildPositionContainer(seasonResult['position']),
+                ),
+                DataCell(
+                  Text(
+                    seasonResult['points'].toString(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    seasonResult['num_races'].toString(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    seasonResult['wins'].toString(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    seasonResult['podiums'].toString(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                DataCell(
+                  Text(
+                    seasonResult['pole_positions'].toString(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                DataCell(
+                  SizedBox(
+                    width: isMobile ? 120 : 200, // Adjust width based on device
+                    child: Text(
+                      seasonResult['team'].toString(),
+                      style: const TextStyle(color: Colors.black),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ]);
+            }).toList(),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget table() {
+    return Scrollbar(
+      thumbVisibility: true,
+      controller: _verticalController,
+      child: SingleChildScrollView(
+        controller: _verticalController,
+        child: _buildTable(Responsive.isMobile(context)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Filter Section
+        _buildFilter(isMobile),
+        SizedBox(height: 16.0), // Spacing between filter and table
+        // Table Section
+        table(),
       ],
     );
   }
@@ -337,7 +386,7 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
     try {
       pos = int.parse(position);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
 
     return Container(
@@ -350,7 +399,7 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
       ),
       child: Center(
         child: Text(
-          position.toString(),
+          position,
           style: TextStyle(color: pos <= 3 ? Colors.white : Colors.black),
         ),
       ),
