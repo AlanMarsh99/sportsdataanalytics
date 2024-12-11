@@ -17,7 +17,7 @@ def get_rounds_in_year(year):
         return [1]  # Default to 1 round if fetch fails
 
 def main():
-    years = range(1950, 2023)
+    years = range(2022, 2023)
 
     # Fetch home endpoints once (not year-specific)
     cache_home_endpoints()

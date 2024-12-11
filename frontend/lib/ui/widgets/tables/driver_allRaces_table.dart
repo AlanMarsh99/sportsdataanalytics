@@ -3,6 +3,7 @@ import 'package:frontend/core/models/race.dart';
 import 'package:frontend/core/services/API_service.dart';
 import 'package:frontend/ui/screens/races/races_detail_screen.dart';
 import 'package:frontend/ui/theme.dart';
+import 'package:frontend/ui/responsive.dart'; // Ensure this is your responsive helper
 
 class DriverAllRacesTableScreen extends StatefulWidget {
   const DriverAllRacesTableScreen({Key? key, required this.data})
@@ -42,13 +43,18 @@ class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
     filter = value;
     setState(() {
       filteredResultsList = _raceData.where((result) {
-        final matchesPosition = result['result'].toString() == filter;
-        final matchesTeam = result['race_name']
+        final matchesRaceName = result['race_name']
             .toString()
             .toLowerCase()
             .contains(filter.toLowerCase());
-        return matchesPosition || matchesTeam;
+        final matchesResult = result['result'].toString() == filter;
+        return matchesRaceName || matchesResult;
       }).toList();
+
+      // Re-apply sorting after filtering
+      if (_sortColumnIndex != null) {
+        _onSort(_sortColumnIndex!, _sortAscending);
+      }
     });
   }
 
@@ -102,151 +108,183 @@ class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: TextField(
-            cursorColor: Colors.white,
-            decoration: InputDecoration(
-              hintText: 'Enter a race name or a result',
-              hintStyle: TextStyle(color: Colors.white70),
-              labelText: 'Filter results',
-              labelStyle: const TextStyle(color: Colors.white),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: Colors.white),
-              ),
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.white,
-              ),
-            ),
-            onChanged: updateFilter,
+  /// Helper method to determine column spacing based on screen width
+  double _getColumnSpacing(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    if (screenWidth < 600) {
+      // Mobile
+      return 15.0;
+    } else if (screenWidth >= 600 && screenWidth < 1200) {
+      // Tablet
+      return 30.0;
+    } else {
+      // Desktop
+      return 56.0;
+    }
+  }
+
+  Widget _buildFilter(bool isMobile) {
+    return SizedBox(
+      width: isMobile ? double.infinity : 500,
+      child: TextField(
+        cursorColor: Colors.white,
+        decoration: InputDecoration(
+          hintText: 'Enter a race name or a result',
+          hintStyle: const TextStyle(color: Colors.white70),
+          labelText: 'Filter results',
+          labelStyle: const TextStyle(color: Colors.white),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: const BorderSide(color: Colors.white),
+          ),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: Colors.white,
           ),
         ),
-        Expanded(
-          child: Scrollbar(
-            controller: _verticalController,
-            thumbVisibility: true,
-            child: SingleChildScrollView(
-              controller: _verticalController,
-              scrollDirection: Axis.vertical,
-              child: Scrollbar(
-                controller: _horizontalController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _horizontalController,
-                  scrollDirection: Axis.horizontal,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    child: DataTable(
-                      sortColumnIndex: _sortColumnIndex,
-                      sortAscending: _sortAscending,
-                      columns: [
-                        DataColumn(
-                          label: const Text(
-                            'Race',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          onSort: (columnIndex, ascending) {
-                            _onSort(columnIndex, ascending);
-                          },
-                        ),
-                        DataColumn(
-                          label: const Text(
-                            'Qualifying',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          numeric: true,
-                          onSort: (columnIndex, ascending) {
-                            _onSort(columnIndex, ascending);
-                          },
-                        ),
-                        DataColumn(
-                          label: const Text(
-                            'Grid',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          numeric: true,
-                          onSort: (columnIndex, ascending) {
-                            _onSort(columnIndex, ascending);
-                          },
-                        ),
-                        DataColumn(
-                          label: const Text(
-                            'Result',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                          numeric: true,
-                          onSort: (columnIndex, ascending) {
-                            _onSort(columnIndex, ascending);
-                          },
-                        ),
-                      ],
-                      rows: filteredResultsList.map((race) {
-                        return DataRow(cells: [
-                          DataCell(
-                            InkWell(
-                              onTap: () async {
-                                // Navigate to the race details screen
-                                int year = int.parse(race['year']);
-                                int round = int.parse(race['round']);
+        onChanged: updateFilter,
+      ),
+    );
+  }
 
-                                Map<String, dynamic> json =
-                                    await APIService().getRaceInfo(year, round);
-                                Race r = Race.fromJson(json);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          RacesDetailScreen(race: r)),
-                                );
-                              },
-                              child: Text(
-                                race['race_name'],
-                                style: const TextStyle(
-                                    color: primary,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline),
-                              ),
-                            ),
-                          ),
-                          DataCell(
-                            _buildPositionContainer(
-                                race['qualifying_position']),
-                          ),
-                          DataCell(
-                            Text(
-                              race['grid'].toString(),
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                          ),
-                          DataCell(
-                            _buildPositionContainer(race['result']),
-                          ),
-                        ]);
-                      }).toList(),
+  Widget _buildTable(bool isMobile) {
+    double columnSpacing = _getColumnSpacing(context);
+
+    return Scrollbar(
+      thumbVisibility: true,
+      controller: _horizontalController,
+      notificationPredicate: (notif) => notif.metrics.axis == Axis.horizontal,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        controller: _horizontalController,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: DataTable(
+            sortColumnIndex: _sortColumnIndex,
+            sortAscending: _sortAscending,
+            columnSpacing: columnSpacing,
+            columns: [
+              DataColumn(
+                label: const Text(
+                  'Race',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Qualifying',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Grid',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+              DataColumn(
+                label: const Text(
+                  'Result',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                numeric: true,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              ),
+            ],
+            rows: filteredResultsList.map((race) {
+              return DataRow(cells: [
+                DataCell(
+                  InkWell(
+                    onTap: () async {
+                      // Navigate to the race details screen
+                      int year = int.parse(race['year']);
+                      int round = int.parse(race['round']);
+
+                      Map<String, dynamic> json =
+                          await APIService().getRaceInfo(year, round);
+                      Race r = Race.fromJson(json);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                RacesDetailScreen(race: r)),
+                      );
+                    },
+                    child: Text(
+                      race['race_name'],
+                      style: const TextStyle(
+                          color: primary,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline),
                     ),
                   ),
                 ),
-              ),
-            ),
+                DataCell(
+                  _buildPositionContainer(race['qualifying_position']),
+                ),
+                DataCell(
+                  Text(
+                    race['grid'].toString(),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                DataCell(
+                  _buildPositionContainer(race['result']),
+                ),
+              ]);
+            }).toList(),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget table() {
+    return Expanded(
+      child: Scrollbar(
+        thumbVisibility: true,
+        controller: _verticalController,
+        child: SingleChildScrollView(
+          controller: _verticalController,
+          child: _buildTable(Responsive.isMobile(context)),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Filter Section
+        _buildFilter(isMobile),
+        SizedBox(height: 16.0), // Spacing between filter and table
+        // Table Section
+        table(),
       ],
     );
   }
@@ -273,7 +311,7 @@ class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
     try {
       pos = int.parse(position);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
 
     return Container(
