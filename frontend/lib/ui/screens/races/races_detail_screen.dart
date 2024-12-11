@@ -203,7 +203,7 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                               isScrollable: true,
                               tabs: [
                                 Tab(text: "Results"),
-                                Tab(text: "Lap graphs"),
+                                Tab(text: "Lap graph"),
                                 Tab(text: "Lap times"),
                                 Tab(text: "Pit stops"),
                               ],
@@ -631,7 +631,7 @@ class _RacesDetailScreenState extends State<RacesDetailScreen> {
                                   isScrollable: true,
                                   tabs: [
                                     Tab(text: "Results"),
-                                    Tab(text: "Lap graphs"),
+                                    Tab(text: "Lap graph"),
                                     Tab(text: "Lap times"),
                                     Tab(text: "Pit stops"),
                                   ],
