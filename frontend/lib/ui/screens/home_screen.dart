@@ -150,6 +150,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void updateUserNotifications(String userId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({
+            'notifyLeaderboardWin': false,
+            'notifyLeagueWin': false,
+          })
+          .then((value) => print("User notifications updated"))
+          .catchError(
+              (error) => print("Failed to update user notifications: $error"));
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Access the provider
@@ -171,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
           firstTimeLeaderboard = false;
         }
-        /*if (authProvider.userApp!.notifyLeagueWin!) {
+        if (authProvider.userApp!.notifyLeagueWin!) {
           if (authProvider.userApp!.leagueNameWin!.isNotEmpty &&
               firstTimeLeague) {
             for (var league in authProvider.userApp!.leagueNameWin!) {
@@ -181,13 +198,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (context) {
                   return CongratulationsDialog(
                       message:
-                          "You've done it! You've won the league ${league} for this season!"");
+                          "You've done it! You've won the league ${league} for this season!");
                 },
               );
             }
             firstTimeLeague = false;
           }
-        }*/
+        }
+        if (authProvider.userApp!.notifyLeaderboardWin! ||
+            authProvider.userApp!.notifyLeagueWin!) {
+          authProvider.userApp!.notifyLeaderboardWin = false;
+          authProvider.userApp!.notifyLeagueWin = false;
+          updateUserNotifications(authProvider.userApp!.id);
+        }
       }
     });
 

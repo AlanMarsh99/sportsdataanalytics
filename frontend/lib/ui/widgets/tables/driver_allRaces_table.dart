@@ -227,8 +227,7 @@ class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                RacesDetailScreen(race: r)),
+                            builder: (context) => RacesDetailScreen(race: r)),
                       );
                     },
                     child: Text(
@@ -260,17 +259,26 @@ class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
     );
   }
 
-  Widget table() {
-    return Expanded(
-      child: Scrollbar(
-        thumbVisibility: true,
-        controller: _verticalController,
-        child: SingleChildScrollView(
-          controller: _verticalController,
-          child: _buildTable(Responsive.isMobile(context)),
-        ),
-      ),
-    );
+  Widget table(bool isMobile) {
+    return isMobile
+        ? Expanded(
+            child: Scrollbar(
+              thumbVisibility: true,
+              controller: _verticalController,
+              child: SingleChildScrollView(
+                controller: _verticalController,
+                child: _buildTable(Responsive.isMobile(context)),
+              ),
+            ),
+          )
+        : Scrollbar(
+            thumbVisibility: true,
+            controller: _verticalController,
+            child: SingleChildScrollView(
+              controller: _verticalController,
+              child: _buildTable(Responsive.isMobile(context)),
+            ),
+          );
   }
 
   @override
@@ -284,7 +292,7 @@ class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
         _buildFilter(isMobile),
         SizedBox(height: 16.0), // Spacing between filter and table
         // Table Section
-        table(),
+        table(isMobile),
       ],
     );
   }
