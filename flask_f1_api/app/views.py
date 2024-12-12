@@ -996,6 +996,7 @@ def get_driver_races(year, driver_id):
     for race in races:
         race_result = race['Results'][0]
         race_details.append({
+            "year": str(year),
             "race_id": race['round'],
             "race_name": race['raceName'],
             "qualifying_position": race_result.get('grid', 'N/A'),
