@@ -350,42 +350,40 @@ class _TeamsDetailScreenState extends State<TeamsDetailScreen> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 30),
-                                Expanded(
-                                  child: FutureBuilder<Map<String, dynamic>>(
-                                    future: _teamStatsFuture,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
-                                        ); // Show loading while fetching
-                                      } else if (snapshot.hasError) {
-                                        return const Text(
-                                          'Error: Failed to load team stats',
-                                          style: TextStyle(color: Colors.white),
-                                        ); // Error handling
-                                      } else if (snapshot.hasData) {
-                                        Map<String, dynamic> data =
-                                            snapshot.data!;
+                                FutureBuilder<Map<String, dynamic>>(
+                                  future: _teamStatsFuture,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
+                                      ); // Show loading while fetching
+                                    } else if (snapshot.hasError) {
+                                      return const Text(
+                                        'Error: Failed to load team stats',
+                                        style: TextStyle(color: Colors.white),
+                                      ); // Error handling
+                                    } else if (snapshot.hasData) {
+                                      Map<String, dynamic> data =
+                                          snapshot.data!;
 
-                                        if (data.isEmpty) {
-                                          return const Text(
-                                            'Error: Data for this team is currently unavailable. Please try again later or select a different team.',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14),
-                                          );
-                                        } else {
-                                          return TeamSeasonsTable(
-                                            seasonsData: data['season_results'],
-                                          );
-                                        }
+                                      if (data.isEmpty) {
+                                        return const Text(
+                                          'Error: Data for this team is currently unavailable. Please try again later or select a different team.',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14),
+                                        );
+                                      } else {
+                                        return TeamSeasonsTable(
+                                          seasonsData: data['season_results'],
+                                        );
                                       }
-                                      return Container();
-                                    },
-                                  ),
+                                    }
+                                    return Container();
+                                  },
                                 ),
                               ],
                             ),
