@@ -146,7 +146,7 @@ class _TeamSeasonsTableState extends State<TeamSeasonsTable> {
 
     if (screenWidth < 600) {
       // Mobile
-      return 15.0;
+      return 1.0;
     } else if (screenWidth >= 600 && screenWidth < 1200) {
       // Tablet
       return 30.0;
@@ -183,6 +183,79 @@ class _TeamSeasonsTableState extends State<TeamSeasonsTable> {
   Widget _buildTable(bool isMobile) {
     double columnSpacing = _getColumnSpacing(context);
 
+    // Define columns with conditional rendering
+    List<DataColumn> columns = [
+      DataColumn(
+        label: const Text(
+          'Year',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        onSort: (columnIndex, _) =>
+            _sortByColumn<String>((team) => team.year, columnIndex),
+      ),
+      DataColumn(
+        label: const Text(
+          'Position',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        onSort: (columnIndex, _) =>
+            _sortByColumn<String>((team) => team.position, columnIndex),
+      ),
+      DataColumn(
+        label: const Text(
+          'Points',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        numeric: true,
+        onSort: (columnIndex, _) =>
+            _sortByColumn<num>((team) => team.points, columnIndex),
+      ),
+      DataColumn(
+        label: const Text(
+          'Wins',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        numeric: true,
+        onSort: (columnIndex, _) =>
+            _sortByColumn<num>((team) => team.wins, columnIndex),
+      ),
+      DataColumn(
+        label: const Text(
+          'Podiums',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        numeric: true,
+        onSort: (columnIndex, _) =>
+            _sortByColumn<num>((team) => team.podiums, columnIndex),
+      ),
+      // Conditionally add Pole Positions column
+      if (!isMobile)
+        DataColumn(
+          label: const Text(
+            'Pole Positions',
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          numeric: true,
+          onSort: (columnIndex, _) => _sortByColumn<num>(
+              (team) => team.polePositions, columnIndex),
+        ),
+      // Conditionally add Drivers column
+      if (!isMobile)
+        const DataColumn(
+          label: Text(
+            'Drivers',
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+        ),
+    ];
+
     return Scrollbar(
       thumbVisibility: true,
       controller: _tableHorizontalController,
@@ -199,73 +272,7 @@ class _TeamSeasonsTableState extends State<TeamSeasonsTable> {
             sortAscending: _isAscending,
             sortColumnIndex: _sortColumnIndex,
             columnSpacing: columnSpacing,
-            columns: [
-              DataColumn(
-                label: const Text(
-                  'Year',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                onSort: (columnIndex, _) =>
-                    _sortByColumn<String>((team) => team.year, columnIndex),
-              ),
-              DataColumn(
-                label: const Text(
-                  'Position',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                onSort: (columnIndex, _) =>
-                    _sortByColumn<String>((team) => team.position, columnIndex),
-              ),
-              DataColumn(
-                label: const Text(
-                  'Points',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, _) =>
-                    _sortByColumn<num>((team) => team.points, columnIndex),
-              ),
-              DataColumn(
-                label: const Text(
-                  'Wins',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, _) =>
-                    _sortByColumn<num>((team) => team.wins, columnIndex),
-              ),
-              DataColumn(
-                label: const Text(
-                  'Podiums',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, _) =>
-                    _sortByColumn<num>((team) => team.podiums, columnIndex),
-              ),
-              DataColumn(
-                label: const Text(
-                  'Pole Positions',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, _) => _sortByColumn<num>(
-                    (team) => team.polePositions, columnIndex),
-              ),
-              const DataColumn(
-                label: Text(
-                  'Drivers',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-              ),
-            ],
+            columns: columns,
             rows: filteredTeamSeasonsList.map((teamSeasonResult) {
               return DataRow(cells: [
                 DataCell(
@@ -295,22 +302,26 @@ class _TeamSeasonsTableState extends State<TeamSeasonsTable> {
                     style: const TextStyle(color: Colors.black),
                   ),
                 ),
-                DataCell(
-                  Text(
-                    teamSeasonResult.polePositions.toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  SizedBox(
-                    width: isMobile ? 120 : 200,
-                    child: Text(
-                      teamSeasonResult.driversList.join(', '),
+                // Conditionally add Pole Positions cell
+                if (!isMobile)
+                  DataCell(
+                    Text(
+                      teamSeasonResult.polePositions.toString(),
                       style: const TextStyle(color: Colors.black),
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ),
+                // Conditionally add Drivers cell
+                if (!isMobile)
+                  DataCell(
+                    SizedBox(
+                      width: 200,
+                      child: Text(
+                        teamSeasonResult.driversList.join(', '),
+                        style: const TextStyle(color: Colors.black),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
               ]);
             }).toList(),
           ),

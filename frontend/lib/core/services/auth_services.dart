@@ -1,3 +1,5 @@
+// auth_services.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,8 @@ class AuthService extends ChangeNotifier {
     _auth.authStateChanges().listen((newUser) async {
       if (newUser == null) {
         _status = Status.Unauthenticated;
+        user = null;
+        userApp = null;
       } else {
         _status = Status.Authenticated;
         user = newUser;
@@ -155,6 +159,8 @@ class AuthService extends ChangeNotifier {
   Future<void> signOut() async {
     await _auth.signOut();
     _status = Status.Uninitialized;
+    user = null;
+    userApp = null;
     notifyListeners();
   }
 
@@ -162,7 +168,7 @@ class AuthService extends ChangeNotifier {
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
   }
 
-  /// Attemps to update the password, if user last login is too old,
+  /// Attempts to update the password, if user last login is too old,
   /// reauthentication will be needed
   Future<bool> updatePassword(
       BuildContext context, String currentPassword, String newPassword) async {
@@ -235,6 +241,28 @@ class AuthService extends ChangeNotifier {
           break;
       }
       return false;
+    }
+  }
+
+  /// Calculates the user's global position based on totalPoints.
+  Future<int> getGlobalPosition() async {
+    if (userApp == null) {
+      return 0; // Or handle unauthenticated state as needed
+    }
+    try {
+      CollectionReference usersRef = FirebaseFirestore.instance.collection('users');
+
+      AggregateQuery countQuery = usersRef.where('totalPoints', isGreaterThan: userApp!.totalPoints).count();
+      AggregateQuerySnapshot snapshot = await countQuery.get();
+
+      // Handle potential null value by providing a default of 0
+      int count = snapshot.count ?? 0;
+
+      // Global position is the number of users with more points plus one
+      return count + 1;
+    } catch (e) {
+      print('Error calculating global position: $e');
+      return -1; // Indicate an error occurred
     }
   }
 }

@@ -221,7 +221,7 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
           child: DataTable(
             sortColumnIndex: sortColumnIndex,
             sortAscending: isAscending,
-            columnSpacing: isMobile ? 15 : 56,
+            columnSpacing: isMobile ? 8 : 56,
             columns: [
               const DataColumn(
                 label: Text(
@@ -282,10 +282,10 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
                       children: [
                         Image.asset(
                           getBadgePath(team.name)!,
-                          width: 30,
-                          height: 30,
+                          width: 24,
+                          height: 24,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         Flexible(child:
                         Text(
                           team.name,

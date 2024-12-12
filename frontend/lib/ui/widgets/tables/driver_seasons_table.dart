@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/responsive.dart'; // Ensure this is your responsive helper
+import 'package:frontend/ui/responsive.dart';
 
 class DriverSeasonsTable extends StatefulWidget {
   const DriverSeasonsTable({Key? key, required this.data}) : super(key: key);
@@ -43,20 +43,14 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
     setState(() {
       filter = value.toLowerCase();
       filteredResultsList = _seasonResults.where((result) {
-        final matchesYear = result['year']
-            .toString()
-            .toLowerCase()
-            .contains(filter);
-        final matchesPosition = result['position']
-            .toString()
-            .toLowerCase()
-            .contains(filter);
-        final matchesTeam = result['team']
-            .toString()
-            .toLowerCase()
-            .contains(filter);
+        final matchesYear =
+            result['year'].toString().toLowerCase().contains(filter);
+        final matchesPosition =
+            result['position'].toString().toLowerCase().contains(filter);
+        final matchesTeam =
+            result['team'].toString().toLowerCase().contains(filter);
         return matchesYear || matchesPosition || matchesTeam;
-      }).toList(); // Added .toList() to convert Iterable to List
+      }).toList();
 
       if (_sortColumnIndex != null) {
         _onSort(_sortColumnIndex!, _sortAscending);
@@ -70,66 +64,62 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
 
-      switch (columnIndex) {
-        case 0: // Year
-          filteredResultsList.sort((a, b) {
-            int yearA = int.tryParse(a['year'].toString()) ?? 0;
-            int yearB = int.tryParse(b['year'].toString()) ?? 0;
-            return ascending ? yearA.compareTo(yearB) : yearB.compareTo(yearA);
-          });
-          break;
-        case 1: // Position
-          filteredResultsList.sort((a, b) {
-            int posA = int.tryParse(a['position'].toString()) ?? 0;
-            int posB = int.tryParse(b['position'].toString()) ?? 0;
-            return ascending ? posA.compareTo(posB) : posB.compareTo(posA);
-          });
-          break;
-        case 2: // Points
-          filteredResultsList.sort((a, b) {
-            double pointsA = double.tryParse(a['points'].toString()) ?? 0.0;
-            double pointsB = double.tryParse(b['points'].toString()) ?? 0.0;
-            return ascending
-                ? pointsA.compareTo(pointsB)
-                : pointsB.compareTo(pointsA);
-          });
-          break;
-        case 3: // Races
-          filteredResultsList.sort((a, b) {
-            int racesA = int.tryParse(a['num_races'].toString()) ?? 0;
-            int racesB = int.tryParse(b['num_races'].toString()) ?? 0;
-            return ascending
-                ? racesA.compareTo(racesB)
-                : racesB.compareTo(racesA);
-          });
-          break;
-        case 4: // Wins
-          filteredResultsList.sort((a, b) {
-            int winsA = int.tryParse(a['wins'].toString()) ?? 0;
-            int winsB = int.tryParse(b['wins'].toString()) ?? 0;
-            return ascending ? winsA.compareTo(winsB) : winsB.compareTo(winsA);
-          });
-          break;
-        case 5: // Podiums
-          filteredResultsList.sort((a, b) {
-            int podiumsA = int.tryParse(a['podiums'].toString()) ?? 0;
-            int podiumsB = int.tryParse(b['podiums'].toString()) ?? 0;
-            return ascending
-                ? podiumsA.compareTo(podiumsB)
-                : podiumsB.compareTo(podiumsA);
-          });
-          break;
-        case 6: // Pole positions
-          filteredResultsList.sort((a, b) {
-            int polesA = int.tryParse(a['pole_positions'].toString()) ?? 0;
-            int polesB = int.tryParse(b['pole_positions'].toString()) ?? 0;
-            return ascending
-                ? polesA.compareTo(polesB)
-                : polesB.compareTo(polesA);
-          });
-          break;
-        // No sorting for Team(s) column
-      }
+      // Define the list of all possible columns with their keys
+      final allColumns = [
+        {'label': 'Year', 'key': 'year'},
+        {'label': 'Position', 'key': 'position'},
+        {'label': 'Points', 'key': 'points'},
+        {'label': 'Races', 'key': 'num_races'},
+        {'label': 'Wins', 'key': 'wins'},
+        {'label': 'Podiums', 'key': 'podiums'},
+        {'label': 'Pole Positions', 'key': 'pole_positions'},
+        {'label': 'Team(s)', 'key': 'team'},
+      ];
+
+      // Determine if we're on mobile to exclude certain columns
+      bool isMobile = Responsive.isMobile(context);
+      // Filter columns based on screen size
+      final visibleColumns = isMobile
+          ? allColumns
+              .where((col) =>
+                  col['label'] != 'Podiums' &&
+                  col['label'] != 'Pole Positions' &&
+                  col['label'] != 'Team(s)')
+              .toList()
+          : allColumns;
+
+      // Get the key of the column to sort by
+      final sortColumn = visibleColumns[columnIndex]['key'];
+
+      filteredResultsList.sort((a, b) {
+        var aValue = a[sortColumn];
+        var bValue = b[sortColumn];
+
+        // Handle different data types
+        if (sortColumn == 'year' ||
+            sortColumn == 'position' ||
+            sortColumn == 'num_races' ||
+            sortColumn == 'wins' ||
+            sortColumn == 'podiums' ||
+            sortColumn == 'pole_positions') {
+          int aInt = int.tryParse(aValue.toString()) ?? 0;
+          int bInt = int.tryParse(bValue.toString()) ?? 0;
+          return ascending ? aInt.compareTo(bInt) : bInt.compareTo(aInt);
+        } else if (sortColumn == 'points') {
+          double aDouble = double.tryParse(aValue.toString()) ?? 0.0;
+          double bDouble = double.tryParse(bValue.toString()) ?? 0.0;
+          return ascending
+              ? aDouble.compareTo(bDouble)
+              : bDouble.compareTo(aDouble);
+        } else if (sortColumn == 'team') {
+          String aStr = aValue.toString();
+          String bStr = bValue.toString();
+          return ascending
+              ? aStr.compareTo(bStr)
+              : bStr.compareTo(aStr);
+        }
+        return 0;
+      });
     });
   }
 
@@ -139,7 +129,7 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
 
     if (screenWidth < 600) {
       // Mobile
-      return 15.0;
+      return 5.0;
     } else if (screenWidth >= 600 && screenWidth < 1200) {
       // Tablet
       return 30.0;
@@ -176,6 +166,28 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
   Widget _buildTable(bool isMobile) {
     double columnSpacing = _getColumnSpacing(context);
 
+    // Define all possible columns with their labels and keys
+    final allColumns = [
+      {'label': 'Year', 'key': 'year', 'numeric': true},
+      {'label': 'Position', 'key': 'position', 'numeric': true},
+      {'label': 'Points', 'key': 'points', 'numeric': true},
+      {'label': 'Races', 'key': 'num_races', 'numeric': true},
+      {'label': 'Wins', 'key': 'wins', 'numeric': true},
+      {'label': 'Podiums', 'key': 'podiums', 'numeric': true},
+      {'label': 'Pole Positions', 'key': 'pole_positions', 'numeric': true},
+      {'label': 'Team(s)', 'key': 'team', 'numeric': false},
+    ];
+
+    // Filter columns based on screen size
+    final visibleColumns = isMobile
+        ? allColumns
+            .where((col) =>
+                col['label'] != 'Podiums' &&
+                col['label'] != 'Pole Positions' &&
+                col['label'] != 'Team(s)')
+            .toList()
+        : allColumns;
+
     return Scrollbar(
       thumbVisibility: true,
       controller: _horizontalController,
@@ -192,144 +204,81 @@ class _DriverSeasonsTableState extends State<DriverSeasonsTable> {
             sortColumnIndex: _sortColumnIndex,
             sortAscending: _sortAscending,
             columnSpacing: columnSpacing,
-            columns: [
-              DataColumn(
-                label: const Text(
-                  'Year',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, ascending) {
-                  _onSort(columnIndex, ascending);
-                },
-              ),
-              DataColumn(
-                label: const Text(
-                  'Position',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, ascending) {
-                  _onSort(columnIndex, ascending);
-                },
-              ),
-              DataColumn(
-                label: const Text(
-                  'Points',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, ascending) {
-                  _onSort(columnIndex, ascending);
-                },
-              ),
-              DataColumn(
-                label: const Text(
-                  'Races',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, ascending) {
-                  _onSort(columnIndex, ascending);
-                },
-              ),
-              DataColumn(
-                label: const Text(
-                  'Wins',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, ascending) {
-                  _onSort(columnIndex, ascending);
-                },
-              ),
-              DataColumn(
-                label: const Text(
-                  'Podiums',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, ascending) {
-                  _onSort(columnIndex, ascending);
-                },
-              ),
-              DataColumn(
-                label: const Text(
-                  'Pole Positions',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                numeric: true,
-                onSort: (columnIndex, ascending) {
-                  _onSort(columnIndex, ascending);
-                },
-              ),
-              const DataColumn(
+            columns: List.generate(visibleColumns.length, (index) {
+              return DataColumn(
                 label: Text(
-                  'Team(s)',
-                  style: TextStyle(
+                  visibleColumns[index]['label'] as String,
+                  style: const TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.black),
                 ),
-              ),
-            ],
+                numeric: visibleColumns[index]['numeric'] as bool,
+                onSort: (columnIndex, ascending) {
+                  _onSort(columnIndex, ascending);
+                },
+              );
+            }),
             rows: filteredResultsList.map((seasonResult) {
-              return DataRow(cells: [
-                DataCell(
-                  Text(
-                    seasonResult['year'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  _buildPositionContainer(seasonResult['position']),
-                ),
-                DataCell(
-                  Text(
-                    seasonResult['points'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    seasonResult['num_races'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    seasonResult['wins'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    seasonResult['podiums'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  Text(
-                    seasonResult['pole_positions'].toString(),
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ),
-                DataCell(
-                  SizedBox(
-                    width: isMobile ? 120 : 200, // Adjust width based on device
-                    child: Text(
-                      seasonResult['team'].toString(),
+              return DataRow(cells: List.generate(visibleColumns.length, (index) {
+                String key = visibleColumns[index]['key'] as String;
+                Widget cellContent;
+
+                switch (key) {
+                  case 'year':
+                    cellContent = Text(
+                      seasonResult['year'].toString(),
                       style: const TextStyle(color: Colors.black),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ]);
+                    );
+                    break;
+                  case 'position':
+                    cellContent = _buildPositionContainer(
+                        seasonResult['position'].toString());
+                    break;
+                  case 'points':
+                    cellContent = Text(
+                      seasonResult['points'].toString(),
+                      style: const TextStyle(color: Colors.black),
+                    );
+                    break;
+                  case 'num_races':
+                    cellContent = Text(
+                      seasonResult['num_races'].toString(),
+                      style: const TextStyle(color: Colors.black),
+                    );
+                    break;
+                  case 'wins':
+                    cellContent = Text(
+                      seasonResult['wins'].toString(),
+                      style: const TextStyle(color: Colors.black),
+                    );
+                    break;
+                  case 'podiums':
+                    cellContent = Text(
+                      seasonResult['podiums'].toString(),
+                      style: const TextStyle(color: Colors.black),
+                    );
+                    break;
+                  case 'pole_positions':
+                    cellContent = Text(
+                      seasonResult['pole_positions'].toString(),
+                      style: const TextStyle(color: Colors.black),
+                    );
+                    break;
+                  case 'team':
+                    cellContent = SizedBox(
+                      width: isMobile ? 120 : 200,
+                      child: Text(
+                        seasonResult['team'].toString(),
+                        style: const TextStyle(color: Colors.black),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    );
+                    break;
+                  default:
+                    cellContent = const SizedBox.shrink();
+                }
+
+                return DataCell(cellContent);
+              }));
             }).toList(),
           ),
         ),
