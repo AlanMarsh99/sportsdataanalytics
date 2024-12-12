@@ -123,31 +123,24 @@ class _HomeScreenState extends State<HomeScreen> {
     DateTime raceDate = DateTime.parse("$date $hour:00");
 
     DateTime deadline = raceDate!.subtract(const Duration(days: 1));
-    remainingTime = deadline!.difference(DateTime.now());
 
-    if (remainingTime.isNegative) {
-      timer = null;
-      setState(() {
-        remainingTime =
-            const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
-      });
-    } else {
-      setState(() {
-        remainingTime = deadline!.difference(DateTime.now());
-      });
+    DateTime _date = DateTime.now()
+        .subtract(Duration(days: 7, hours: 11, minutes: 32, seconds: 43));
+    remainingTime = deadline!.difference(_date);
 
-      // Set up the timer to update every second
-      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        setState(() {
-          remainingTime = deadline!.difference(DateTime.now());
-          if (remainingTime.isNegative) {
-            remainingTime =
-                const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
-            timer.cancel();
-          }
-        });
+    // Set up the timer to update every second
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        DateTime date = DateTime.now()
+            .subtract(Duration(days: 7, hours: 11, minutes: 32, seconds: 43));
+        remainingTime = deadline!.difference(date);
+        if (remainingTime.isNegative) {
+          remainingTime =
+              const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
+          timer.cancel();
+        }
       });
-    }
+    });
   }
 
   void updateUserNotifications(String userId) async {

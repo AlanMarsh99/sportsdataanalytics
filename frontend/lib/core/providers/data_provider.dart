@@ -71,7 +71,116 @@ class DataProvider extends ChangeNotifier {
 
       notifyListeners();
 
-      Map<String, dynamic>? info = await apiService.getUpcomingRace();
+      Map<String, dynamic>? info = {
+        "race_name": "Abu Dhabi Grand Prix",
+        "race_id": "24",
+        "date": "2024-12-08",
+        "hour": "13:00",
+        "year": "2024",
+        "drivers": [
+          {
+            "driver_id": "max_verstappen",
+            "driver_name": "Max Verstappen",
+            "team_name": "Red Bull"
+          },
+          {
+            "driver_id": "norris",
+            "driver_name": "Lando Norris",
+            "team_name": "McLaren"
+          },
+          {
+            "driver_id": "sainz",
+            "driver_name": "Carlos Sainz Jr.",
+            "team_name": "Ferrari"
+          },
+          {
+            "driver_id": "leclerc",
+            "driver_name": "Charles Leclerc",
+            "team_name": "Ferrari"
+          },
+          {
+            "driver_id": "hamilton",
+            "driver_name": "Lewis Hamilton",
+            "team_name": "Mercedes"
+          },
+          {
+            "driver_id": "russell",
+            "driver_name": "George Russell",
+            "team_name": "Mercedes"
+          },
+          {
+            "driver_id": "gasly",
+            "driver_name": "Pierre Gasly",
+            "team_name": "Alpine"
+          },
+          {
+            "driver_id": "hulkenberg",
+            "driver_name": "Nico Hülkenberg",
+            "team_name": "Haas"
+          },
+          {
+            "driver_id": "alonso",
+            "driver_name": "Fernando Alonso",
+            "team_name": "Aston Martin"
+          },
+          {
+            "driver_id": "piastri",
+            "driver_name": "Oscar Piastri",
+            "team_name": "McLaren"
+          },
+          {
+            "driver_id": "albon",
+            "driver_name": "Alexander Albon",
+            "team_name": "Williams"
+          },
+          {
+            "driver_id": "tsunoda",
+            "driver_name": "Yuki Tsunoda",
+            "team_name": "AlphaTauri"
+          },
+          {
+            "driver_id": "zhou",
+            "driver_name": "Guanyu Zhou",
+            "team_name": "Alfa Romeo"
+          },
+          {
+            "driver_id": "stroll",
+            "driver_name": "Lance Stroll",
+            "team_name": "Aston Martin"
+          },
+          {
+            "driver_id": "doohan",
+            "driver_name": "Jack Doohan",
+            "team_name": "Alpine"
+          },
+          {
+            "driver_id": "magnussen",
+            "driver_name": "Kevin Magnussen",
+            "team_name": "Haas"
+          },
+          {
+            "driver_id": "lawson",
+            "driver_name": "Liam Lawson",
+            "team_name": "AlphaTauri"
+          },
+          {
+            "driver_id": "bottas",
+            "driver_name": "Valtteri Bottas",
+            "team_name": "Alfa Romeo"
+          },
+          {
+            "driver_id": "colapinto",
+            "driver_name": "Franco Colapinto",
+            "team_name": "Williams"
+          },
+          {
+            "driver_id": "perez",
+            "driver_name": "Sergio Pérez",
+            "team_name": "Red Bull"
+          }
+        ]
+      };
+      //await apiService.getUpcomingRace();
       if (info != null) {
         _upcomingRaceInfo = info;
       } else {

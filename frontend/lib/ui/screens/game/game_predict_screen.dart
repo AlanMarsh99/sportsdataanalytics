@@ -84,32 +84,33 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
     // Convert date and time strings to DateTime object
     raceDate = DateTime.parse("$date $hour:00");
     DateTime deadline = raceDate!.subtract(const Duration(days: 1));
+    DateTime _date = DateTime.now()
+        .subtract(Duration(days: 7, hours: 11, minutes: 32, seconds: 43));
+    remainingTime = deadline!.difference(_date);
+    //deadline!.difference(DateTime.now());
 
-    remainingTime = deadline!.difference(DateTime.now());
-
-    if (remainingTime.isNegative) {
+    /*if (remainingTime.isNegative) {
       timer = null;
       setState(() {
         remainingTime =
             const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
       });
-    } else {
-      setState(() {
-        remainingTime = deadline!.difference(DateTime.now());
-      });
+    } else {*/
 
-      // Set up the timer to update every second
-      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        setState(() {
-          remainingTime = deadline!.difference(DateTime.now());
-          if (remainingTime.isNegative) {
-            remainingTime =
-                const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
-            timer.cancel();
-          }
-        });
+    // Set up the timer to update every second
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        DateTime date = DateTime.now()
+            .subtract(Duration(days: 7, hours: 11, minutes: 32, seconds: 43));
+        remainingTime = deadline!.difference(date);
+        if (remainingTime.isNegative) {
+          remainingTime =
+              const Duration(days: 0, hours: 0, minutes: 0, seconds: 0);
+          timer.cancel();
+        }
       });
-    }
+    });
+    //}
   }
 
   @override
@@ -222,7 +223,8 @@ class _GamePredictScreenState extends State<GamePredictScreen> {
                                   child: Text(
                                     'No data available about the upcoming race at the moment. Try again later.',
                                     style: TextStyle(
-                                        color: Colors.white, fontSize: isMobile ? 16 : 20),
+                                        color: Colors.white,
+                                        fontSize: isMobile ? 16 : 20),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
