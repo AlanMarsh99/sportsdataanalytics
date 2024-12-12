@@ -166,26 +166,32 @@ class _RaceResultsTableState extends State<RaceResultsTable> {
     return [
       DataCell(_buildPositionContainer(result.position)),
       DataCell(
-        SizedBox(
-          width: isMobile ? 100 : null,
-          child: TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DriversScreen(
-                    driverId: result.driverId,
-                    driverName: result.driver,
+        // Wrap with Align to left-align the content
+        Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: isMobile ? 90 : null,
+            child: TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DriversScreen(
+                      driverId: result.driverId,
+                      driverName: result.driver,
+                    ),
                   ),
+                );
+              },
+              child: Text(
+                result.driver,
+                overflow: TextOverflow.ellipsis, // Prevent overflow
+                style: TextStyle(
+                  color: primary,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline,
+                  fontSize: isMobile ? 12 : 14, // Conditional font size
                 ),
-              );
-            },
-            child: Text(
-              result.driver,
-              style: const TextStyle(
-                color: primary,
-                fontWeight: FontWeight.bold,
-                decoration: TextDecoration.underline,
               ),
             ),
           ),

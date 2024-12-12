@@ -44,7 +44,7 @@ class _PitStopsTableState extends State<PitStopsTable> {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: DataTable(
-                columnSpacing: isMobile ? 15 : 56,
+                columnSpacing: isMobile ? 10 : 56,
                 columns: _getColumns(isMobile),
                 rows: _buildRows(widget.data, isMobile),
               ),
