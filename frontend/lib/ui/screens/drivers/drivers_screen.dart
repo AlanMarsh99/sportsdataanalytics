@@ -63,8 +63,7 @@ class _DriversScreenState extends State<DriversScreen> {
       _driversStatsFuture =
           APIService().getDriverStats(widget.driverId!, currentYear);
     } else {
-      _driversStatsFuture =
-          Future.value({}); 
+      _driversStatsFuture = Future.value({});
 
       // First Future to get drivers
       _driversNamesFuture =
@@ -909,7 +908,8 @@ class _DriversScreenState extends State<DriversScreen> {
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
-              child: _buildStatCard(championships, 10, 'CHAMPIONSHIPS', false),
+              child:
+                  _buildStatCard(championships, null, 'CHAMPIONSHIPS', false),
             ),
             SizedBox(width: 16),
             Flexible(
@@ -924,12 +924,15 @@ class _DriversScreenState extends State<DriversScreen> {
     );
   }
 
-  Widget _buildStatCard(int stat, int total, String label, bool hasPercentage) {
+  Widget _buildStatCard(
+      int stat, int? total, String label, bool hasPercentage) {
     int percentage = 0;
-    try {
-      percentage = (stat * 100 / total).truncate();
-    } catch (e) {
-      percentage = 0;
+    if (hasPercentage) {
+      try {
+        percentage = (stat * 100 / total!).truncate();
+      } catch (e) {
+        percentage = 0;
+      }
     }
 
     return Container(
@@ -954,12 +957,15 @@ class _DriversScreenState extends State<DriversScreen> {
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
               ),
-              Text(
-                '/$total',
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.white),
+              Visibility(
+                visible: total != null,
+                child: Text(
+                  '/$total',
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.white),
+                ),
               ),
               Visibility(
                 visible: hasPercentage,
