@@ -334,11 +334,14 @@ class _RacesSeasonTableState extends State<RacesSeasonTable>
                                       },
                                       child: Text(
                                         race.raceName,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: primary,
                                           fontWeight: FontWeight.bold,
                                           decoration: TextDecoration.underline,
+                                          fontSize: isMobile ? 14 : 16, // Slightly smaller font size on mobile
                                         ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
                                       ),
                                     ),
                                   ),
