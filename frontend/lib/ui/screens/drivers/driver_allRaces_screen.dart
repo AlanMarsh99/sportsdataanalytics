@@ -11,13 +11,15 @@ class DriverAllRacesScreen extends StatefulWidget {
       required this.selectedDriver,
       required this.driversMap,
       required this.driversNames,
-      required this.driversStats})
+      required this.driversStats,
+      required this.year})
       : super(key: key);
 
   final String selectedDriver;
   final Map<String, dynamic> driversMap;
   final List<String> driversNames;
   final Map<String, dynamic> driversStats;
+  final String year;
 
   _DriverAllRacesScreenState createState() => _DriverAllRacesScreenState();
 }
@@ -35,11 +37,11 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
   @override
   void initState() {
     super.initState();
-    int currentYear = DateTime.now().year;
+    selectedSeason = widget.year;
+    int currentYear = int.parse(selectedSeason);
     _driverRaceStats = APIService().getDriverRaceStats(
         widget.driversMap[widget.selectedDriver], currentYear);
     selectedDriver = widget.selectedDriver;
-    selectedSeason = currentYear.toString();
   }
 
   /// Helper function to extract last name and retrieve image path

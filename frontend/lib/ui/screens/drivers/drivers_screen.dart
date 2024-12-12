@@ -359,6 +359,7 @@ class _DriversScreenState extends State<DriversScreen> {
                                                         driversNames:
                                                             driversNames,
                                                         driversStats: data,
+                                                        year: selectedSeason,
                                                       ),
                                                     ),
                                                   );
@@ -388,6 +389,7 @@ class _DriversScreenState extends State<DriversScreen> {
                                                         driversNames:
                                                             driversNames,
                                                         driversStats: data,
+                                                        year: selectedSeason,
                                                       ),
                                                     ),
                                                   );
@@ -690,6 +692,8 @@ class _DriversScreenState extends State<DriversScreen> {
                                                                     driversNames,
                                                                 driversStats:
                                                                     data,
+                                                                year:
+                                                                    selectedSeason,
                                                               ),
                                                             ),
                                                           );
@@ -723,6 +727,8 @@ class _DriversScreenState extends State<DriversScreen> {
                                                                     driversNames,
                                                                 driversStats:
                                                                     data,
+                                                                year:
+                                                                    selectedSeason,
                                                               ),
                                                             ),
                                                           );
