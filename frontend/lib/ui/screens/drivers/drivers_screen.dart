@@ -764,8 +764,8 @@ class _DriversScreenState extends State<DriversScreen> {
 
   Widget _buildYearDropdown() {
     return Container(
-      width: 100,
-      height: 50,
+      width: 80,
+      height: 49,
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
       decoration: BoxDecoration(
         color: Colors.white,
