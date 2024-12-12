@@ -45,32 +45,6 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> getHomeScreenInfo() async {
     try {
-      Map<String, dynamic>? data =
-          await apiService.getDriverStandings(DateTime.now().year);
-      if (data != null) {
-        if (data.isNotEmpty) {
-          _driversStandings = data['driver_standings'];
-        } else {
-          _driversStandings = [];
-        }
-      } else {
-        _driversStandings = [];
-      }
-
-      Map<String, dynamic>? data2 =
-          await apiService.getConstructorStandings(DateTime.now().year);
-      if (data2 != null) {
-        if (data2.isNotEmpty) {
-          _constructorsStandings = data2['constructors_standings'];
-        } else {
-          _constructorsStandings = [];
-        }
-      } else {
-        _constructorsStandings = [];
-      }
-
-      notifyListeners();
-
       Map<String, dynamic>? info = {
         "race_name": "Abu Dhabi Grand Prix",
         "race_id": "24",
@@ -187,6 +161,34 @@ class DataProvider extends ChangeNotifier {
         _upcomingRaceInfo = {};
       }
       notifyListeners();
+      
+      Map<String, dynamic>? data =
+          await apiService.getDriverStandings(DateTime.now().year);
+      if (data != null) {
+        if (data.isNotEmpty) {
+          _driversStandings = data['driver_standings'];
+        } else {
+          _driversStandings = [];
+        }
+      } else {
+        _driversStandings = [];
+      }
+
+      Map<String, dynamic>? data2 =
+          await apiService.getConstructorStandings(DateTime.now().year);
+      if (data2 != null) {
+        if (data2.isNotEmpty) {
+          _constructorsStandings = data2['constructors_standings'];
+        } else {
+          _constructorsStandings = [];
+        }
+      } else {
+        _constructorsStandings = [];
+      }
+
+      notifyListeners();
+
+      
 
       _lastRaceResults = await apiService.getLastRaceResults();
       if (_lastRaceResults != null) {
