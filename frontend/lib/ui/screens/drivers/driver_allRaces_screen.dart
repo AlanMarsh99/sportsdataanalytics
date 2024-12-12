@@ -11,13 +11,15 @@ class DriverAllRacesScreen extends StatefulWidget {
       required this.selectedDriver,
       required this.driversMap,
       required this.driversNames,
-      required this.driversStats})
+      required this.driversStats,
+      required this.year})
       : super(key: key);
 
   final String selectedDriver;
   final Map<String, dynamic> driversMap;
   final List<String> driversNames;
   final Map<String, dynamic> driversStats;
+  final String year;
 
   _DriverAllRacesScreenState createState() => _DriverAllRacesScreenState();
 }
@@ -35,11 +37,11 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
   @override
   void initState() {
     super.initState();
-    int currentYear = DateTime.now().year;
+    selectedSeason = widget.year;
+    int currentYear = int.parse(selectedSeason);
     _driverRaceStats = APIService().getDriverRaceStats(
         widget.driversMap[widget.selectedDriver], currentYear);
     selectedDriver = widget.selectedDriver;
-    selectedSeason = currentYear.toString();
   }
 
   /// Helper function to extract last name and retrieve image path
@@ -214,7 +216,12 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
                                         DriverAllRacesTableScreen(data: data),
                                   ),
                                 )
-                              : Container();
+                              : Center(
+                                  child: Text(
+                                    'No data available for ${selectedSeason} at the moment. Try another year.',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                );
                         }
                         return Container();
                       },
@@ -427,17 +434,32 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
   }
 
   Widget _buildRacesOverviewContainers(Map<String, dynamic> driversStats) {
-    Map<String, dynamic> latestSeason = driversStats["season_results"].last;
+    String podiums = '-';
+    String points = '-';
+    String polePositions = '-';
+    String position = '-';
+    String wins = '-';
+    //Map<String, dynamic> latestSeason = driversStats["season_results"].last;
+    Map<String, dynamic> latestSeason = {};
 
-    // Extrae los valores que te interesan
-    //int numRaces = latestSeason["num_races"];
-    int podiums = latestSeason["podiums"];
-    String points = latestSeason["points"];
-    int polePositions = latestSeason["pole_positions"];
-    String position = latestSeason["position"];
-    //String team = latestSeason["team"];
-    int wins = latestSeason["wins"];
-    //int year = latestSeason["year"];
+    if (driversStats["season_results"] != null) {
+      latestSeason = (driversStats["season_results"] as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .firstWhere(
+            (season) => season["year"] == selectedSeason,
+            orElse: () =>
+                {}, // Devuelve un mapa vacío si no encuentra coincidencias
+          );
+    }
+
+    if (latestSeason.isNotEmpty) {
+      // Extrae los valores que te interesan
+      podiums = latestSeason["podiums"].toString();
+      points = latestSeason["points"].toString();
+      polePositions = latestSeason["pole_positions"].toString();
+      position = latestSeason["position"].toString();
+      wins = latestSeason["wins"].toString();
+    }
 
     return Column(
       children: [
@@ -463,14 +485,12 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
             ),
             const SizedBox(width: 15),
             Expanded(
-              child: _buildRaceOverviewContainer(
-                  'Podiums', podiums.toString(), false),
+              child: _buildRaceOverviewContainer('Podiums', podiums, false),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        _buildRaceOverviewContainer(
-            'Pole positions', polePositions.toString(), false),
+        _buildRaceOverviewContainer('Pole positions', polePositions, false),
         /*const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -590,6 +610,7 @@ class _DriverAllRacesScreenState extends State<DriverAllRacesScreen> {
         .toList();
 
     if (!years.contains(selectedSeason)) {
+      print('Season not found');
       selectedSeason = years.last;
     }
 
