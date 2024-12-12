@@ -221,9 +221,9 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
           child: DataTable(
             sortColumnIndex: sortColumnIndex,
             sortAscending: isAscending,
-            columnSpacing: isMobile ? 8 : 56,
+            columnSpacing: isMobile ? 12 : 56, // Increased spacing for Team
             columns: [
-              const DataColumn(
+              DataColumn(
                 label: Text(
                   'Team',
                   style: TextStyle(
@@ -252,51 +252,54 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
                   onSort(columnIndex, ascending);
                 },
               ),
-              const DataColumn(
-                label: Text(
-                  'Drivers',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black),
+              if (!isMobile) // Conditionally include Drivers column
+                const DataColumn(
+                  label: Text(
+                    'Drivers',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
                 ),
-              ),
             ],
             rows: filteredTeamsList.map((team) {
               return DataRow(cells: [
                 DataCell(
                   SizedBox(
-                    width: isMobile ? 125 : null,
-                    child:
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TeamsDetailScreen(
-                            teamId: team.id,
-                            teamName: team.name,
+                    width: isMobile ? 150 : null, // Increased width on mobile
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TeamsDetailScreen(
+                              teamId: team.id,
+                              teamName: team.name,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          getBadgePath(team.name)!,
-                          width: 24,
-                          height: 24,
-                        ),
-                        const SizedBox(width: 4),
-                        Flexible(child:
-                        Text(
-                          team.name,
-                          style: const TextStyle(
-                              color: primary,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline),
-                        ),)
-                      ],
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            getBadgePath(team.name)!,
+                            width: 24,
+                            height: 24,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded( // Use Expanded to utilize available space
+                            child: Text(
+                              team.name,
+                              style: const TextStyle(
+                                  color: primary,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline),
+                              overflow: TextOverflow.ellipsis, // Handle overflow
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),)
+                  ),
                 ),
                 DataCell(
                   Text(
@@ -310,15 +313,17 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
                     style: const TextStyle(color: Colors.black),
                   ),
                 ),
-                DataCell(
-                  SizedBox(
-                    width: isMobile ? 120 : 140,
-                    child: Text(
-                      team.driversList.join(', '),
-                      style: const TextStyle(color: Colors.black),
+                if (!isMobile) // Conditionally include Drivers cell
+                  DataCell(
+                    SizedBox(
+                      width: 140,
+                      child: Text(
+                        team.driversList.join(', '),
+                        style: const TextStyle(color: Colors.black),
+                        overflow: TextOverflow.ellipsis, // Handle overflow
+                      ),
                     ),
                   ),
-                ),
               ]);
             }).toList(),
           ),
@@ -363,7 +368,8 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
                   thumbVisibility: true,
                   controller: _chartHorizontalController,
                   notificationPredicate: (scrollNotification) {
-                    return scrollNotification.metrics.axis == Axis.horizontal;
+                    return scrollNotification.metrics.axis ==
+                        Axis.horizontal;
                   },
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -462,6 +468,7 @@ class _TeamsSeasonTableState extends State<TeamsSeasonTable>
                                                 fontSize: fontSize,
                                                 fontWeight: FontWeight.bold,
                                               ),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         );
