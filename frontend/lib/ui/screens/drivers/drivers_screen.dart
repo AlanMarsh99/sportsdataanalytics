@@ -154,60 +154,72 @@ class _DriversScreenState extends State<DriversScreen> {
                                 ],
                               ),
                         const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            FutureBuilder<List<dynamic>>(
-                              future: _driversNamesFuture,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                  ); // Show loading while fetching
-                                } else if (snapshot.hasError) {
-                                  return const Text(
+
+                        FutureBuilder<List<dynamic>>(
+                          future: _driversNamesFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ); // Show loading while fetching
+                            } else if (snapshot.hasError) {
+                              return Row(
+                                children: [
+                                  Text(
                                     'Error: Failed to load drivers',
                                     style: TextStyle(color: Colors.white),
-                                  ); // Error handling
-                                } else if (snapshot.hasData) {
-                                  List<dynamic> driversList = snapshot.data!;
-                                  if (driversList.isNotEmpty) {
-                                    driversNames = [];
-                                    driversMap = {};
-                                    for (var driver in driversList) {
-                                      driversMap[driver['driver_name']] =
-                                          driver['driver_id'];
-                                      driversNames.add(driver['driver_name']);
-                                    }
-
-                                    if (!driversNames
-                                        .contains(selectedDriver)) {
-                                      selectedDriver = driversNames[0];
-                                    }
-                                  }
-
-                                  return _buildDriverDropdown();
+                                  ),
+                                  const SizedBox(width: 20),
+                                  _buildYearDropdown()
+                                ],
+                              ); // Error handling
+                            } else if (snapshot.hasData) {
+                              List<dynamic> driversList = snapshot.data!;
+                              if (driversList.isNotEmpty) {
+                                driversNames = [];
+                                driversMap = {};
+                                for (var driver in driversList) {
+                                  driversMap[driver['driver_name']] =
+                                      driver['driver_id'];
+                                  driversNames.add(driver['driver_name']);
                                 }
-                                return Container();
-                              },
-                            ),
-                            SizedBox(width: 20),
-                            _buildYearDropdown()
-                          ],
+
+                                if (!driversNames.contains(selectedDriver)) {
+                                  selectedDriver = driversNames[0];
+                                }
+                              }
+
+                              return Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      _buildDriverDropdown(),
+                                      const SizedBox(width: 20),
+                                      _buildYearDropdown()
+                                    ],
+                                  ),
+                                  if (selectedDriver != null)
+                                    const SizedBox(height: 20),
+                                  if (selectedDriver != null)
+                                    Center(
+                                      child: CircleAvatar(
+                                        radius: 80,
+                                        backgroundColor: Colors.white,
+                                        backgroundImage: AssetImage(
+                                          getDriverImagePath(selectedDriver!),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            }
+                            return Container();
+                          },
                         ),
-                        if (selectedDriver != null) const SizedBox(height: 20),
-                        if (selectedDriver != null)
-                          Center(
-                            child: CircleAvatar(
-                              radius: 80,
-                              backgroundColor: Colors.white,
-                              backgroundImage: AssetImage(
-                                getDriverImagePath(selectedDriver!),
-                              ),
-                            ),
-                          ),
+
                         const SizedBox(height: 20),
                         const Text(
                           'CAREER STATS',
@@ -455,72 +467,85 @@ class _DriversScreenState extends State<DriversScreen> {
                                 ),
                               ),
                         const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            FutureBuilder<List<dynamic>>(
-                              future: _driversNamesFuture,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                    ),
-                                  ); // Show loading while fetching
-                                } else if (snapshot.hasError) {
-                                  return const Text(
-                                    'Error: Failed to load drivers',
+                        FutureBuilder<List<dynamic>>(
+                          future: _driversNamesFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ); // Show loading while fetching
+                            } else if (snapshot.hasError) {
+                              return Row(
+                                children: [
+                                  const Text(
+                                    'Error: Failed to load drivers. Try another year.',
                                     style: TextStyle(color: Colors.white),
-                                  ); // Error handling
-                                } else if (snapshot.hasData) {
-                                  List<dynamic> driversList = snapshot.data!;
+                                  ),
+                                  const SizedBox(
+                                    width: 20,
+                                  ),
+                                  _buildYearDropdown()
+                                ],
+                              );
+                            } else if (snapshot.hasData) {
+                              List<dynamic> driversList = snapshot.data!;
 
-                                  if (driversList.isNotEmpty) {
-                                    driversNames = [];
-                                    driversMap = {};
-                                    for (var driver in driversList) {
-                                      driversMap[driver['driver_name']] =
-                                          driver['driver_id'];
-                                      driversNames.add(driver['driver_name']);
-                                    }
-
-                                    if (!driversNames
-                                        .contains(selectedDriver)) {
-                                      selectedDriver = driversNames[0];
-                                    }
-                                  }
-
-                                  return _buildDriverDropdown();
+                              if (driversList.isNotEmpty) {
+                                driversNames = [];
+                                driversMap = {};
+                                for (var driver in driversList) {
+                                  driversMap[driver['driver_name']] =
+                                      driver['driver_id'];
+                                  driversNames.add(driver['driver_name']);
                                 }
-                                return Container();
-                              },
-                            ),
-                            SizedBox(width: 20),
-                            _buildYearDropdown()
-                          ],
+
+                                if (!driversNames.contains(selectedDriver)) {
+                                  selectedDriver = driversNames[0];
+                                }
+                              }
+
+                              return Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      _buildDriverDropdown(),
+                                      const SizedBox(width: 20),
+                                      _buildYearDropdown()
+                                    ],
+                                  ),
+                                  if (selectedDriver != null)
+                                    const SizedBox(height: 20),
+                                  if (selectedDriver != null)
+                                    Center(
+                                      child: Text(
+                                        selectedDriver!,
+                                        style: const TextStyle(
+                                            fontSize: 21,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  if (selectedDriver != null)
+                                    const SizedBox(height: 20),
+                                  if (selectedDriver != null)
+                                    Center(
+                                      child: CircleAvatar(
+                                        radius: 120,
+                                        backgroundColor: Colors.white,
+                                        backgroundImage: AssetImage(
+                                          getDriverImagePath(selectedDriver!),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            }
+                            return Container();
+                          },
                         ),
-                        if (selectedDriver != null) const SizedBox(height: 20),
-                        if (selectedDriver != null)
-                          Center(
-                            child: Text(
-                              selectedDriver!,
-                              style: const TextStyle(
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                          ),
-                        if (selectedDriver != null) const SizedBox(height: 20),
-                        if (selectedDriver != null)
-                          Center(
-                            child: CircleAvatar(
-                              radius: 120,
-                              backgroundColor: Colors.white,
-                              backgroundImage: AssetImage(
-                                getDriverImagePath(selectedDriver!),
-                              ),
-                            ),
-                          ),
                         const SizedBox(height: 20),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -604,7 +629,7 @@ class _DriversScreenState extends State<DriversScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 30),
+                            const SizedBox(width: 30),
                             Flexible(
                               flex: 3,
                               child: Column(
@@ -797,6 +822,8 @@ class _DriversScreenState extends State<DriversScreen> {
 
           _driversNamesFuture.then((drivers) {
             if (drivers.isNotEmpty) {
+              driversMap = {};
+              driversNames = [];
               setState(() {
                 for (var driver in drivers) {
                   driversMap[driver['driver_name']] = driver['driver_id'];
@@ -862,7 +889,7 @@ class _DriversScreenState extends State<DriversScreen> {
             selectedDriver = newValue;
             driverChanged = true;
             _driversStatsFuture = APIService().getDriverStats(
-                driversMap[selectedDriver], DateTime.now().year);
+                driversMap[selectedDriver], int.parse(selectedSeason));
           });
         },
       ),
@@ -899,7 +926,7 @@ class _DriversScreenState extends State<DriversScreen> {
               fit: FlexFit.tight,
               child: _buildStatCard(wins, races, 'WINS', true),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
@@ -917,7 +944,7 @@ class _DriversScreenState extends State<DriversScreen> {
               child:
                   _buildStatCard(championships, null, 'CHAMPIONSHIPS', false),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Flexible(
               flex: 2,
               fit: FlexFit.tight,
