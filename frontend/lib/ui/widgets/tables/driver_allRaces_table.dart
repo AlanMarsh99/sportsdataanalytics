@@ -219,7 +219,7 @@ class _DriverAllRacesTableScreenState extends State<DriverAllRacesTableScreen> {
                     onTap: () async {
                       // Navigate to the race details screen
                       int year = int.parse(race['year']);
-                      int round = int.parse(race['round']);
+                      int round = int.parse(race['race_id']);
 
                       Map<String, dynamic> json =
                           await APIService().getRaceInfo(year, round);
