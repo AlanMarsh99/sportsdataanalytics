@@ -1,4 +1,4 @@
-# F1 Sports Data Analytics Tool
+# F1 Sports Data Analytics Tool and Game
 
 ## Overview
 
@@ -10,15 +10,14 @@ This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing
 - **Visualization**: Interactive charts and graphs for race results, driver performance, and historical trends.
 - **Predictive Analytics**: Machine learning models to forecast outcomes of future races based on historical data.
 - **User Experience**: Designed to be intuitive for F1 fans, teams, broadcasters and journalists.
-- **Gamification**: Make predictions of the upcoming race and compete with your friends to win points, avatars and badges to be the first of the leaderboard!
+- **Gamification**: Make predictions of the upcoming race and compete with your friends to win points and avatars to be the first of the leaderboard! Game features: prediction game, leagues, leaderbaords, points, levels, avatars, season-long challenges, chats and a steering wheel for navigation.
 
 ## Technology Stack
 
 - **Frontend**: Flutter
 - **Backend**: Flask
 - **Machine Learning**: Python for predictive analytics models
-- **Database**: PostgreSQL and Firebase Cloud Firestore for data storage
-- **Visualization Tools**: To be decided
+- **Database**: Firebase Cloud Firestore for data storage
 - **Version Control**: Git, GitHub for code repository
 
 ## Setup and Installation
@@ -29,7 +28,6 @@ This project is a **Sports Data Analytics Tool** focused on **Formula 1** racing
 - Flutter
 - Python
 - Git
-- PostgreSQL
 
 
 ### Installation Steps
