@@ -67,10 +67,12 @@ class MyDrawer extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       onPressed: () {
-        // Acción al seleccionar el item (cambiar de pantalla)
-        Navigator.pop(context); // Cierra el drawer
         // Aquí puedes agregar lógica para navegar entre pantallas
         nav.updateIndex(value);
+        
+        // Acción al seleccionar el item (cambiar de pantalla)
+        Navigator.pop(context); // Cierra el drawer
+        
       },
     );
   }

@@ -23,7 +23,11 @@ class ChatWidget extends StatefulWidget {
   _ChatWidgetState createState() => _ChatWidgetState();
 }
 
-class _ChatWidgetState extends State<ChatWidget> {
+class _ChatWidgetState extends State<ChatWidget>
+    with AutomaticKeepAliveClientMixin<ChatWidget> {
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController _controller = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -31,18 +35,27 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   @override
   void dispose() {
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
+    if (_focusNode.hasFocus) {
+      FocusScope.of(context).requestFocus(_focusNode);
+    }
     return DashChat(
       currentUser: widget.currentUser,
       messageOptions: MessageOptions(
         currentUserContainerColor: primary,
         showOtherUsersAvatar: true,
         showTime: true,
-        avatarBuilder: (ChatUser user, Function? onPress, Function? onLongPress) {
+        avatarBuilder:
+            (ChatUser user, Function? onPress, Function? onLongPress) {
           return Padding(
             padding: const EdgeInsets.only(right: 5),
             child: CircleAvatar(
@@ -65,7 +78,9 @@ class _ChatWidgetState extends State<ChatWidget> {
           );
         },
       ),
-      inputOptions: const InputOptions(
+      inputOptions: InputOptions(
+        focusNode: _focusNode,
+        textController: _controller,
         sendOnEnter: true,
         alwaysShowSend: true,
         inputTextStyle: TextStyle(
